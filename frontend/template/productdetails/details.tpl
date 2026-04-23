@@ -72,6 +72,7 @@
 {/block}
 
 {block name='productdetails-details-stock' prepend}
+    {math equation="min(100, max(0, x/y*100))" x=$Artikel->fLagerbestand y=$oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_wert') assign="stockPct"}
     <style>
         .lagerbestand-anzeige {
             margin-top: 0px;
@@ -90,11 +91,9 @@
         }
         .fortschritt {
             background-color: {$oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_farbe')};
-            width: {($Artikel->fLagerbestand / $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_wert')) * 100}%;
+            width: {$stockPct}%;
             height: 100%;
         }
-
-
     </style>
         {if ($Artikel->fLagerbestand < $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_wert')) && $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_aktiv')}
             <div class="lagerbestand-anzeige">
