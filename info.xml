@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jtlshopplugin>
+    <Name>Artikeldetails Plus</Name>
+    <Description>Extra Artikeldetails aus dem eigentlichen Template in ein Plugin überführt.</Description>
+    <Author>Oliver Kamps</Author>
+    <URL>https://ollipolli.de</URL>
+    <XMLVersion>102</XMLVersion>
+    <MinShopVersion>5.5.1</MinShopVersion>
+    <MaxShopVersion>5.5.3</MaxShopVersion>
+    <PluginID>artikel_details_plus</PluginID>
+    <Version>0.0.14</Version>
+    <CreateDate>2025-06-12</CreateDate>
+    <Install>
+        <Adminmenu>
+            <Settingslink sort="1">
+                <Name>Fahreigenschaften</Name>
+                <Setting type="text" initialValue="" sort="0" conf="N">
+                    <Name>Allgemein</Name>
+                    <Description>Allgemeine Einstellungen des Plugins</Description>
+                    <ValueName>Spacer1</ValueName>
+                </Setting>
+                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                    <Name>Merkmalwert Anzeige auf Artikeldetailseite aktivieren</Name>
+                    <Description>Aktiviert die Anzeige der Merkmalswerte auf der Artikeldetailseite.</Description>
+                    <ValueName>artikel_details_plus_merkmalwerte_aktiv</ValueName>
+                </Setting>
+                <Setting type="checkbox" initialValue="N" sort="2" conf=">">
+                    <Name>Fahrlevelanzeige aktivieren</Name>
+                    <Description>Aktiviert die Anzeige der Fahrlevel auf der Artikeldetailseite.</Description>
+                    <ValueName>artikel_details_plus_fahrlevel_aktiv</ValueName>
+                </Setting>
+            </Settingslink>
+            <Settingslink sort="2">
+                <Name>Merkmalbilder</Name>
+                <Setting type="text" initialValue="" sort="0" conf="N">
+                    <Name>Allgemein</Name>
+                    <Description>Allgemeine Einstellungen der Merkmalsbilder</Description>
+                    <ValueName>Spacer2</ValueName>
+                </Setting>
+                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                    <Name>Merkmalbilder Anzeige aktivieren</Name>
+                    <Description>Aktiviert die Anzeige der Merkmalsbilder im Artikeldetail.</Description>
+                    <ValueName>artikel_details_plus_merkmalbilder_aktiv</ValueName>
+                </Setting>
+                <Setting type="selectbox" initialValue="1" sort="2" conf="Y" multiple="Y">
+                    <Name>Merkmalwerte mit Bildern</Name>
+                    <Description>Wählen Sie die Merkmale aus, die auf der Artikeldetailseite mit Bildern angezeigt werden sollen.</Description>
+                    <ValueName>artikel_details_plus_merkmalwerte</ValueName>
+                    <OptionsSource>
+                        <File>merkmalwerte.php</File>
+                    </OptionsSource>
+                    <SelectboxOptions>
+                        <Option value="0" sort="1">Leider fehlgeschlagen</Option>
+                    </SelectboxOptions>
+                </Setting>
+            </Settingslink>
+            <Settingslink sort="3">
+                <Name>Countdown</Name>
+                <Setting type="text" initialValue="" sort="0" conf="N">
+                    <Name>Allgemein</Name>
+                    <Description>Allgemeine Einstellungen des Countdowns</Description>
+                    <ValueName>Spacer3</ValueName>
+                </Setting>
+                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                    <Name>Countdown aktivieren</Name>
+                    <Description>Aktiviert die Anzeige des Countdowns auf der Artikeldetailseite.</Description>
+                    <ValueName>artikel_details_plus_countdown_aktiv</ValueName>
+                </Setting>
+                <Setting type="date" sort="3" conf="Y">
+                    <Name>Datum</Name>
+                    <Description>Lege das Datum fest.</Description>
+                    <ValueName>artikel_details_plus_countdown_date</ValueName>
+                </Setting>
+                <Setting type="time" sort="4" conf="Y">
+                    <Name>Zeit</Name>
+                    <Description>Lege die Zeit fest.</Description>
+                    <ValueName>artikel_details_plus_countdown_time</ValueName>
+                </Setting>
+            </Settingslink>
+            <Settingslink sort="4">
+                <Name>Lagerbestandsanzeige</Name>
+                <Setting type="text" initialValue="" sort="0" conf="N">
+                    <Name>Allgemein</Name>
+                    <Description>Allgemeine Einstellungen der Lagerbestandsanzeige</Description>
+                    <ValueName>Spacer4</ValueName>
+                </Setting>
+                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                    <Name>Lagerbestandsanzeige aktivieren</Name>
+                    <Description>Aktiviert die Anzeige des Lagerbestands auf der Artikeldetailseite.</Description>
+                    <ValueName>artikel_details_plus_lagerbestand_aktiv</ValueName>
+                </Setting>
+                <Setting type="number" initialValue="10" sort="2" conf="Y">
+                    <Name>Nur bei Lagerbestand unter</Name>
+                    <Description>Aktiviert die Anzeige des Lagerbestands nur, wenn der Lagerbestand unter dem angegebenen Wert liegt.</Description>
+                    <ValueName>artikel_details_plus_lagerbestand_wert</ValueName>
+                </Setting>
+                <Setting type="color" initialValue="#ffa54f" sort="3" conf="Y">
+                    <Name>Farbe der Anzeige</Name>
+                    <Description>Wählen Sie die Farbe für die Lagerbestandsanzeige.</Description>
+                    <ValueName>artikel_details_plus_lagerbestand_farbe</ValueName>
+                </Setting>
+            </Settingslink>
+        </Adminmenu>
+        <Locales>
+            <Variable>
+                <Name>artikel_details_plus_countdown_heading</Name>
+                <Description>Titel des Countdowns</Description>
+                <VariableLocalized iso="GER">Black Weekend Sale</VariableLocalized>
+                <VariableLocalized iso="ENG">Black Weekend Sale</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_form_button</Name>
+                <Description>Button Text für Formular - günstiger gesehen</Description>
+                <VariableLocalized iso="GER">Günstiger gesehen?</VariableLocalized>
+                <VariableLocalized iso="ENG">Seen it cheaper?</VariableLocalized>
+            </Variable>
+        </Locales>
+    </Install>
+
+</jtlshopplugin>
