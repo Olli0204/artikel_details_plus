@@ -11,6 +11,63 @@
     <Version>0.0.14</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
+        <Hooks>
+            <Hook id="1">frontend/hooks/artikel_page.php</Hook>
+        </Hooks>
+        <Emailtemplate>
+            <Template>
+                <Name>Günstiger gesehen Benachrichtigung</Name>
+                <Description>Benachrichtigung wenn ein Kunde einen günstigeren Preis meldet.</Description>
+                <Type>text/html</Type>
+                <ModulId>guenstigergesehen</ModulId>
+                <Active>Y</Active>
+                <AKZ>0</AKZ>
+                <AGB>0</AGB>
+                <WRB>0</WRB>
+                <WRBForm>0</WRBForm>
+                <DSE>0</DSE>
+                <TemplateLanguage iso="GER">
+                    <Subject>Günstiger gesehen: {$oPluginMail->cArtikelName}</Subject>
+                    <ContentHtml><![CDATA[
+<p>Ein Kunde hat einen günstigeren Preis gemeldet.</p>
+<table cellpadding="5">
+    <tr><td><strong>Artikel:</strong></td><td>{$oPluginMail->cArtikelName}</td></tr>
+    <tr><td><strong>E-Mail:</strong></td><td>{$oPluginMail->cEmail}</td></tr>
+    <tr><td><strong>Link:</strong></td><td><a href="{$oPluginMail->cURL}">{$oPluginMail->cURL}</a></td></tr>
+    {if $oPluginMail->cNachricht}
+    <tr><td><strong>Nachricht:</strong></td><td>{$oPluginMail->cNachricht}</td></tr>
+    {/if}
+</table>
+                    ]]></ContentHtml>
+                    <ContentText>Günstiger gesehen: {$oPluginMail->cArtikelName}
+
+Artikel:  {$oPluginMail->cArtikelName}
+E-Mail:   {$oPluginMail->cEmail}
+Link:     {$oPluginMail->cURL}
+{if $oPluginMail->cNachricht}Nachricht: {$oPluginMail->cNachricht}{/if}</ContentText>
+                </TemplateLanguage>
+                <TemplateLanguage iso="ENG">
+                    <Subject>Seen it cheaper: {$oPluginMail->cArtikelName}</Subject>
+                    <ContentHtml><![CDATA[
+<p>A customer has reported a cheaper price.</p>
+<table cellpadding="5">
+    <tr><td><strong>Product:</strong></td><td>{$oPluginMail->cArtikelName}</td></tr>
+    <tr><td><strong>E-Mail:</strong></td><td>{$oPluginMail->cEmail}</td></tr>
+    <tr><td><strong>Link:</strong></td><td><a href="{$oPluginMail->cURL}">{$oPluginMail->cURL}</a></td></tr>
+    {if $oPluginMail->cNachricht}
+    <tr><td><strong>Message:</strong></td><td>{$oPluginMail->cNachricht}</td></tr>
+    {/if}
+</table>
+                    ]]></ContentHtml>
+                    <ContentText>Seen it cheaper: {$oPluginMail->cArtikelName}
+
+Product:  {$oPluginMail->cArtikelName}
+E-Mail:   {$oPluginMail->cEmail}
+Link:     {$oPluginMail->cURL}
+{if $oPluginMail->cNachricht}Message: {$oPluginMail->cNachricht}{/if}</ContentText>
+                </TemplateLanguage>
+            </Template>
+        </Emailtemplate>
         <Adminmenu>
             <Settingslink sort="1">
                 <Name>Fahreigenschaften</Name>
