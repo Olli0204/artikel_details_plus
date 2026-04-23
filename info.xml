@@ -24,7 +24,7 @@
                     <Description>Aktiviert die Anzeige der Merkmalswerte auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_merkmalwerte_aktiv</ValueName>
                 </Setting>
-                <Setting type="checkbox" initialValue="N" sort="2" conf=">">
+                <Setting type="checkbox" initialValue="N" sort="2" conf="Y">
                     <Name>Fahrlevelanzeige aktivieren</Name>
                     <Description>Aktiviert die Anzeige der Fahrlevel auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_fahrlevel_aktiv</ValueName>

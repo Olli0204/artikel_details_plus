@@ -1,3 +1,3 @@
 <?php
-echo("<script>console.log('test');</script>");
+// TODO: Formular-Logik für "Günstiger gesehen?" implementieren
 ?>

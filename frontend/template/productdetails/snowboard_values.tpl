@@ -24,4 +24,3 @@
         </div>
     </div>
 {/if}
-<p>Test</p>

@@ -2,7 +2,7 @@
     {if $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_countdown_aktiv') === 'on' && $Artikel->Preise->Sonderpreis_aktiv}
         <style>
             .countdownbox {
-                width 100%;
+                width: 100%;
                 background-color: rgb(255, 165, 79, 0.3);
                 text-align: center;
                 border: 2px solid #FFA54F;
@@ -38,15 +38,18 @@
                         document.getElementById("minuteid").innerHTML = minutes;
                         document.getElementById("secondid").innerHTML = seconds;
 
-                        if(distance > 0 ){
-                        timer.style.display = "block";
+                        if (distance > 0) {
+                            timer.style.display = "block";
+                        } else {
+                            clearInterval(x);
+                            timer.style.display = "none";
                         }
-                        
+
                     }, 1000);
                 });
         </script> 
 
-        <div id="countdownbox" class="countdownbox"">
+        <div id="countdownbox" class="countdownbox">
             <span style="font-size: 20px;">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_countdown_heading')}</span>
             <table style="display: flex; justify-content: center;">
                 <tr>
