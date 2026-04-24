@@ -11,6 +11,40 @@
     <Version>0.0.14</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
+        <Emailtemplate>
+            <Template>
+                <Name>Günstiger gesehen Benachrichtigung</Name>
+                <Description>Benachrichtigung wenn ein Kunde einen günstigeren Preis meldet.</Description>
+                <Type>text/html</Type>
+                <ModulId>guenstigergesehen</ModulId>
+                <Active>Y</Active>
+                <AKZ>0</AKZ>
+                <AGB>0</AGB>
+                <WRB>0</WRB>
+                <WRBForm>0</WRBForm>
+                <DSE>0</DSE>
+                <TemplateLanguage iso="GER">
+                    <Subject>Günstiger gesehen: {$oPluginMail->cArtikelName}</Subject>
+                    <ContentHtml><![CDATA[
+<p>Ein Kunde hat einen günstigeren Preis gemeldet.</p>
+<table cellpadding="5">
+    <tr><td><strong>Artikel:</strong></td><td>{$oPluginMail->cArtikelName}</td></tr>
+    <tr><td><strong>E-Mail:</strong></td><td>{$oPluginMail->cEmail}</td></tr>
+    <tr><td><strong>Link:</strong></td><td><a href="{$oPluginMail->cURL}">{$oPluginMail->cURL}</a></td></tr>
+    {if $oPluginMail->cNachricht}
+    <tr><td><strong>Nachricht:</strong></td><td>{$oPluginMail->cNachricht}</td></tr>
+    {/if}
+</table>
+                    ]]></ContentHtml>
+                    <ContentText>Günstiger gesehen: {$oPluginMail->cArtikelName}
+
+Artikel:  {$oPluginMail->cArtikelName}
+E-Mail:   {$oPluginMail->cEmail}
+Link:     {$oPluginMail->cURL}
+{if $oPluginMail->cNachricht}Nachricht: {$oPluginMail->cNachricht}{/if}</ContentText>
+                </TemplateLanguage>
+            </Template>
+        </Emailtemplate>
         <Adminmenu>
             <Settingslink sort="1">
                 <Name>Fahreigenschaften</Name>
@@ -113,6 +147,60 @@
                 <Description>Button Text für Formular - günstiger gesehen</Description>
                 <VariableLocalized iso="GER">Günstiger gesehen?</VariableLocalized>
                 <VariableLocalized iso="ENG">Seen it cheaper?</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_title</Name>
+                <Description>Titel des Modals "Günstiger gesehen"</Description>
+                <VariableLocalized iso="GER">Günstiger gesehen?</VariableLocalized>
+                <VariableLocalized iso="ENG">Seen it cheaper?</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_success</Name>
+                <Description>Erfolgsmeldung nach Formular-Absenden</Description>
+                <VariableLocalized iso="GER">Vielen Dank! Wir haben Ihren Preishinweis erhalten und werden ihn prüfen.</VariableLocalized>
+                <VariableLocalized iso="ENG">Thank you! We have received your price tip and will review it.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_err_validation</Name>
+                <Description>Fehlermeldung bei ungültigen Formularfeldern</Description>
+                <VariableLocalized iso="GER">Bitte füllen Sie E-Mail-Adresse und Link korrekt aus.</VariableLocalized>
+                <VariableLocalized iso="ENG">Please enter a valid email address and link.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_err_csrf</Name>
+                <Description>Fehlermeldung bei ungültigem Sicherheitstoken</Description>
+                <VariableLocalized iso="GER">Ungültige Anfrage. Bitte laden Sie die Seite neu und versuchen Sie es erneut.</VariableLocalized>
+                <VariableLocalized iso="ENG">Invalid request. Please reload the page and try again.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_err_general</Name>
+                <Description>Allgemeine Fehlermeldung beim Formular</Description>
+                <VariableLocalized iso="GER">Beim Senden ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.</VariableLocalized>
+                <VariableLocalized iso="ENG">An error occurred while sending. Please try again later.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_label_email</Name>
+                <Description>Label für das E-Mail-Feld</Description>
+                <VariableLocalized iso="GER">Ihre E-Mail-Adresse *</VariableLocalized>
+                <VariableLocalized iso="ENG">Your email address *</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_label_url</Name>
+                <Description>Label für das URL-Feld</Description>
+                <VariableLocalized iso="GER">Link zum günstigeren Angebot *</VariableLocalized>
+                <VariableLocalized iso="ENG">Link to the cheaper offer *</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_label_message</Name>
+                <Description>Label für das Nachrichtenfeld</Description>
+                <VariableLocalized iso="GER">Nachricht (optional)</VariableLocalized>
+                <VariableLocalized iso="ENG">Message (optional)</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_submit</Name>
+                <Description>Text des Absenden-Buttons im "Günstiger gesehen"-Formular</Description>
+                <VariableLocalized iso="GER">Abschicken</VariableLocalized>
+                <VariableLocalized iso="ENG">Submit</VariableLocalized>
             </Variable>
         </Locales>
     </Install>
