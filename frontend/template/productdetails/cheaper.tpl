@@ -66,7 +66,7 @@
                 {row}
                     {col md="auto" class="ml-auto-util"}
                         {button type="submit" variant="primary" block=true}
-                            {lang key='sendQuestion' section='productDetails'}
+                            {$l->getTranslation('artikel_details_plus_cheaper_submit')}
                         {/button}
                     {/col}
                 {/row}

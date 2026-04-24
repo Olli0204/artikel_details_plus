@@ -196,6 +196,12 @@ Link:     {$oPluginMail->cURL}
                 <VariableLocalized iso="GER">Nachricht (optional)</VariableLocalized>
                 <VariableLocalized iso="ENG">Message (optional)</VariableLocalized>
             </Variable>
+            <Variable>
+                <Name>artikel_details_plus_cheaper_submit</Name>
+                <Description>Text des Absenden-Buttons im "Günstiger gesehen"-Formular</Description>
+                <VariableLocalized iso="GER">Abschicken</VariableLocalized>
+                <VariableLocalized iso="ENG">Submit</VariableLocalized>
+            </Variable>
         </Locales>
     </Install>
 
