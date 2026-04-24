@@ -60,12 +60,12 @@
     isset($ecm_sb_gewbis)}
 <p class="ecm-gewicht-title">
     {if $lang eq "eng"}
-    Suggested Wheight:
+    Suggested Weight:
     {else}
     Empfohlenes Körpergewicht:
     {/if}
 </p>
-<div class="ecm-gewicht-list" style="" data-toggle="tooltip" data-placement="bottom" data-html="true" title="{if $lang eq "eng"} Suggested Wheight: {else}Empfohlenes Körpergewicht: {/if}<br>{$ecm_sb_gewab} - {$ecm_sb_gewbis} kg">
+<div class="ecm-gewicht-list" style="" data-toggle="tooltip" data-placement="bottom" data-html="true" title="{if $lang eq "eng"} Suggested Weight: {else}Empfohlenes Körpergewicht: {/if}<br>{$ecm_sb_gewab} - {$ecm_sb_gewbis} kg">
     {if !$isMobile}
         {assign "ecm_sb_gewlist" ["+", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90", "95", "100", "+"]} {*this list needs to have an + at first and last element*}
     {else}
