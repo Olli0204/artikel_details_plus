@@ -1,8 +1,10 @@
 {block name='productdetails-cheaper'}
+    {assign "l" $oPlugin_artikel_details_plus->getLocalization()}
+
     {if $smarty.get.adp_cheaper eq 'success' && $smarty.get.adp_ka == $Artikel->kArtikel}
 
         <div class="alert alert-success" role="alert">
-            <strong>Vielen Dank!</strong> Wir haben Ihren Preishinweis erhalten und werden ihn prüfen.
+            {$l->getTranslation('artikel_details_plus_cheaper_success')}
         </div>
         <script>
             $(document).ready(function () {
@@ -15,11 +17,11 @@
         {if $smarty.get.adp_cheaper eq 'error' && $smarty.get.adp_ka == $Artikel->kArtikel}
             <div class="alert alert-danger" role="alert">
                 {if $smarty.get.adp_err eq 'validation'}
-                    Bitte füllen Sie E-Mail-Adresse und Link korrekt aus.
+                    {$l->getTranslation('artikel_details_plus_cheaper_err_validation')}
                 {elseif $smarty.get.adp_err eq 'csrf'}
-                    Ungültige Anfrage. Bitte laden Sie die Seite neu und versuchen Sie es erneut.
+                    {$l->getTranslation('artikel_details_plus_cheaper_err_csrf')}
                 {else}
-                    Beim Senden ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.
+                    {$l->getTranslation('artikel_details_plus_cheaper_err_general')}
                 {/if}
             </div>
             <script>
@@ -35,7 +37,8 @@
                 {input type="hidden" name="adp_artikel_id"   value=$Artikel->kArtikel}
                 {input type="hidden" name="adp_artikel_name" value=$Artikel->cName}
 
-                {formgroup label-for="adp_email_{$Artikel->kArtikel}" label="Ihre E-Mail-Adresse *"}
+                {formgroup label-for="adp_email_{$Artikel->kArtikel}"
+                           label=$l->getTranslation('artikel_details_plus_cheaper_label_email')}
                     {input type="email"
                            name="adp_email"
                            id="adp_email_{$Artikel->kArtikel}"
@@ -43,7 +46,8 @@
                            placeholder=" "}
                 {/formgroup}
 
-                {formgroup label-for="adp_url_{$Artikel->kArtikel}" label="Link zum günstigeren Angebot *"}
+                {formgroup label-for="adp_url_{$Artikel->kArtikel}"
+                           label=$l->getTranslation('artikel_details_plus_cheaper_label_url')}
                     {input type="url"
                            name="adp_url"
                            id="adp_url_{$Artikel->kArtikel}"
@@ -51,7 +55,8 @@
                            placeholder="https://"}
                 {/formgroup}
 
-                {formgroup label-for="adp_nachricht_{$Artikel->kArtikel}" label="Nachricht (optional)"}
+                {formgroup label-for="adp_nachricht_{$Artikel->kArtikel}"
+                           label=$l->getTranslation('artikel_details_plus_cheaper_label_message')}
                     {textarea name="adp_nachricht"
                               id="adp_nachricht_{$Artikel->kArtikel}"
                               rows="3"
