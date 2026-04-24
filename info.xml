@@ -11,9 +11,6 @@
     <Version>0.0.14</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
-        <Hooks>
-            <Hook id="1">frontend/hooks/artikel_page.php</Hook>
-        </Hooks>
         <Emailtemplate>
             <Template>
                 <Name>Günstiger gesehen Benachrichtigung</Name>
