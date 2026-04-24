@@ -134,6 +134,19 @@ Link:     {$oPluginMail->cURL}
                     <ValueName>artikel_details_plus_lagerbestand_farbe</ValueName>
                 </Setting>
             </Settingslink>
+            <Settingslink sort="5">
+                <Name>Günstiger gesehen</Name>
+                <Setting type="text" initialValue="" sort="0" conf="N">
+                    <Name>Allgemein</Name>
+                    <Description>Einstellungen für das "Günstiger gesehen?"-Formular</Description>
+                    <ValueName>Spacer5</ValueName>
+                </Setting>
+                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                    <Name>Formular aktivieren</Name>
+                    <Description>Aktiviert den "Günstiger gesehen?"-Button und das Formular auf der Artikeldetailseite.</Description>
+                    <ValueName>artikel_details_plus_cheaper_aktiv</ValueName>
+                </Setting>
+            </Settingslink>
         </Adminmenu>
         <Locales>
             <Variable>

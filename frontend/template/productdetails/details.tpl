@@ -105,6 +105,7 @@
                 </div>
             </div>
         {/if}
+        {if $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_cheaper_aktiv') === 'on'}
         <div class="col col-12">
             <div class="row" style="border-top: 1px solid #ebebeb; margin-right: 0px; margin-left: 0px; justify-content: right;" >
                 <button type="button" class="btn btn-link question" id="z{$Artikel->kArtikel}" title="Günstiger gesehen" data-toggle="modal" data-target="#cheaper-{$Artikel->kArtikel}" style="margin-right: 0px; padding-right: 0px;">
@@ -113,4 +114,5 @@
                 </button>
             </div>
         </div>
+        {/if}
     {/block}
