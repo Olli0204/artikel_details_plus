@@ -28,11 +28,15 @@ class Bootstrap extends Bootstrapper
         $kArtikel = (int)($_POST['adp_artikel_id'] ?? 0);
 
         // PRG: saubere Redirect-URL ohne eigene GET-Params aufbauen
-        $uri = $_SERVER['REQUEST_URI'] ?? '/';
-        $uri = preg_replace('/([?&])adp_cheaper=[^&]*/', '', $uri);
-        $uri = preg_replace('/([?&])adp_(ka|err)=[^&]*/', '', $uri);
-        $uri = rtrim($uri, '?&');
-        $sep = str_contains($uri, '?') ? '&' : '?';
+        $parts = parse_url($_SERVER['REQUEST_URI'] ?? '/');
+        $path  = $parts['path'] ?? '/';
+        $query = [];
+        if (!empty($parts['query'])) {
+            parse_str($parts['query'], $query);
+            unset($query['adp_cheaper'], $query['adp_err'], $query['adp_ka']);
+        }
+        $uri = $path . ($query ? '?' . http_build_query($query) : '');
+        $sep = $query ? '&' : '?';
 
         $redirectError = function (string $code) use ($uri, $sep, $kArtikel): void {
             header('Location: ' . $uri . $sep . 'adp_cheaper=error&adp_err=' . $code . '&adp_ka=' . $kArtikel, true, 303);

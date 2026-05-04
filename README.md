@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.1.1
+**Version:** 0.1.2
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.7.0
 **Voraussetzung:** PHP 8.0+
 
@@ -150,7 +150,7 @@ artikel_details_plus/
 │   │   ├── details.tpl                    # Countdown, Lagerbestand, Cheaper-Button
 │   │   ├── tabs.tpl                       # Pentagon/Gewicht/Fahrlevel im Beschreibungs-Tab
 │   │   ├── svg_attributes.tpl             # Pentagon-SVG + Gewicht/Fahrlevel-Logik
-│   │   ├── snowboard_values.tpl           # Snowboard-Shape-Visualisierung (dormant)
+│   │   ├── snowboard_values.tpl           # Snowboard-Spezifikationsliste (Form/Shape/Waist/Nose/Tail)
 │   │   ├── popups.tpl                     # Modal-Wrapper
 │   │   └── cheaper.tpl                    # Formular-Markup
 │   └── productlist/
@@ -160,12 +160,17 @@ artikel_details_plus/
 └── README.md
 ```
 
-### Hinweis zu `snowboard_values.tpl`
-Das Template rendert `<div class="c-snoboard-viz">` mit Daten-Attributen für Shape, Waist, Nose, Tail — der zugehörige JavaScript-/CSS-Code ist aktuell **nicht im Plugin enthalten**. Die Visualisierung ist daher dormant und wird erst aktiv, wenn ein passendes JS/CSS aus dem Theme oder einem weiteren Plugin geladen wird.
+### Snowboard-Spezifikationsliste
+`snowboard_values.tpl` rendert eine `<ul class="adp-snowboard-specs">` mit Form / Shape / Waist / Nose / Tail (in mm), sobald alle fünf Funktionsattribute am Artikel gesetzt sind. Reine Textausgabe — Styling kann frei im Theme vorgenommen werden.
 
 ---
 
 ## Versionsverlauf
+
+### 0.1.2 (2026-05-04)
+- Cleanup: ungenutzten `cheaper.php`-Stub gelöscht
+- Cleanup: `snowboard_values.tpl` auf reine Spezifikationsliste reduziert (vorher leerer Canvas-Container ohne JS)
+- Robustness: Redirect-URL-Bereinigung im „Günstiger gesehen"-Handler nutzt jetzt `parse_url`/`http_build_query` statt fragiler Regex
 
 ### 0.1.1 (2026-05-04)
 - Fix: Checkbox-Einstellungen durch Selectbox (Ja/Nein) ersetzt — beheben Bug, der das Deaktivieren verhindert hat
