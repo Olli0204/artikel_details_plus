@@ -1,4 +1,4 @@
-{if $oPlugin_artikel_details_plus->getConfig()->getValue("artikel_details_plus_merkmalwerte_aktiv")}
+{if $oPlugin_artikel_details_plus->getConfig()->getValue("artikel_details_plus_merkmalwerte_aktiv") === 'Y'}
 
 {capture name="adp_merkmal_styles"}
 <style>

@@ -97,7 +97,7 @@
     </style>
 {/if}
 
-{if $oPlugin_artikel_details_plus->getConfig()->getValue("artikel_details_plus_fahrlevel_aktiv")}
+{if $oPlugin_artikel_details_plus->getConfig()->getValue("artikel_details_plus_fahrlevel_aktiv") === 'Y'}
     {if isset($Artikel->FunktionsAttribute.fahrlevel_ab)}{assign "ecm_sb_fahab" $Artikel->FunktionsAttribute.fahrlevel_ab}{elseif isset($Artikel->VaterFunktionsAttribute.fahrlevel_ab)}{assign "ecm_sb_fahab" $Artikel->VaterFunktionsAttribute.fahrlevel_ab}{/if}
     {if isset($Artikel->FunktionsAttribute.fahrlevel_bis)}{assign "ecm_sb_fahbis" $Artikel->FunktionsAttribute.fahrlevel_bis}{elseif isset($Artikel->VaterFunktionsAttribute.fahrlevel_bis)}{assign "ecm_sb_fahbis" $Artikel->VaterFunktionsAttribute.fahrlevel_bis}{/if}
 

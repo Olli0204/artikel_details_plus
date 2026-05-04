@@ -1,5 +1,5 @@
 {block name="productlist-index-include-price" append}
-    {if $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_merkmalbilder_aktiv')}
+    {if $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_merkmalbilder_aktiv') === 'Y'}
         <ul style="padding: 0px; list-style-type: none; display:flex; justify-content: center;">
             {foreach from=$oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_merkmalwerte') item=featureNumber}
                 {if isset ($Artikel->oMerkmale_arr.{$featureNumber})}

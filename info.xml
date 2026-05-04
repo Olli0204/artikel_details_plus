@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.7.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -53,15 +53,23 @@ Link:     {$oPluginMail->cURL}
                     <Description>Allgemeine Einstellungen des Plugins</Description>
                     <ValueName>Spacer1</ValueName>
                 </Setting>
-                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
                     <Name>Merkmalwert Anzeige auf Artikeldetailseite aktivieren</Name>
                     <Description>Aktiviert die Anzeige der Merkmalswerte auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_merkmalwerte_aktiv</ValueName>
+                    <SelectboxOptions>
+                        <Option value="Y" sort="0">Ja</Option>
+                        <Option value="N" sort="1">Nein</Option>
+                    </SelectboxOptions>
                 </Setting>
-                <Setting type="checkbox" initialValue="N" sort="2" conf="Y">
+                <Setting type="selectbox" initialValue="N" sort="2" conf="Y">
                     <Name>Fahrlevelanzeige aktivieren</Name>
                     <Description>Aktiviert die Anzeige der Fahrlevel auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_fahrlevel_aktiv</ValueName>
+                    <SelectboxOptions>
+                        <Option value="Y" sort="0">Ja</Option>
+                        <Option value="N" sort="1">Nein</Option>
+                    </SelectboxOptions>
                 </Setting>
             </Settingslink>
             <Settingslink sort="2">
@@ -71,10 +79,14 @@ Link:     {$oPluginMail->cURL}
                     <Description>Allgemeine Einstellungen der Merkmalsbilder</Description>
                     <ValueName>Spacer2</ValueName>
                 </Setting>
-                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
                     <Name>Merkmalbilder Anzeige aktivieren</Name>
                     <Description>Aktiviert die Anzeige der Merkmalsbilder im Artikeldetail.</Description>
                     <ValueName>artikel_details_plus_merkmalbilder_aktiv</ValueName>
+                    <SelectboxOptions>
+                        <Option value="Y" sort="0">Ja</Option>
+                        <Option value="N" sort="1">Nein</Option>
+                    </SelectboxOptions>
                 </Setting>
                 <Setting type="selectbox" initialValue="1" sort="2" conf="Y" multiple="Y">
                     <Name>Merkmalwerte mit Bildern</Name>
@@ -95,10 +107,14 @@ Link:     {$oPluginMail->cURL}
                     <Description>Allgemeine Einstellungen des Countdowns</Description>
                     <ValueName>Spacer3</ValueName>
                 </Setting>
-                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
                     <Name>Countdown aktivieren</Name>
                     <Description>Aktiviert die Anzeige des Countdowns auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_countdown_aktiv</ValueName>
+                    <SelectboxOptions>
+                        <Option value="Y" sort="0">Ja</Option>
+                        <Option value="N" sort="1">Nein</Option>
+                    </SelectboxOptions>
                 </Setting>
                 <Setting type="date" sort="3" conf="Y">
                     <Name>Datum</Name>
@@ -118,10 +134,14 @@ Link:     {$oPluginMail->cURL}
                     <Description>Allgemeine Einstellungen der Lagerbestandsanzeige</Description>
                     <ValueName>Spacer4</ValueName>
                 </Setting>
-                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
                     <Name>Lagerbestandsanzeige aktivieren</Name>
                     <Description>Aktiviert die Anzeige des Lagerbestands auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_lagerbestand_aktiv</ValueName>
+                    <SelectboxOptions>
+                        <Option value="Y" sort="0">Ja</Option>
+                        <Option value="N" sort="1">Nein</Option>
+                    </SelectboxOptions>
                 </Setting>
                 <Setting type="number" initialValue="10" sort="2" conf="Y">
                     <Name>Nur bei Lagerbestand unter</Name>
@@ -141,10 +161,14 @@ Link:     {$oPluginMail->cURL}
                     <Description>Einstellungen für das "Günstiger gesehen?"-Formular</Description>
                     <ValueName>Spacer5</ValueName>
                 </Setting>
-                <Setting type="checkbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
                     <Name>Formular aktivieren</Name>
                     <Description>Aktiviert den "Günstiger gesehen?"-Button und das Formular auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_cheaper_aktiv</ValueName>
+                    <SelectboxOptions>
+                        <Option value="Y" sort="0">Ja</Option>
+                        <Option value="N" sort="1">Nein</Option>
+                    </SelectboxOptions>
                 </Setting>
             </Settingslink>
         </Adminmenu>
