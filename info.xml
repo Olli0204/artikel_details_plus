@@ -6,9 +6,9 @@
     <URL>https://ollipolli.de</URL>
     <XMLVersion>102</XMLVersion>
     <MinShopVersion>5.5.1</MinShopVersion>
-    <MaxShopVersion>5.7.0</MaxShopVersion>
+    <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.1.2</Version>
+    <Version>0.2.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -66,6 +66,24 @@ Link:     {$oPluginMail->cURL}
                     <Name>Fahrlevelanzeige aktivieren</Name>
                     <Description>Aktiviert die Anzeige der Fahrlevel auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_fahrlevel_aktiv</ValueName>
+                    <SelectboxOptions>
+                        <Option value="Y" sort="0">Ja</Option>
+                        <Option value="N" sort="1">Nein</Option>
+                    </SelectboxOptions>
+                </Setting>
+                <Setting type="selectbox" initialValue="Y" sort="3" conf="Y">
+                    <Name>Fahreigenschaften-Diagramm anzeigen</Name>
+                    <Description>Zeigt das Diagramm der Fahreigenschaften (Carving, Jib, Powder, All-Mountain, Jump) im Beschreibungs-Tab. Liest die Funktionsattribute carving, jib, powder, all_mountain und jump (0 bis 10), ersatzweise vom Vaterartikel.</Description>
+                    <ValueName>artikel_details_plus_specs_characteristics_aktiv</ValueName>
+                    <SelectboxOptions>
+                        <Option value="Y" sort="0">Ja</Option>
+                        <Option value="N" sort="1">Nein</Option>
+                    </SelectboxOptions>
+                </Setting>
+                <Setting type="selectbox" initialValue="Y" sort="4" conf="Y">
+                    <Name>Dimensionen anzeigen</Name>
+                    <Description>Zeigt Form, Shape, Waist, Nose und Tail als Tabelle mit Board-Skizze im Beschreibungs-Tab. Liest die gleichnamigen Funktionsattribute (Breiten in mm), ersatzweise vom Vaterartikel.</Description>
+                    <ValueName>artikel_details_plus_specs_dimensions_aktiv</ValueName>
                     <SelectboxOptions>
                         <Option value="Y" sort="0">Ja</Option>
                         <Option value="N" sort="1">Nein</Option>
@@ -173,6 +191,18 @@ Link:     {$oPluginMail->cURL}
             </Settingslink>
         </Adminmenu>
         <Locales>
+            <Variable>
+                <Name>artikel_details_plus_specs_heading_characteristics</Name>
+                <Description>Überschrift des Fahreigenschaften-Diagramms</Description>
+                <VariableLocalized iso="GER">Fahreigenschaften</VariableLocalized>
+                <VariableLocalized iso="ENG">Ride Characteristics</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_specs_heading_dimensions</Name>
+                <Description>Überschrift der Dimensionen-Darstellung</Description>
+                <VariableLocalized iso="GER">Dimensionen</VariableLocalized>
+                <VariableLocalized iso="ENG">Dimensions</VariableLocalized>
+            </Variable>
             <Variable>
                 <Name>artikel_details_plus_countdown_heading</Name>
                 <Description>Titel des Countdowns</Description>
