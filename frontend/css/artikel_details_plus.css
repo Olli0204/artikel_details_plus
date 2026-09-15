@@ -1,0 +1,59 @@
+/* artikel_details_plus – Snowboard-Specs (Fahreigenschaften + Dimensionen) */
+.adp-specs {
+    margin: 20px auto;
+    max-width: 640px;
+}
+.adp-specs__heading {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+    margin: 0 0 12px;
+}
+.adp-board {
+    margin: 0 auto 12px;
+}
+.adp-board__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-width: 600px;
+    margin: 0 auto;
+}
+.adp-board__outline {
+    fill: var(--primary, #FFA54F);
+    fill-opacity: 0.25;
+    stroke: var(--primary, #FFA54F);
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+.adp-board__measure {
+    stroke: #333;
+    stroke-width: 1;
+    stroke-dasharray: 4 3;
+}
+.adp-board__tick {
+    stroke: #333;
+    stroke-width: 1.5;
+}
+.adp-board__label {
+    fill: #333;
+    font-size: 15px;
+    font-weight: 600;
+}
+.adp-specs__table {
+    width: auto;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+.adp-specs__table th,
+.adp-specs__table td {
+    padding: 4px 14px;
+    border-bottom: 1px solid #ebebeb;
+    text-align: left;
+}
+.adp-specs__table th {
+    font-weight: 600;
+}
+.adp-specs__table td {
+    text-align: right;
+}

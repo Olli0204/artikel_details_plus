@@ -3,24 +3,25 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.1.2
-**Kompatibel mit:** JTL-Shop 5.5.1 – 5.7.0
-**Voraussetzung:** PHP 8.0+
+**Version:** 0.2.0
+**Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
+**Voraussetzung:** PHP 8.1+
 
 ---
 
 ## Funktionen
 
-### 1. Erweiterte Merkmaldarstellung
-Auf der Artikeldetailseite wird im Beschreibungs-Tab ein interaktives **Pentagon-SVG-Diagramm** für fünf Snowboard-Fahreigenschaften (Carving, Jib, Powder, All-Mountain, Jump) gerendert. Daneben optional eine **Körpergewichtsleiste** und eine **Fahrlevel-Anzeige** (Beginner / Advanced / Professional).
+### 1. Snowboard-Specs (Fahreigenschaften, Körpergewicht, Fahrlevel, Dimensionen)
+Auf der Artikeldetailseite werden im Beschreibungs-Tab die Snowboard-Eigenschaften visualisiert. Die Werte werden in `Bootstrap::assignSnowboardSpecs()` aus den **Funktionsattributen** des Artikels gelesen, ersatzweise vom Vaterartikel (Attributnamen kleingeschrieben, Dezimalkomma erlaubt), und den Templates als fertige Arrays übergeben.
 
-Erforderliche Funktionsattribute am Artikel — die Anzeige erscheint nur, wenn alle entsprechenden Attribute gesetzt sind:
+| Bereich | Darstellung | Funktionsattribute |
+|---|---|---|
+| Fahreigenschaften | interaktives **Pentagon-SVG-Diagramm** (`ecm_polygon_svg.js`), Werte 0–10; erscheint ab drei vorhandenen Werten | `carving`, `jib`, `powder`, `all_mountain`, `jump` |
+| Körpergewicht | Skalenleiste in kg | `koerpergewicht_ab`, `koerpergewicht_bis` |
+| Fahrlevel | Leiste Beginner / Advanced / Professional | `fahrlevel_ab`, `fahrlevel_bis` |
+| Dimensionen | Tabelle Form / Shape / Waist / Nose / Tail plus **SVG-Board-Skizze** mit Breitenmaßen (Nose links, Tail rechts, breiteste Stelle als Referenz); die Skizze erscheint, wenn `nose`, `waist` und `tail` numerisch sind | `form`, `shape`, `waist`, `nose`, `tail` (Breiten in mm) |
 
-| Funktion | Erforderliche Funktionsattribute |
-|---|---|
-| Pentagon-Diagramm | `carving`, `jib`, `powder`, `all_mountain`, `jump` (jeweils 0–10) |
-| Körpergewichtsleiste | `koerpergewicht_ab`, `koerpergewicht_bis` (in kg) |
-| Fahrlevel-Anzeige | `fahrlevel_ab`, `fahrlevel_bis` (Werte: `Beginner` / `Advanced` / `Professional`) |
+Fahreigenschaften-Diagramm und Dimensionen lassen sich einzeln abschalten; der Schalter „Merkmalwert-Anzeige aktiv" bleibt der Hauptschalter für den gesamten Bereich. Die Überschriften „Fahreigenschaften" und „Dimensionen" sind Sprachvariablen. Dieser Bereich ersetzt das frühere Plugin `snowboard_specs` (September 2026 integriert).
 
 ### 2. Merkmalbilder in der Artikelliste
 Unterhalb jeder Produktbox in Kategorie- und Suchergebnislisten werden Bilder ausgewählter Merkmalwerte angezeigt — z. B. Technologie- oder Eigenschaftsbadges. In den Plugin-Einstellungen wird ausgewählt, welche Merkmale (nur die mit hinterlegten Bildern) angezeigt werden sollen.
@@ -58,12 +59,14 @@ Erfolgs- und Fehlermeldungen werden als Alerts oberhalb des Formulars angezeigt;
 
 ## Konfiguration
 
-Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen sind als Selectbox mit Werten **Ja / Nein** umgesetzt (statt Checkbox — siehe Hinweis unten).
+Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen sind als Selectbox mit Werten **Ja / Nein** umgesetzt.
 
 | Tab | Einstellung | Typ | Beschreibung |
 |---|---|---|---|
 | Fahreigenschaften | Merkmalwert-Anzeige aktiv | Ja/Nein | Schaltet Pentagon-Diagramm und Gewichtsleiste im Beschreibungs-Tab ein |
 | Fahreigenschaften | Fahrlevelanzeige aktiv | Ja/Nein | Schaltet die Beginner/Advanced/Professional-Leiste ein |
+| Fahreigenschaften | Fahreigenschaften-Diagramm anzeigen | Ja/Nein (Default Ja) | Pentagon-Diagramm der Fahreigenschaften |
+| Fahreigenschaften | Dimensionen anzeigen | Ja/Nein (Default Ja) | Tabelle und Board-Skizze mit Form/Shape/Waist/Nose/Tail |
 | Merkmalbilder | Merkmalbilder Anzeige aktiv | Ja/Nein | Aktiviert Bilder unter den Artikelboxen in der Listenansicht |
 | Merkmalbilder | Merkmalwerte mit Bildern | Mehrfachauswahl | Welche Merkmale (mit hinterlegten Bildern) angezeigt werden — dynamisch aus `tmerkmal` |
 | Countdown | Countdown aktiv | Ja/Nein | Zeigt den Timer an (zusätzliche Bedingung: aktiver Sonderpreis) |
@@ -73,8 +76,6 @@ Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen si
 | Lagerbestandsanzeige | Farbe der Anzeige | Color (Default `#ffa54f`) | Farbe des Fortschrittsbalkens |
 | Günstiger gesehen | Formular aktiv | Ja/Nein | Schaltet Button und Modal auf der Artikeldetailseite ein |
 
-**Hinweis:** Die Aktiv-Einstellungen sind bewusst keine Checkboxen — JTL-Core hat einen Bug, durch den ungecheckte Checkboxen beim Speichern nicht zurückgesetzt werden können (siehe Migration-Hinweis unten).
-
 ---
 
 ## Übersetzbare Texte
@@ -83,6 +84,8 @@ Alle frontend-relevanten Texte sind als Sprachvariablen hinterlegt und können u
 
 | Variable | Default DE | Default EN |
 |---|---|---|
+| `artikel_details_plus_specs_heading_characteristics` | Fahreigenschaften | Ride Characteristics |
+| `artikel_details_plus_specs_heading_dimensions` | Dimensionen | Dimensions |
 | `artikel_details_plus_countdown_heading` | Black Weekend Sale | Black Weekend Sale |
 | `artikel_details_plus_form_button` | Günstiger gesehen? | Seen it cheaper? |
 | `artikel_details_plus_cheaper_title` | Günstiger gesehen? | Seen it cheaper? |
@@ -111,36 +114,37 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 | `productlist-index-include-price` | `item_box.tpl` | Merkmalbilder unter Artikelboxen |
 
 ### Hooks
-- `HOOK_ARTIKEL_PAGE` (registriert in `Bootstrap.php`): verarbeitet POST-Submissions des „Günstiger gesehen"-Formulars; führt PRG-Redirect aus.
+- `HOOK_ARTIKEL_PAGE` (registriert in `Bootstrap.php`): verarbeitet POST-Submissions des „Günstiger gesehen"-Formulars (PRG-Redirect) und ruft `assignSnowboardSpecs()` auf, das die Smarty-Variablen `adpSpecsCharacteristics`, `adpSpecsDimensions`, `adpSpecsBoard` und `adpFrontendURL` setzt.
 
 ### Dynamische Optionsquelle
 - `adminmenu/merkmalwerte.php`: SQL-Query über `tmerkmal`/`tmerkmalwert`, liefert nur Merkmale mit mindestens einem bebilderten Wert. Versorgt die Mehrfachauswahl „Merkmalwerte mit Bildern".
 
 ### Assets
-- `ecm_polygon_svg.js`: JS-Klasse zur Berechnung und Darstellung des Pentagon-Radar-Diagramms (kein jQuery-Plugin, eigenständige ES6-Klasse). Wird via `<script src>` in `svg_attributes.tpl` eingebunden.
+- `frontend/js/ecm_polygon_svg.js`: JS-Klasse zur Berechnung und Darstellung des Pentagon-Radar-Diagramms (eigenständige ES6-Klasse, benötigt jQuery aus dem Template). Wird via `<script src>` in `svg_attributes.tpl` eingebunden.
+- `frontend/css/artikel_details_plus.css`: Styles der Snowboard-Specs (Überschriften, Board-Skizze, Dimensionen-Tabelle); wird in `tabs.tpl` mit Versions-Parameter verlinkt. Farbe der Skizze über `--primary`, Fallback `#FFA54F`.
 
 ---
 
 ## Update / Migration
 
-Ab Version **0.1.1** sind die früheren Checkbox-Einstellungen auf **Selectbox (Ja/Nein)** umgestellt. Hintergrund: JTL-Core-Bug — eine ungecheckte Checkbox sendet beim Speichern keinen Wert, wodurch der vorherige Wert in `tplugineinstellungen` erhalten bleibt; die Einstellung lässt sich faktisch nicht mehr deaktivieren.
+Ab Version **0.1.1** sind die früheren Checkbox-Einstellungen auf **Selectbox (Ja/Nein)** umgestellt. `Migrations/Migration20260504120100.php` konvertiert beim Plugin-Update bestehende `'on'`-Werte automatisch zu `'Y'`; Einstellungen bleiben erhalten. (Die damalige Annahme, Checkboxen ließen sich im JTL-Core nicht abwählen, hat sich als falsch erwiesen; die Selectboxen bleiben trotzdem, weil sie funktionieren.)
 
-`Migrations/Migration20260504120100.php` konvertiert beim Plugin-Update bestehende `'on'`-Werte automatisch zu `'Y'`. Es ist also kein manueller Eingriff in die Datenbank nötig — Einstellungen bleiben erhalten.
+Die beiden neuen Schalter aus 0.2.0 werden beim Update mit dem Standardwert „Ja" angelegt.
 
 ---
 
 ## Entwicklung
 
 ### Voraussetzungen
-- JTL-Shop 5.5.1 – 5.7.0
-- PHP 8.0+ (`str_contains()`, `declare(strict_types=1)`)
+- JTL-Shop 5.5.1 – 5.8.0
+- PHP 8.1+ (`str_contains()`, `declare(strict_types=1)`)
 - jQuery (Standard im JTL-Template enthalten)
 
 ### Verzeichnisstruktur
 
 ```
 artikel_details_plus/
-├── Bootstrap.php                          # Hook-Registrierung, Cheaper-Form-Handling
+├── Bootstrap.php                          # Hook-Registrierung, Cheaper-Form-Handling, Snowboard-Specs-Daten
 ├── Migrations/                            # DB-Migrationen
 │   └── Migration20260504120100.php
 ├── adminmenu/
@@ -150,22 +154,31 @@ artikel_details_plus/
 │   │   ├── details.tpl                    # Countdown, Lagerbestand, Cheaper-Button
 │   │   ├── tabs.tpl                       # Pentagon/Gewicht/Fahrlevel im Beschreibungs-Tab
 │   │   ├── svg_attributes.tpl             # Pentagon-SVG + Gewicht/Fahrlevel-Logik
-│   │   ├── snowboard_values.tpl           # Snowboard-Spezifikationsliste (Form/Shape/Waist/Nose/Tail)
+│   │   ├── snowboard_values.tpl           # Dimensionen: Board-Skizze + Tabelle (Form/Shape/Waist/Nose/Tail)
 │   │   ├── popups.tpl                     # Modal-Wrapper
 │   │   └── cheaper.tpl                    # Formular-Markup
 │   └── productlist/
 │       └── item_box.tpl                   # Merkmalbilder unter Artikelboxen
-├── ecm_polygon_svg.js                     # Pentagon-Radar-Diagramm
+├── frontend/css/artikel_details_plus.css  # Styles der Snowboard-Specs
+├── frontend/js/ecm_polygon_svg.js         # Pentagon-Radar-Diagramm
 ├── info.xml                               # Plugin-Manifest
 └── README.md
 ```
 
-### Snowboard-Spezifikationsliste
-`snowboard_values.tpl` rendert eine `<ul class="adp-snowboard-specs">` mit Form / Shape / Waist / Nose / Tail (in mm), sobald alle fünf Funktionsattribute am Artikel gesetzt sind. Reine Textausgabe — Styling kann frei im Theme vorgenommen werden.
+### Board-Skizze
+`Bootstrap::buildBoardSketch()` berechnet den SVG-Pfad (viewBox 600×220): die breiteste der drei Breiten wird auf 140 Einheiten skaliert, Nose/Waist/Tail liegen bei x = 80 / 300 / 520, die Kanten sind kubische Bézier-Kurven. `snowboard_values.tpl` zeichnet Umriss, gestrichelte Maßlinien und Beschriftungen; Werte werden so ausgegeben, wie sie im Shop gepflegt sind (z. B. `298,5`).
 
 ---
 
 ## Versionsverlauf
+
+### 0.2.0 (2026-09-15)
+- Funktionalität des Plugins `snowboard_specs` integriert: Fahreigenschaften und Dimensionen werden in `Bootstrap::assignSnowboardSpecs()` aus den Funktionsattributen gelesen (mit Vaterartikel-Fallback und Dezimalkomma-Unterstützung), neue Schalter „Fahreigenschaften-Diagramm anzeigen" und „Dimensionen anzeigen", übersetzbare Überschriften
+- Neu: SVG-Board-Skizze mit Nose/Waist/Tail-Maßen plus Tabelle für Form/Shape/Waist/Nose/Tail (vorher reine Liste ohne Vaterartikel-Fallback)
+- Pentagon-Diagramm erscheint ab drei vorhandenen Werten, Werte werden auf 0–10 begrenzt
+- Fix: `$oBrowser->bMobile` (wird vom Core nicht mehr gesetzt) durch `$isMobile` ersetzt
+- `ecm_polygon_svg.js` nach `frontend/js/` verschoben, Asset-URLs über den Plugin-Frontend-Pfad statt `$shopURL`
+- Kompatibilität mit JTL-Shop 5.8.0 geprüft (alle sechs NOVA-Blöcke vorhanden, Core-API unverändert), MaxShopVersion auf 5.8.0
 
 ### 0.1.2 (2026-05-04)
 - Cleanup: ungenutzten `cheaper.php`-Stub gelöscht

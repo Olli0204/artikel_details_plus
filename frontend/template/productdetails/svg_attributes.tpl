@@ -1,33 +1,21 @@
-{if isset($Artikel->FunktionsAttribute.jib)}{assign "ecm_sb_jib" $Artikel->FunktionsAttribute.jib}{elseif isset($Artikel->VaterFunktionsAttribute.jib)}{assign "ecm_sb_jib" $Artikel->VaterFunktionsAttribute.jib}{/if}
-{if isset($Artikel->FunktionsAttribute.jump)}{assign "ecm_sb_jump" $Artikel->FunktionsAttribute.jump}{elseif isset($Artikel->VaterFunktionsAttribute.jump)}{assign "ecm_sb_jump" $Artikel->VaterFunktionsAttribute.jump}{/if}
-{if isset($Artikel->FunktionsAttribute.powder)}{assign "ecm_sb_powder" $Artikel->FunktionsAttribute.powder}{elseif isset($Artikel->VaterFunktionsAttribute.powder)}{assign "ecm_sb_powder" $Artikel->VaterFunktionsAttribute.powder}{/if}
-{if isset($Artikel->FunktionsAttribute.carving)}{assign "ecm_sb_carving" $Artikel->FunktionsAttribute.carving}{elseif isset($Artikel->VaterFunktionsAttribute.carving)}{assign "ecm_sb_carving" $Artikel->VaterFunktionsAttribute.carving}{/if}
-{if isset($Artikel->FunktionsAttribute.all_mountain)}{assign "ecm_sb_all_mountain" $Artikel->FunktionsAttribute.all_mountain}{elseif isset($Artikel->VaterFunktionsAttribute.all_mountain)}{assign "ecm_sb_all_mountain" $Artikel->VaterFunktionsAttribute.all_mountain}{/if}
+{* Fahreigenschaften: Werte kommen aus Bootstrap::assignSnowboardSpecs() (Funktionsattribute mit Vater-Fallback) *}
+{if !empty($adpSpecsCharacteristics)}
+<div class="pentarow text-center adp-specs adp-specs--characteristics">
+    <script src="{$adpFrontendURL}js/ecm_polygon_svg.js"></script>
 
-
-{if isset($ecm_sb_jib) &&
-    isset($ecm_sb_jump) &&
-    isset($ecm_sb_powder) &&
-    isset($ecm_sb_carving) &&
-    isset($ecm_sb_all_mountain) }
-
-<div class="pentarow text-center">    
-    <center><script src="{$shopURL}plugins/artikel_details_plus/ecm_polygon_svg.js"></script></center>
-    
     <div class="col-lg-8 col-lg-push-2 col-md-6 col-md-push-3 col-xs-10 col-xs-push-1">
-        {*<h3> Snowboard {lang key="articelDetails-attributs" section="global"} </h3>*}
+        <h3 class="adp-specs__heading">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_specs_heading_characteristics')}</h3>
         <center><div id="ecm-attributes-svg"></div></center>
         <center><p class="ecm-attributes-description">-</p></center>
     </div>
-    
-        
+
     <script>
             $(function () {
-                // [lable, description, value, max_value]
-                let data = [['Carving', '', {$ecm_sb_carving}, 10], ['Jib', '', {$ecm_sb_jib}, 10], ['Powder', '', {$ecm_sb_powder}, 10], ['All-Mountain', '', {$ecm_sb_all_mountain}, 10], ['Jump', '', {$ecm_sb_jump}, 10]];
+                // [label, description, value, max_value]
+                let data = [{foreach $adpSpecsCharacteristics as $c}['{$c.label|escape:'javascript'}', '', {$c.value}, {$c.max}]{if !$c@last}, {/if}{/foreach}];
                 let ecm_svg = new ECM_POLYGON_SVG(500, 400, 'black', 'red', 5, data);
                 $("#ecm-attributes-svg").append(ecm_svg.getHTML());
-                
+
                 $( ".ecm_button" ).on( "mouseenter", function() {
                     let obj = JSON.parse($( this ).attr('attr-ecm-svg'));
                     $(".ecm-attributes-description").html(obj.title + ': ' + obj.value + '/' + obj.max_value);
@@ -52,7 +40,7 @@
     </style>
 </div>
 {/if}
-    
+
 {if isset($Artikel->FunktionsAttribute.koerpergewicht_ab)}{assign "ecm_sb_gewab" $Artikel->FunktionsAttribute.koerpergewicht_ab}{/if}
 {if isset($Artikel->FunktionsAttribute.koerpergewicht_bis)}{assign "ecm_sb_gewbis" $Artikel->FunktionsAttribute.koerpergewicht_bis}{/if}
 
@@ -111,7 +99,7 @@
         {/if}
     </p>
     <div class="ecm-gewicht-list" style="" data-toggle="tooltip" data-placement="bottom" data-html="true" title="{if $lang eq "eng"}Rider Skills: {else}Fahrlevel: {/if}<br>{if {$ecm_sb_fahab} != {$ecm_sb_fahbis}} {$ecm_sb_fahab} - {$ecm_sb_fahbis}">{else}{$ecm_sb_fahab}">{/if}
-        {if not $oBrowser->bMobile}
+        {if !$isMobile}
             {assign "ecm_sb_fahlist" ["Beginner", "Advanced", "Professional"]} {*this list needs to have an + at first and last element*}
         {else}
             {assign "ecm_sb_fahlist" ["+", "40", "50", "60", "70", "80", "90", "100", "+"]} {*this list needs to have an + at first and last element*}
