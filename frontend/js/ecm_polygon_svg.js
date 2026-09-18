@@ -1,5 +1,10 @@
+// Radar-Diagramm der Fahreigenschaften.
+// Farben und Typografie kommen aus css/artikel_details_plus.css (.adp-radar__*),
+// das Skript setzt nur noch Geometrie und Klassen.
 // top 33.3
 // bottom 334.8
+
+if (typeof window.ECM_POLYGON_SVG === 'undefined') {
 
 class ECM_POLYGON_SVG {
     constructor(width, height, col_pri, col_sec, level, data) {
@@ -19,7 +24,7 @@ class ECM_POLYGON_SVG {
         // get lines
         let linePath_arr = [];
         for (let i = 1; i <= this.level; i++) {
-            linePath_arr.push(this.getPath(this.getPolygonLine(this.max_radius * (i / (this.level + 1))), 'fill="none" stroke="black" stroke-width="1"'));
+            linePath_arr.push(this.getPath(this.getPolygonLine(this.max_radius * (i / (this.level + 1))), 'class="adp-radar__grid"'));
         }
 
         let lable_points = this.getPolygonLine(this.max_radius * (1 - (0 / this.level)));
@@ -27,8 +32,8 @@ class ECM_POLYGON_SVG {
 
 
         let article_points = this.getPolygon();
-        linePath_arr.push(this.getPath(article_points, 'fill="#ff4c4c" fill-opacity="0.4" stroke="#ff4c4c" stroke-width="1"'));
-        linePath_arr.push(this.getButtons(article_points, 'fill="#ff4c4c" fill-opacity="0.4" stroke="#ff4c4c" stroke-width="1"'));
+        linePath_arr.push(this.getPath(article_points, 'class="adp-radar__area"'));
+        linePath_arr.push(this.getButtons(article_points));
         
         
         return this.getSVG(linePath_arr, 'viewBox="0 0 '+ this.width +' ' + this.height + '"')
@@ -107,9 +112,9 @@ class ECM_POLYGON_SVG {
             let obj = {"title":this.data[i][0],"description":this.data[i][1], "value":this.data[i][2], "max_value":this.data[i][3]};
 
             buttons = buttons + '<g class="ecm_button" attr-ecm-svg="' + JSON.stringify(obj).replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '">';
-            buttons = buttons + this.getPath(this.getButtonPoints(outerline_grid, this.center, i, this.numberOfCorners), 'class="ecm_button_vis" fill="grey" stroke="grey" stroke-width="1"');
+            buttons = buttons + this.getPath(this.getButtonPoints(outerline_grid, this.center, i, this.numberOfCorners), 'class="ecm_button_vis adp-radar__hit"');
             buttons = buttons + this.getPath(outerline_points, 'opacity="0"');
-            buttons = buttons + '<text x="' + outerline_points[2][0] + '" y="' + outerline_points[2][1] + '" ' + 'text-anchor="middle"' + '><tspan alignment-baseline="middle">' + this.data[i][0] + '</tspan></text>';
+            buttons = buttons + '<text class="adp-radar__label" x="' + outerline_points[2][0] + '" y="' + outerline_points[2][1] + '" ' + 'text-anchor="middle"' + '><tspan alignment-baseline="middle">' + this.data[i][0] + '</tspan></text>';
             buttons = buttons + '</g>';
         }
         return buttons + '</g>';
@@ -144,6 +149,10 @@ class ECM_POLYGON_SVG {
         });
         return svg + '</svg>';
     }
+}
+
+window.ECM_POLYGON_SVG = ECM_POLYGON_SVG;
+
 }
 
 

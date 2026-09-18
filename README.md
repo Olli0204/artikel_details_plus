@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.3.0
+**Version:** 0.4.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -27,7 +27,7 @@ Fahreigenschaften-Diagramm und Dimensionen lassen sich einzeln abschalten; der S
 Unterhalb jeder Produktbox in Kategorie- und Suchergebnislisten werden Bilder ausgewählter Merkmalwerte angezeigt — z. B. Technologie- oder Eigenschaftsbadges. In den Plugin-Einstellungen wird ausgewählt, welche Merkmale (nur die mit hinterlegten Bildern) angezeigt werden sollen.
 
 ### 3. Lagerbestandsanzeige
-Sobald der Lagerbestand unter einen konfigurierbaren Schwellenwert fällt, erscheint ein **farbiger Fortschrittsbalken** mit der Restmenge. Der Balken füllt sich proportional zum Verhältnis Bestand/Schwellwert. Farbe ist im Backend per Color-Picker einstellbar.
+Sobald der Lagerbestand unter einen konfigurierbaren Schwellenwert fällt, erscheint ein **schlanker Fortschrittsbalken** mit der Restmenge. Der Balken füllt sich proportional zum Verhältnis Bestand/Schwellwert. Farbe ist im Backend per Color-Picker einstellbar; sie wird als CSS-Variable (`--adp-stock-color`) an das Element übergeben, das Styling selbst liegt im Stylesheet.
 
 ### 4. Countdown (umgezogen)
 Der Countdown auf der Artikeldetailseite wird seit 0.3.0 von der **Countdown-Verwaltung in Startseite Plus** (Plugin-Tab „Countdowns“, Option „Auf Artikeldetailseiten anzeigen“) bereitgestellt. Dort lassen sich mehrere Countdowns für verschiedene Aktionen pflegen, die auch der Aktions-Banner nutzt.
@@ -107,7 +107,7 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 
 | Block | Datei | Wirkung |
 |---|---|---|
-| `productdetails-details-stock` | `details.tpl` | Lagerbestand-Balken + „Günstiger gesehen"-Button |
+| `productdetails-details-stock` | `details.tpl` | Stylesheet-Einbindung, Lagerbestand-Balken + „Günstiger gesehen"-Button |
 | `tab-description-media-types`, `productdetails-tabs-card-description-content` | `tabs.tpl` | Pentagon/Gewicht/Fahrlevel im Beschreibungs-Tab |
 | `productdetails-popups` | `popups.tpl` | Modal mit Formular |
 | `productlist-index-include-price` | `item_box.tpl` | Merkmalbilder unter Artikelboxen |
@@ -120,7 +120,16 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 
 ### Assets
 - `frontend/js/ecm_polygon_svg.js`: JS-Klasse zur Berechnung und Darstellung des Pentagon-Radar-Diagramms (eigenständige ES6-Klasse, benötigt jQuery aus dem Template). Wird via `<script src>` in `svg_attributes.tpl` eingebunden.
-- `frontend/css/artikel_details_plus.css`: Styles der Snowboard-Specs (Überschriften, Board-Skizze, Dimensionen-Tabelle); wird in `tabs.tpl` mit Versions-Parameter verlinkt. Farbe der Skizze über `--primary`, Fallback `#FFA54F`.
+- `frontend/css/artikel_details_plus.css`: komplettes Frontend-Design des Plugins (Lagerbestand, „Günstiger gesehen"-Zeile, Specs-Panels, Radar-Diagramm, Gewichts-/Fahrlevel-Leisten, Board-Skizze und Dimensionen-Tabelle); wird einmalig in `details.tpl` mit Versions-Parameter verlinkt. Akzentfarbe über `--primary`, Fallback `#FFA54F`; lokale Tokens `--adp-accent`, `--adp-border`, `--adp-surface`, `--adp-radius`.
+
+### Design (seit 0.4.0)
+Alle Bauteile teilen sich ein Design-System im Stylesheet — keine Inline-`<style>`-Blöcke und keine Farben im JavaScript mehr:
+
+- **Panels:** Jeder Specs-Bereich sitzt in einer eigenen Karte (`.adp-panel`, 1px Rahmen, 6px Radius) mit kleiner Versal-Überschrift und Akzentstrich.
+- **Raster:** `.adp-specs__grid` ist ab 768px zweispaltig — Diagramm links über beide Zeilen, Gewicht/Fahrlevel und Dimensionen rechts darunter; darunter einspaltig. Fehlt ein Bereich, füllen die übrigen die Breite.
+- **Radar-Diagramm:** Gitter und Fläche werden über die Klassen `.adp-radar__grid`, `.adp-radar__area`, `.adp-radar__hit` und `.adp-radar__label` gestylt (Akzentfarbe statt Rot). Unter dem Diagramm steht eine Chip-Liste mit allen Werten, damit die Zahlen auch ohne Hover (Touch) sichtbar sind; beim Überfahren eines Sektors wird der passende Chip hervorgehoben.
+- **Gewicht und Fahrlevel:** Pill-Leisten (`.adp-meter`) mit hellem Track, akzentfarbenem Bereich und der Spanne im Klartext neben der Überschrift statt im Tooltip.
+- **Dimensionen:** Board-Skizze und Tabelle stehen per Container-Query nebeneinander, sobald das Panel breit genug ist.
 
 ---
 
@@ -150,7 +159,7 @@ artikel_details_plus/
 │   └── merkmalwerte.php                   # Dynamische Optionsquelle (Selectbox)
 ├── frontend/template/
 │   ├── productdetails/
-│   │   ├── details.tpl                    # Lagerbestand, Cheaper-Button
+│   │   ├── details.tpl                    # Stylesheet, Lagerbestand, Cheaper-Button
 │   │   ├── tabs.tpl                       # Pentagon/Gewicht/Fahrlevel im Beschreibungs-Tab
 │   │   ├── svg_attributes.tpl             # Pentagon-SVG + Gewicht/Fahrlevel-Logik
 │   │   ├── snowboard_values.tpl           # Dimensionen: Board-Skizze + Tabelle (Form/Shape/Waist/Nose/Tail)
@@ -158,7 +167,7 @@ artikel_details_plus/
 │   │   └── cheaper.tpl                    # Formular-Markup
 │   └── productlist/
 │       └── item_box.tpl                   # Merkmalbilder unter Artikelboxen
-├── frontend/css/artikel_details_plus.css  # Styles der Snowboard-Specs
+├── frontend/css/artikel_details_plus.css  # Frontend-Design aller Bauteile
 ├── frontend/js/ecm_polygon_svg.js         # Pentagon-Radar-Diagramm
 ├── info.xml                               # Plugin-Manifest
 └── README.md
@@ -170,6 +179,14 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.4.0 (2026-09-18)
+- Design-Überarbeitung der Artikeldetailseite: Fahreigenschaften, Körpergewicht/Fahrlevel und Dimensionen liegen jetzt in einheitlichen Karten mit gemeinsamem Raster (ab 768px zweispaltig) statt frei im Beschreibungs-Tab
+- Radar-Diagramm in Akzentfarbe mit hellem Gitter und lesbaren Beschriftungen; neue Chip-Liste mit allen Werten (vorher nur per Hover sichtbar, auf Touch-Geräten gar nicht)
+- Gewichts- und Fahrlevel-Leisten als abgerundete Pill-Leisten mit Klartext-Spanne statt schwarzem Kasten mit Tooltip
+- Lagerbestandsanzeige als schlanker Balken ohne Rahmen; die eingestellte Farbe kommt als CSS-Variable ins Markup
+- „Günstiger gesehen?"-Zeile übernimmt Abstände und Trennlinie der NOVA-Zeile „Frage zum Artikel"
+- Alle Inline-`<style>`-Blöcke und die fest kodierten Farben in `ecm_polygon_svg.js` entfernt; das Stylesheet wird einmalig in `details.tpl` eingebunden, das Diagramm-Skript ist gegen doppeltes Laden abgesichert
 
 ### 0.3.0 (2026-09-18)
 - Countdown entfernt: Einstellungen, Sprachvariablen und Template-Block sind in die Countdown-Verwaltung von Startseite Plus 2.1.0 umgezogen (mehrere Countdowns, Anzeige auf Artikelseiten wahlweise nur bei Sonderpreis). Migration räumt die alten Einstellungswerte auf.

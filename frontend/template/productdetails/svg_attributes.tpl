@@ -1,66 +1,75 @@
 {* Fahreigenschaften: Werte kommen aus Bootstrap::assignSnowboardSpecs() (Funktionsattribute mit Vater-Fallback) *}
 {if !empty($adpSpecsCharacteristics)}
-<div class="pentarow text-center adp-specs adp-specs--characteristics">
-    <script src="{$adpFrontendURL}js/ecm_polygon_svg.js"></script>
+<section class="adp-panel adp-radar">
+    <h3 class="adp-panel__title">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_specs_heading_characteristics')|escape:'html'}</h3>
 
-    <div class="col-lg-8 col-lg-push-2 col-md-6 col-md-push-3 col-xs-10 col-xs-push-1">
-        <h3 class="adp-specs__heading">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_specs_heading_characteristics')}</h3>
-        <center><div id="ecm-attributes-svg"></div></center>
-        <center><p class="ecm-attributes-description">-</p></center>
-    </div>
+    <div class="adp-radar__chart"></div>
 
+    <ul class="adp-radar__legend">
+        {foreach $adpSpecsCharacteristics as $c}
+            <li class="adp-radar__chip" data-adp-radar-index="{$c@index}">{$c.label|escape:'html'} <b>{$c.value}</b>/{$c.max}</li>
+        {/foreach}
+    </ul>
+
+    <script src="{$adpFrontendURL}js/ecm_polygon_svg.js?v={$oPlugin_artikel_details_plus->getMeta()->getVersion()}"></script>
     <script>
-            $(function () {
-                // [label, description, value, max_value]
-                let data = [{foreach $adpSpecsCharacteristics as $c}['{$c.label|escape:'javascript'}', '', {$c.value}, {$c.max}]{if !$c@last}, {/if}{/foreach}];
-                let ecm_svg = new ECM_POLYGON_SVG(500, 400, 'black', 'red', 5, data);
-                $("#ecm-attributes-svg").append(ecm_svg.getHTML());
+        $(function () {
+            // [label, description, value, max_value]
+            var data = [{foreach $adpSpecsCharacteristics as $c}['{$c.label|escape:'javascript'}', '', {$c.value}, {$c.max}]{if !$c@last}, {/if}{/foreach}];
 
-                $( ".ecm_button" ).on( "mouseenter", function() {
-                    let obj = JSON.parse($( this ).attr('attr-ecm-svg'));
-                    $(".ecm-attributes-description").html(obj.title + ': ' + obj.value + '/' + obj.max_value);
+            $('.adp-radar__chart').each(function () {
+                var chart = $(this);
+                if (chart.children().length) {
+                    return; // Diagramm wurde bereits gezeichnet
+                }
+                chart.append(new ECM_POLYGON_SVG(500, 400, 'black', 'red', 5, data).getHTML());
+
+                var chips = chart.closest('.adp-radar').find('.adp-radar__chip');
+                chart.find('.ecm_button').each(function (index) {
+                    $(this).on('mouseenter focusin', function () {
+                        chips.removeClass('is-active').filter('[data-adp-radar-index="' + index + '"]').addClass('is-active');
+                    }).on('mouseleave focusout', function () {
+                        chips.removeClass('is-active');
+                    });
                 });
-            }
-
-            );
+            });
+        });
     </script>
-    <style>
-        .ecm_button text {
-            fill: black;
-            font-weight: bolder;
-            font-size: 12px;
-        }
-        .ecm_buttons .ecm_button path {
-            opacity : 0;
-        }
-
-        .ecm_buttons .ecm_button:hover path.ecm_button_vis {
-            opacity : 0.1;
-        }
-    </style>
-</div>
+</section>
 {/if}
 
 {* Körpergewicht und Fahrlevel: Werte kommen aus Bootstrap::assignDetailExtras() *}
-{if !empty($adpWeight)}
-    {assign var=adpWeightSteps value=($isMobile) ? $adpWeight.mobile : $adpWeight.desktop}
-    {assign var=adpWeightTitle value=$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_weight_title')}
-    <p class="ecm-gewicht-title">{$adpWeightTitle|escape:'html'}</p>
-    <div class="ecm-gewicht-list" data-toggle="tooltip" data-placement="bottom" data-html="true"
-         title="{$adpWeightTitle|escape:'html'}<br>{$adpWeight.from} - {$adpWeight.to} kg">
-        {foreach $adpWeightSteps as $step}
-            <div class="ecm-gewicht-item{if $step.set} set{/if}" style="width: {100 / ($adpWeightSteps|count)}%;">{$step.label}</div>
-        {/foreach}
-    </div>
-{/if}
+{if !empty($adpWeight) || !empty($adpLevel)}
+<section class="adp-panel adp-fit">
+    {if !empty($adpWeight)}
+        {assign var=adpWeightSteps value=($isMobile) ? $adpWeight.mobile : $adpWeight.desktop}
+        {assign var=adpWeightTitle value=$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_weight_title')}
+        <div class="adp-meter adp-meter--weight">
+            <p class="adp-meter__head">
+                <span class="adp-meter__label">{$adpWeightTitle|escape:'html'}</span>
+                <span class="adp-meter__range">{$adpWeight.from} – {$adpWeight.to} kg</span>
+            </p>
+            <div class="adp-meter__scale">
+                {foreach $adpWeightSteps as $step}
+                    <span class="adp-meter__step{if $step.set} is-set{/if}">{$step.label|escape:'html'}</span>
+                {/foreach}
+            </div>
+        </div>
+    {/if}
 
-{if !empty($adpLevel)}
-    {assign var=adpLevelTitle value=$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_level_title')}
-    <p class="ecm-gewicht-title">{$adpLevelTitle|escape:'html'}</p>
-    <div class="ecm-gewicht-list" data-toggle="tooltip" data-placement="bottom" data-html="true"
-         title="{$adpLevelTitle|escape:'html'}<br>{if $adpLevel.from !== $adpLevel.to}{$adpLevel.from} - {$adpLevel.to}{else}{$adpLevel.from}{/if}">
-        {foreach $adpLevel.steps as $step}
-            <div class="ecm-gewicht-item{if $step.set} set{/if}" style="width: {100 / ($adpLevel.steps|count)}%;">{$step.label}</div>
-        {/foreach}
-    </div>
+    {if !empty($adpLevel)}
+        {assign var=adpLevelTitle value=$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_level_title')}
+        <div class="adp-meter adp-meter--level">
+            <p class="adp-meter__head">
+                <span class="adp-meter__label">{$adpLevelTitle|escape:'html'}</span>
+                <span class="adp-meter__range">{if $adpLevel.from !== $adpLevel.to}{$adpLevel.from|escape:'html'} – {$adpLevel.to|escape:'html'}{else}{$adpLevel.from|escape:'html'}{/if}</span>
+            </p>
+            <div class="adp-meter__scale">
+                {foreach $adpLevel.steps as $step}
+                    <span class="adp-meter__step{if $step.set} is-set{/if}">{$step.label|escape:'html'}</span>
+                {/foreach}
+            </div>
+        </div>
+    {/if}
+</section>
 {/if}
