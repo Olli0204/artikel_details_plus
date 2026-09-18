@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.2.2</Version>
+    <Version>0.3.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -98,29 +98,6 @@ Link:     {$oPluginMail->cURL}
                     </SelectboxOptions>
                 </Setting>
             </Settingslink>
-            <Settingslink sort="3">
-                <Name>Countdown</Name>
-                <Setting type="text" initialValue="" sort="0" conf="N">
-                    <Name>Allgemein</Name>
-                    <Description>Allgemeine Einstellungen des Countdowns</Description>
-                    <ValueName>Spacer3</ValueName>
-                </Setting>
-                <Setting type="checkbox" sort="1" conf="Y">
-                    <Name>Countdown aktivieren</Name>
-                    <Description>Aktiviert die Anzeige des Countdowns auf der Artikeldetailseite.</Description>
-                    <ValueName>artikel_details_plus_countdown_aktiv</ValueName>
-                </Setting>
-                <Setting type="date" sort="3" conf="Y">
-                    <Name>Datum</Name>
-                    <Description>Lege das Datum fest.</Description>
-                    <ValueName>artikel_details_plus_countdown_date</ValueName>
-                </Setting>
-                <Setting type="time" sort="4" conf="Y">
-                    <Name>Zeit</Name>
-                    <Description>Lege die Zeit fest.</Description>
-                    <ValueName>artikel_details_plus_countdown_time</ValueName>
-                </Setting>
-            </Settingslink>
             <Settingslink sort="4">
                 <Name>Lagerbestandsanzeige</Name>
                 <Setting type="text" initialValue="" sort="0" conf="N">
@@ -178,30 +155,6 @@ Link:     {$oPluginMail->cURL}
                 <VariableLocalized iso="ENG">Only %s pieces available!</VariableLocalized>
             </Variable>
             <Variable>
-                <Name>artikel_details_plus_countdown_days</Name>
-                <Description>Countdown: Beschriftung Tage</Description>
-                <VariableLocalized iso="GER">Tage</VariableLocalized>
-                <VariableLocalized iso="ENG">Days</VariableLocalized>
-            </Variable>
-            <Variable>
-                <Name>artikel_details_plus_countdown_hours</Name>
-                <Description>Countdown: Beschriftung Stunden</Description>
-                <VariableLocalized iso="GER">Stunden</VariableLocalized>
-                <VariableLocalized iso="ENG">Hours</VariableLocalized>
-            </Variable>
-            <Variable>
-                <Name>artikel_details_plus_countdown_minutes</Name>
-                <Description>Countdown: Beschriftung Minuten</Description>
-                <VariableLocalized iso="GER">Minuten</VariableLocalized>
-                <VariableLocalized iso="ENG">Minutes</VariableLocalized>
-            </Variable>
-            <Variable>
-                <Name>artikel_details_plus_countdown_seconds</Name>
-                <Description>Countdown: Beschriftung Sekunden</Description>
-                <VariableLocalized iso="GER">Sekunden</VariableLocalized>
-                <VariableLocalized iso="ENG">Seconds</VariableLocalized>
-            </Variable>
-            <Variable>
                 <Name>artikel_details_plus_specs_heading_characteristics</Name>
                 <Description>Überschrift des Fahreigenschaften-Diagramms</Description>
                 <VariableLocalized iso="GER">Fahreigenschaften</VariableLocalized>
@@ -212,12 +165,6 @@ Link:     {$oPluginMail->cURL}
                 <Description>Überschrift der Dimensionen-Darstellung</Description>
                 <VariableLocalized iso="GER">Dimensionen</VariableLocalized>
                 <VariableLocalized iso="ENG">Dimensions</VariableLocalized>
-            </Variable>
-            <Variable>
-                <Name>artikel_details_plus_countdown_heading</Name>
-                <Description>Titel des Countdowns</Description>
-                <VariableLocalized iso="GER">Black Weekend Sale</VariableLocalized>
-                <VariableLocalized iso="ENG">Black Weekend Sale</VariableLocalized>
             </Variable>
             <Variable>
                 <Name>artikel_details_plus_form_button</Name>
