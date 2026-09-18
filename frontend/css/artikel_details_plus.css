@@ -1,59 +1,343 @@
-/* artikel_details_plus – Snowboard-Specs (Fahreigenschaften + Dimensionen) */
+/* ==========================================================================
+   artikel_details_plus – Frontend-Design der Artikeldetailseite
+   Gemeinsame Optik für Lagerbestand, "Günstiger gesehen?", Fahreigenschaften,
+   Körpergewicht/Fahrlevel und Dimensionen.
+   Farben folgen dem Theme (--primary), Radien/Linien dem Snowshop-Template.
+   ========================================================================== */
+
+.adp-stock,
+.adp-cheaper,
 .adp-specs {
-    margin: 20px auto;
-    max-width: 640px;
+    --adp-accent: var(--primary, #FFA54F);
+    --adp-ink: #1b1b1b;
+    --adp-muted: #6c757d;
+    --adp-border: #e1e5ea;
+    --adp-surface: #f7f8fa;
+    --adp-radius: 6px;
 }
-.adp-specs__heading {
-    font-size: 1.1rem;
+
+/* ------------------------------------------------------- Lagerbestand */
+.adp-stock {
+    margin: 0 0 1rem;
+}
+.adp-stock__label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .75rem;
+    margin: 0 0 .4rem;
+    font-size: .9rem;
+    line-height: 1.3;
+    color: var(--adp-ink);
+}
+.adp-stock__label strong {
+    font-weight: 700;
+}
+.adp-stock__track {
+    display: block;
+    height: .5rem;
+    border-radius: 999px;
+    background: var(--adp-surface);
+    box-shadow: inset 0 0 0 1px var(--adp-border);
+    overflow: hidden;
+}
+.adp-stock__bar {
+    display: block;
+    height: 100%;
+    width: var(--adp-stock-pct, 0%);
+    min-width: .5rem;
+    border-radius: inherit;
+    background: var(--adp-stock-color, var(--adp-accent));
+}
+
+/* -------------------------------------------- "Günstiger gesehen?"-Link */
+/* Übernimmt Abstände und Trennlinie der NOVA-Zeile "Frage zum Artikel". */
+.adp-cheaper {
+    display: flex;
+    justify-content: flex-end;
+    margin: .5rem 0 0;
+    padding-top: .5rem;
+    border-top: 1px solid var(--adp-border);
+}
+.adp-cheaper__btn.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    margin: 0;
+    padding: .25rem 0;
+    font-size: .9rem;
     font-weight: 600;
-    text-align: center;
-    margin: 0 0 12px;
+    color: var(--adp-muted);
+    text-decoration: none;
+    box-shadow: none;
 }
-.adp-board {
-    margin: 0 auto 12px;
+.adp-cheaper__btn.btn:hover,
+.adp-cheaper__btn.btn:focus {
+    color: var(--adp-accent);
+    text-decoration: none;
+}
+.adp-cheaper__btn .fa {
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+/* ------------------------------------------------ Specs: Raster + Panels */
+.adp-specs {
+    max-width: 960px;
+    margin: 0 auto 1.5rem;
+    text-align: left;
+}
+.adp-specs__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+}
+@media (min-width: 768px) {
+    .adp-specs__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        align-items: start;
+    }
+    /* Genau drei Panels: Diagramm links über beide Zeilen, Leisten und Dimensionen rechts */
+    .adp-specs__grid > .adp-radar:nth-child(1):nth-last-child(3) {
+        grid-row: span 2;
+    }
+    .adp-specs__grid > .adp-radar:nth-child(1):nth-last-child(3) ~ .adp-panel--wide {
+        grid-column: 2;
+    }
+}
+.adp-panel {
+    min-width: 0;
+    padding: 1.25rem 1.25rem 1.1rem;
+    border: 1px solid var(--adp-border);
+    border-radius: var(--adp-radius);
+    background: #fff;
+}
+.adp-panel--wide {
+    grid-column: 1 / -1;
+}
+.adp-panel__title {
+    margin: 0 0 1.1rem;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    text-align: center;
+    color: var(--adp-muted);
+}
+.adp-panel__title::after {
+    content: "";
+    display: block;
+    width: 2rem;
+    height: 2px;
+    margin: .5rem auto 0;
+    background: var(--adp-accent);
+}
+
+/* ---------------------------------------------------- Fahreigenschaften */
+.adp-radar__chart {
+    max-width: 380px;
+    margin: 0 auto;
+}
+.adp-radar__chart svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+.adp-radar__grid {
+    fill: none;
+    stroke: var(--adp-border);
+    stroke-width: 1;
+}
+.adp-radar__area {
+    fill: var(--adp-accent);
+    fill-opacity: .3;
+    stroke: var(--adp-accent);
+    stroke-width: 2;
+    stroke-linejoin: round;
+}
+.adp-radar__hit {
+    fill: var(--adp-accent);
+    fill-opacity: 0;
+    stroke: none;
+    transition: fill-opacity .15s ease;
+}
+.ecm_button:hover .adp-radar__hit {
+    fill-opacity: .12;
+}
+.adp-radar__label {
+    fill: var(--adp-muted);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: .02em;
+}
+.ecm_button:hover .adp-radar__label {
+    fill: var(--adp-ink);
+}
+.adp-radar__legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .35rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.adp-radar__chip {
+    display: inline-block;
+    padding: .2rem .55rem;
+    border-radius: 999px;
+    background: var(--adp-surface);
+    font-size: .78rem;
+    color: var(--adp-muted);
+    transition: background-color .15s ease, color .15s ease;
+}
+.adp-radar__chip b {
+    color: var(--adp-ink);
+    font-weight: 700;
+}
+.adp-radar__chip.is-active {
+    background: var(--adp-accent);
+    color: var(--adp-ink);
+}
+.adp-radar__chip.is-active b {
+    color: inherit;
+}
+
+/* ------------------------------------------ Körpergewicht und Fahrlevel */
+.adp-fit {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.adp-meter + .adp-meter {
+    margin-top: 1.1rem;
+}
+.adp-meter__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .5rem;
+    margin: 0 0 .4rem;
+    font-size: .85rem;
+    color: var(--adp-muted);
+}
+.adp-meter__range {
+    font-weight: 700;
+    color: var(--adp-ink);
+    white-space: nowrap;
+}
+.adp-meter__scale {
+    display: flex;
+    overflow: hidden;
+    border: 1px solid var(--adp-border);
+    border-radius: 999px;
+    background: var(--adp-surface);
+}
+.adp-meter__step {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: .3rem .15rem;
+    font-size: .72rem;
+    line-height: 1.4;
+    text-align: center;
+    white-space: nowrap;
+    color: var(--adp-muted);
+}
+.adp-meter__step.is-set {
+    background: var(--adp-accent);
+    color: var(--adp-ink);
+    font-weight: 700;
+}
+.adp-meter--level .adp-meter__step {
+    font-size: .8rem;
+    padding: .35rem .25rem;
+}
+
+/* -------------------------------------------------------- Dimensionen */
+.adp-dims__body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .75rem 2rem;
+    align-items: center;
+    max-width: 880px;
+    margin: 0 auto;
+}
+/* Skizze und Tabelle nebeneinander, sobald das Panel selbst breit genug ist
+   (Container-Query, damit auch das halbbreite Panel korrekt umbricht) */
+.adp-dims {
+    container-type: inline-size;
+}
+@container (min-width: 620px) {
+    .adp-dims--sketch .adp-dims__body {
+        grid-template-columns: minmax(0, 1.15fr) minmax(200px, .85fr);
+    }
+}
+.adp-dims__board {
+    width: 100%;
+    max-width: 520px;
+    margin: 0 auto;
 }
 .adp-board__svg {
     display: block;
     width: 100%;
     height: auto;
-    max-width: 600px;
-    margin: 0 auto;
 }
 .adp-board__outline {
-    fill: var(--primary, #FFA54F);
-    fill-opacity: 0.25;
-    stroke: var(--primary, #FFA54F);
+    fill: var(--adp-accent);
+    fill-opacity: .22;
+    stroke: var(--adp-accent);
     stroke-width: 2;
     stroke-linejoin: round;
 }
 .adp-board__measure {
-    stroke: #333;
+    stroke: #b9bfc6;
     stroke-width: 1;
     stroke-dasharray: 4 3;
 }
 .adp-board__tick {
-    stroke: #333;
+    stroke: #b9bfc6;
     stroke-width: 1.5;
 }
 .adp-board__label {
-    fill: #333;
-    font-size: 15px;
+    fill: #6c757d;
+    font-size: 18px;
     font-weight: 600;
 }
-.adp-specs__table {
-    width: auto;
+.adp-dims__table {
+    width: 100%;
+    max-width: 420px;
     margin: 0 auto;
+    align-self: start;
     border-collapse: collapse;
+    font-size: .9rem;
 }
-.adp-specs__table th,
-.adp-specs__table td {
-    padding: 4px 14px;
-    border-bottom: 1px solid #ebebeb;
+.adp-dims__table th,
+.adp-dims__table td {
+    padding: .45rem .25rem;
+    border-bottom: 1px solid var(--adp-border);
+}
+.adp-dims__table th {
+    font-weight: 500;
     text-align: left;
+    color: var(--adp-muted);
 }
-.adp-specs__table th {
-    font-weight: 600;
-}
-.adp-specs__table td {
+.adp-dims__table td {
     text-align: right;
+    font-weight: 700;
+    color: var(--adp-ink);
+}
+.adp-dims__table tr:last-child th,
+.adp-dims__table tr:last-child td {
+    border-bottom: 0;
+}
+
+@media (max-width: 575px) {
+    .adp-panel {
+        padding: 1rem .9rem .9rem;
+    }
+    .adp-meter__step {
+        font-size: .68rem;
+    }
 }

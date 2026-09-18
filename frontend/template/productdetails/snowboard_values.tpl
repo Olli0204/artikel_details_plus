@@ -1,10 +1,11 @@
 {* Dimensionen: Werte kommen aus Bootstrap::assignSnowboardSpecs() (Funktionsattribute mit Vater-Fallback) *}
 {if !empty($adpSpecsDimensions)}
-<div class="adp-specs adp-specs--dimensions">
-    <h3 class="adp-specs__heading">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_specs_heading_dimensions')}</h3>
+<section class="adp-panel adp-panel--wide adp-dims{if $adpSpecsBoard !== null} adp-dims--sketch{/if}">
+    <h3 class="adp-panel__title">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_specs_heading_dimensions')|escape:'html'}</h3>
 
+    <div class="adp-dims__body">
     {if $adpSpecsBoard !== null}
-    <div class="adp-board">
+    <div class="adp-dims__board">
         <svg class="adp-board__svg" viewBox="0 0 600 220" xmlns="http://www.w3.org/2000/svg" role="img"
              aria-label="Nose {$adpSpecsBoard.nose.value|escape:'html'} mm, Waist {$adpSpecsBoard.waist.value|escape:'html'} mm, Tail {$adpSpecsBoard.tail.value|escape:'html'} mm">
             <path class="adp-board__outline" d="{$adpSpecsBoard.path}"/>
@@ -19,15 +20,16 @@
     </div>
     {/if}
 
-    <table class="adp-specs__table">
+    <table class="adp-dims__table">
         <tbody>
         {foreach $adpSpecsDimensions as $dim}
             <tr>
                 <th scope="row">{$dim.label|escape:'html'}</th>
-                <td>{$dim.value|escape:'html'}{if $dim.unit} {$dim.unit}{/if}</td>
+                <td>{$dim.value|escape:'html'}{if $dim.unit} {$dim.unit|escape:'html'}{/if}</td>
             </tr>
         {/foreach}
         </tbody>
     </table>
-</div>
+    </div>
+</section>
 {/if}

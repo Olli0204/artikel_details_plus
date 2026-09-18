@@ -1,61 +1,21 @@
 {if !empty($adpSpecsActive)}
 
-{capture name="adp_merkmal_styles"}
-<link rel="stylesheet" href="{$adpFrontendURL}css/artikel_details_plus.css?v={$oPlugin_artikel_details_plus->getMeta()->getVersion()}">
-<style>
-    .neue_darstellung {
-        width: 70% !important;
-    }
-    @media only screen and (max-width: 1200px) {
-        .neue_darstellung {
-            width: 100%;
-        }
-    }
-    .pentarow {
-        display: flex;
-        align-content: center;
-        justify-content: center;
-    }
-    .ecm-gewicht-title {
-        text-align: center;
-        margin-bottom: 0;
-    }
-    .ecm-gewicht-list {
-        display: flex;
-        border: 1px solid black;
-        text-align: center;
-        margin-bottom: 10px;
-    }
-    .ecm-gewicht-item {
-        display: inline-block;
-        color: black;
-    }
-    .ecm-gewicht-item.set {
-        background-color: black;
-        color: white;
-    }
-</style>
-{/capture}
-
-{capture name="adp_merkmal_content"}
-    <center>
-        <div class="neue_darstellung">
+{capture name="adp_specs_block"}
+    {* Stylesheet wird einmalig in productdetails/details.tpl eingebunden *}
+    <div class="adp-specs">
+        <div class="adp-specs__grid">
             {include file='productdetails/svg_attributes.tpl' tplscope='details'}
+            {include file='productdetails/snowboard_values.tpl' tplscope='details'}
         </div>
-    </center>
-    <center>
-        {include file='productdetails/snowboard_values.tpl' tplscope='details'}
-    </center>
+    </div>
 {/capture}
 
 {block name='tab-description-media-types' prepend}
-    {$smarty.capture.adp_merkmal_styles}
-    {$smarty.capture.adp_merkmal_content}
+    {$smarty.capture.adp_specs_block}
 {/block}
 
 {block name='productdetails-tabs-card-description-content' prepend}
-    {$smarty.capture.adp_merkmal_styles}
-    {$smarty.capture.adp_merkmal_content}
+    {$smarty.capture.adp_specs_block}
 {/block}
 
 {/if}
