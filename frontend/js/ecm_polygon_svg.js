@@ -106,7 +106,7 @@ class ECM_POLYGON_SVG {
             
             let obj = {"title":this.data[i][0],"description":this.data[i][1], "value":this.data[i][2], "max_value":this.data[i][3]};
 
-            buttons = buttons + '<g class="ecm_button" style="" attr-ecm-svg='+JSON.stringify(obj)+'>';
+            buttons = buttons + '<g class="ecm_button" attr-ecm-svg="' + JSON.stringify(obj).replace(/&/g, '&amp;').replace(/"/g, '&quot;') + '">';
             buttons = buttons + this.getPath(this.getButtonPoints(outerline_grid, this.center, i, this.numberOfCorners), 'class="ecm_button_vis" fill="grey" stroke="grey" stroke-width="1"');
             buttons = buttons + this.getPath(outerline_points, 'opacity="0"');
             buttons = buttons + '<text x="' + outerline_points[2][0] + '" y="' + outerline_points[2][1] + '" ' + 'text-anchor="middle"' + '><tspan alignment-baseline="middle">' + this.data[i][0] + '</tspan></text>';

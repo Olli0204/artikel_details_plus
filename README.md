@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.2.0
+**Version:** 0.2.1
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -114,7 +114,7 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 | `productlist-index-include-price` | `item_box.tpl` | Merkmalbilder unter Artikelboxen |
 
 ### Hooks
-- `HOOK_ARTIKEL_PAGE` (registriert in `Bootstrap.php`): verarbeitet POST-Submissions des „Günstiger gesehen"-Formulars (PRG-Redirect) und ruft `assignSnowboardSpecs()` auf, das die Smarty-Variablen `adpSpecsCharacteristics`, `adpSpecsDimensions`, `adpSpecsBoard` und `adpFrontendURL` setzt.
+- `HOOK_ARTIKEL_PAGE` (registriert in `Bootstrap.php`): verarbeitet POST-Submissions des „Günstiger gesehen"-Formulars (PRG-Redirect) und befüllt die Smarty-Variablen für alle Bauteile: `assignSnowboardSpecs()` setzt `adpSpecsCharacteristics`, `adpSpecsDimensions`, `adpSpecsBoard`, `adpFrontendURL`; `assignDetailExtras()` setzt `adpCountdown`, `adpStock`, `adpCheaperActive`, `adpWeight`, `adpLevel`. Die Templates rechnen nichts mehr selbst.
 
 ### Dynamische Optionsquelle
 - `adminmenu/merkmalwerte.php`: SQL-Query über `tmerkmal`/`tmerkmalwert`, liefert nur Merkmale mit mindestens einem bebilderten Wert. Versorgt die Mehrfachauswahl „Merkmalwerte mit Bildern".
@@ -171,6 +171,15 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.2.1 (2026-09-18)
+- Fix: Division durch den Lagerbestand-Schwellenwert lief im Template auf jeder Artikelseite; bei Schwellenwert 0 führte das zu einem Fatal Error. Berechnung jetzt in PHP, Balken nur bei Schwellenwert > 0 und Bestand > 0
+- Fix: Modal-ID des „Günstiger gesehen"-Formulars folgt jetzt wie NOVA dem Kind-Artikel bei Variationskombinationen; vorher öffnete sich das Modal dort nicht
+- Fix: Fahrlevel-Leiste zeigte auf Mobilgeräten die Gewichts-Skala; Körpergewicht und Fahrlevel werden jetzt in PHP berechnet (mit Vaterartikel-Fallback), Fahrlevel-Werte werden unabhängig von Groß-/Kleinschreibung erkannt
+- Fix: Countdown erscheint nur mit gültigem Datum und Uhrzeit in der Zukunft
+- Sicherheit: Formular-POST wird ignoriert, wenn das Formular deaktiviert ist; Artikelname kommt aus der Datenbank statt aus dem Formular; nur http(s)-Links; fehlgeschlagener Mailversand führt zur Fehlermeldung statt zur Erfolgsmeldung; Merkmalwert-Tooltips und Board-Beschriftungen werden escaped
+- Merkmalbilder: Shop-URL-Variable korrigiert (`$ShopURL`), leere Merkmalauswahl erzeugt keine leere Liste mehr
+- Button-Beschriftung nutzt Bootstrap-4-Klassen (`d-none d-md-inline`) statt Bootstrap-3-Klassen
 
 ### 0.2.0 (2026-09-15)
 - Funktionalität des Plugins `snowboard_specs` integriert: Fahreigenschaften und Dimensionen werden in `Bootstrap::assignSnowboardSpecs()` aus den Funktionsattributen gelesen (mit Vaterartikel-Fallback und Dezimalkomma-Unterstützung), neue Schalter „Fahreigenschaften-Diagramm anzeigen" und „Dimensionen anzeigen", übersetzbare Überschriften

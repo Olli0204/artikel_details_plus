@@ -1,5 +1,5 @@
 {block name='productdetails-details-include-variation' append}
-    {if $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_countdown_aktiv') === 'Y' && $Artikel->Preise->Sonderpreis_aktiv}
+    {if !empty($adpCountdown)}
         <style>
             .countdownbox {
                 width: 100%;
@@ -17,7 +17,7 @@
             <script>
                 window.addEventListener('load', function () {
 
-                    var countDownDate = new Date("{$oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_countdown_date')}T{$oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_countdown_time')}").getTime();
+                    var countDownDate = new Date("{$adpCountdown.target|escape:'javascript'}").getTime();
 
                     var timer = document.getElementById("countdownbox");
                     var x = setInterval(function () {
@@ -72,47 +72,45 @@
 {/block}
 
 {block name='productdetails-details-stock' prepend}
-    {math equation="min(100, max(0, x/y*100))" x=$Artikel->fLagerbestand y=$oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_wert') assign="stockPct"}
-    <style>
-        .lagerbestand-anzeige {
-            margin-top: 0px;
-            width: 100%;
-            margin-left: 20px;
-            margin-right: 20px;
-            margin-bottom: 10px;
-        }
-        .lagerbestand-fortschritt {
-            width: 100%;
-            background-color: lightgrey;
-            height: 20px;
-            border-radius: 5px;
-            overflow: hidden;
-            border: 1px solid grey;
-        }
-        .fortschritt {
-            background-color: {$oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_farbe')};
-            width: {$stockPct}%;
-            height: 100%;
-        }
-    </style>
-        {if ($Artikel->fLagerbestand < $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_wert')) && $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_lagerbestand_aktiv') === 'Y'}
-            <div class="lagerbestand-anzeige">
-                <div>
-        <span>{if $lang eq "eng"}Only {else}Nur noch {/if}<strong>{$Artikel->fLagerbestand}</strong>{if $lang eq "eng"} pieces available!{else} Stück verfügbar!{/if}</span>
-                </div>
-                <div class="lagerbestand-fortschritt">
-                    <div class="fortschritt"></div>
-                </div>
+    {if !empty($adpStock)}
+        <style>
+            .lagerbestand-anzeige {
+                width: 100%;
+                margin: 0 0 10px;
+            }
+            .lagerbestand-fortschritt {
+                width: 100%;
+                background-color: lightgrey;
+                height: 20px;
+                border-radius: 5px;
+                overflow: hidden;
+                border: 1px solid grey;
+            }
+            .lagerbestand-fortschritt .fortschritt {
+                background-color: {$adpStock.color};
+                width: {$adpStock.pct}%;
+                height: 100%;
+            }
+        </style>
+        <div class="lagerbestand-anzeige">
+            <div>
+                <span>{if $lang eq "eng"}Only {else}Nur noch {/if}<strong>{$adpStock.count}</strong>{if $lang eq "eng"} pieces available!{else} Stück verfügbar!{/if}</span>
             </div>
-        {/if}
-        {if $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_cheaper_aktiv') === 'Y'}
+            <div class="lagerbestand-fortschritt">
+                <div class="fortschritt"></div>
+            </div>
+        </div>
+    {/if}
+    {if $adpCheaperActive}
+        {* gleiche ID-Logik wie NOVA popups.tpl: bei Variationskombinationen zählt der Kind-Artikel *}
+        {assign var=adpModalId value=($Artikel->kArtikelVariKombi > 0) ? $Artikel->kArtikelVariKombi : $Artikel->kArtikel}
         <div class="col col-12">
-            <div class="row" style="border-top: 1px solid #ebebeb; margin-right: 0px; margin-left: 0px; justify-content: right;" >
-                <button type="button" class="btn btn-link question" id="z{$Artikel->kArtikel}" title="Günstiger gesehen" data-toggle="modal" data-target="#cheaper-{$Artikel->kArtikel}" style="margin-right: 0px; padding-right: 0px;">
+            <div class="row" style="border-top: 1px solid #ebebeb; margin-right: 0px; margin-left: 0px; justify-content: flex-end;">
+                <button type="button" class="btn btn-link question" id="adp-cheaper-btn-{$adpModalId}" title="{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_form_button')|escape:'html'}" data-toggle="modal" data-target="#cheaper-{$adpModalId}" style="margin-right: 0px; padding-right: 0px;">
                     <span class="fa fa-question-circle"></span>
-                    <span class="hidden-xs hidden-sm">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_form_button')}</span>
+                    <span class="d-none d-md-inline">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_form_button')}</span>
                 </button>
             </div>
         </div>
-        {/if}
-    {/block}
+    {/if}
+{/block}

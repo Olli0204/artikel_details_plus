@@ -17,7 +17,138 @@ class Bootstrap extends Bootstrapper
         $dispatcher->hookInto(\HOOK_ARTIKEL_PAGE, function (array $args): void {
             $this->handleCheaperForm();
             $this->assignSnowboardSpecs($args['oArtikel'] ?? null);
+            $this->assignDetailExtras($args['oArtikel'] ?? null);
         });
+    }
+
+    /**
+     * Fahrlevel-Stufen in der Reihenfolge der Leiste (Werte der Funktionsattribute fahrlevel_ab/_bis)
+     */
+    private const LEVELS = ['Beginner', 'Advanced', 'Professional'];
+
+    /**
+     * Skalen der Körpergewichtsleiste (kg), jeweils mit "+" am Anfang und Ende
+     */
+    private const WEIGHT_STEPS_DESKTOP = [35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100];
+    private const WEIGHT_STEPS_MOBILE  = [40, 50, 60, 70, 80, 90, 100];
+
+    /**
+     * Countdown, Lagerbestandsanzeige, "Günstiger gesehen", Körpergewicht und Fahrlevel:
+     * alle Berechnungen passieren hier, die Templates geben nur noch aus.
+     */
+    public function assignDetailExtras(?object $artikel): void
+    {
+        $smarty = Shop::Smarty();
+        $config = $this->getPlugin()->getConfig();
+
+        $smarty->assign('adpCountdown', null)
+            ->assign('adpStock', null)
+            ->assign('adpCheaperActive', $config->getValue('artikel_details_plus_cheaper_aktiv') === 'Y')
+            ->assign('adpWeight', null)
+            ->assign('adpLevel', null);
+
+        if ($artikel === null) {
+            return;
+        }
+
+        // Countdown: nur mit gültigem Datum und Uhrzeit und nur bei aktivem Sonderpreis
+        if (
+            $config->getValue('artikel_details_plus_countdown_aktiv') === 'Y'
+            && !empty($artikel->Preise->Sonderpreis_aktiv)
+        ) {
+            $date = \trim((string)$config->getValue('artikel_details_plus_countdown_date'));
+            $time = \trim((string)$config->getValue('artikel_details_plus_countdown_time'));
+            if (\preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) && \preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $time)) {
+                $target = \DateTime::createFromFormat('Y-m-d H:i', $date . ' ' . \substr($time, 0, 5));
+                if ($target !== false && $target->getTimestamp() > \time()) {
+                    $smarty->assign('adpCountdown', ['target' => $date . 'T' . \substr($time, 0, 5) . ':00']);
+                }
+            }
+        }
+
+        // Lagerbestand: Balken nur unterhalb des Schwellenwerts, Division nur mit Schwellenwert > 0
+        if ($config->getValue('artikel_details_plus_lagerbestand_aktiv') === 'Y') {
+            $threshold = (float)\str_replace(',', '.', (string)$config->getValue('artikel_details_plus_lagerbestand_wert'));
+            $stock     = (float)($artikel->fLagerbestand ?? 0);
+            $color     = (string)$config->getValue('artikel_details_plus_lagerbestand_farbe');
+            if (!\preg_match('/^#[0-9a-f]{3,8}$/i', $color)) {
+                $color = '#ffa54f';
+            }
+            if ($threshold > 0 && $stock > 0 && $stock < $threshold) {
+                $smarty->assign('adpStock', [
+                    'count' => \fmod($stock, 1.0) === 0.0 ? (string)(int)$stock : (string)$stock,
+                    'pct'   => (int)\round(\min(100.0, \max(0.0, $stock / $threshold * 100))),
+                    'color' => $color,
+                ]);
+            }
+        }
+
+        if ($config->getValue('artikel_details_plus_merkmalwerte_aktiv') !== 'Y') {
+            return;
+        }
+
+        // Körpergewicht
+        $from = $this->numericAttribute($artikel, 'koerpergewicht_ab');
+        $to   = $this->numericAttribute($artikel, 'koerpergewicht_bis');
+        if ($from !== null && $to !== null && $to >= $from) {
+            $smarty->assign('adpWeight', [
+                'from'    => $from,
+                'to'      => $to,
+                'desktop' => $this->weightSteps(self::WEIGHT_STEPS_DESKTOP, $from, $to),
+                'mobile'  => $this->weightSteps(self::WEIGHT_STEPS_MOBILE, $from, $to),
+            ]);
+        }
+
+        // Fahrlevel
+        if ($config->getValue('artikel_details_plus_fahrlevel_aktiv') === 'Y') {
+            $fromIdx = $this->levelIndex($this->attribute($artikel, 'fahrlevel_ab'));
+            $toIdx   = $this->levelIndex($this->attribute($artikel, 'fahrlevel_bis'));
+            if ($fromIdx !== null || $toIdx !== null) {
+                $fromIdx ??= $toIdx;
+                $toIdx   ??= $fromIdx;
+                if ($fromIdx > $toIdx) {
+                    [$fromIdx, $toIdx] = [$toIdx, $fromIdx];
+                }
+                $steps = [];
+                foreach (self::LEVELS as $idx => $label) {
+                    $steps[] = ['label' => $label, 'set' => $idx >= $fromIdx && $idx <= $toIdx];
+                }
+                $smarty->assign('adpLevel', [
+                    'from'  => self::LEVELS[$fromIdx],
+                    'to'    => self::LEVELS[$toIdx],
+                    'steps' => $steps,
+                ]);
+            }
+        }
+    }
+
+    /**
+     * @param int[] $scale
+     * @return array<int, array{label: string, set: bool}>
+     */
+    private function weightSteps(array $scale, float $from, float $to): array
+    {
+        $steps   = [['label' => '+', 'set' => $scale[0] > $from]];
+        foreach ($scale as $kg) {
+            $steps[] = ['label' => (string)$kg, 'set' => $kg >= $from && $kg <= $to];
+        }
+        $steps[] = ['label' => '+', 'set' => $scale[\count($scale) - 1] < $to];
+
+        return $steps;
+    }
+
+    private function levelIndex(?string $value): ?int
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+        foreach (self::LEVELS as $idx => $label) {
+            if (\strcasecmp($label, $value) === 0) {
+                return $idx;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -176,10 +307,15 @@ class Bootstrap extends Bootstrapper
 
     private function handleCheaperForm(): void
     {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || empty($_POST['adp_cheaper_submit'])) {
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || empty($_POST['adp_cheaper_submit'])) {
+            return;
+        }
+        // Formular deaktiviert: POST ignorieren, sonst könnte weiterhin Mail ausgelöst werden
+        if ($this->getPlugin()->getConfig()->getValue('artikel_details_plus_cheaper_aktiv') !== 'Y') {
             return;
         }
 
+        $post     = static fn(string $key): string => \is_string($_POST[$key] ?? null) ? \trim($_POST[$key]) : '';
         $kArtikel = (int)($_POST['adp_artikel_id'] ?? 0);
 
         // PRG: saubere Redirect-URL ohne eigene GET-Params aufbauen
@@ -208,14 +344,17 @@ class Bootstrap extends Bootstrapper
             exit;
         }
 
-        $email       = filter_var(trim($_POST['adp_email'] ?? ''), FILTER_VALIDATE_EMAIL);
-        $url         = filter_var(trim($_POST['adp_url'] ?? ''), FILTER_VALIDATE_URL);
-        $nachricht   = strip_tags(trim($_POST['adp_nachricht'] ?? ''));
-        $artikelName = strip_tags(trim($_POST['adp_artikel_name'] ?? ''));
+        $email     = \filter_var($post('adp_email'), \FILTER_VALIDATE_EMAIL);
+        $url       = \filter_var($post('adp_url'), \FILTER_VALIDATE_URL);
+        $nachricht = \mb_substr(\strip_tags($post('adp_nachricht')), 0, 2000);
 
-        if (!$email || !$url) {
+        if (!$email || !$url || !\in_array(\parse_url($url, \PHP_URL_SCHEME), ['http', 'https'], true)) {
             $redirectError('validation');
         }
+
+        // Artikelname aus der Datenbank statt aus dem Formular, damit der Betreff nicht manipulierbar ist
+        $product     = $kArtikel > 0 ? $this->getDB()->select('tartikel', 'kArtikel', $kArtikel) : null;
+        $artikelName = $product !== null ? (string)$product->cName : '';
 
         $config  = Shop::getSettings([\CONF_EMAILS]);
         $toEmail = $config['emails']['email_master_absender'] ?? '';
@@ -243,11 +382,14 @@ class Bootstrap extends Bootstrapper
                 'kPlugin_' . $this->getPlugin()->getID() . '_guenstigergesehen',
                 $data
             );
-            $mailer->send($mailObj);
+            $sent = $mailer->send($mailObj);
         } catch (\Exception $e) {
             Shop::Container()->getLogService()->error(
                 'ArtikelDetailsPlus cheaper form: ' . $e->getMessage()
             );
+            $sent = false;
+        }
+        if ($sent !== true) {
             $redirectError('mail');
         }
 
