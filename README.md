@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.2.1
+**Version:** 0.2.2
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -59,22 +59,22 @@ Erfolgs- und Fehlermeldungen werden als Alerts oberhalb des Formulars angezeigt;
 
 ## Konfiguration
 
-Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen sind als Selectbox mit Werten **Ja / Nein** umgesetzt.
+Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen sind Checkboxen (seit 0.2.2; gespeichert wird `on` bzw. leer).
 
 | Tab | Einstellung | Typ | Beschreibung |
 |---|---|---|---|
-| Fahreigenschaften | Merkmalwert-Anzeige aktiv | Ja/Nein | Schaltet Pentagon-Diagramm und Gewichtsleiste im Beschreibungs-Tab ein |
-| Fahreigenschaften | Fahrlevelanzeige aktiv | Ja/Nein | Schaltet die Beginner/Advanced/Professional-Leiste ein |
-| Fahreigenschaften | Fahreigenschaften-Diagramm anzeigen | Ja/Nein (Default Ja) | Pentagon-Diagramm der Fahreigenschaften |
-| Fahreigenschaften | Dimensionen anzeigen | Ja/Nein (Default Ja) | Tabelle und Board-Skizze mit Form/Shape/Waist/Nose/Tail |
-| Merkmalbilder | Merkmalbilder Anzeige aktiv | Ja/Nein | Aktiviert Bilder unter den Artikelboxen in der Listenansicht |
+| Fahreigenschaften | Merkmalwert-Anzeige aktiv | Checkbox | Schaltet Pentagon-Diagramm und Gewichtsleiste im Beschreibungs-Tab ein |
+| Fahreigenschaften | Fahrlevelanzeige aktiv | Checkbox | Schaltet die Beginner/Advanced/Professional-Leiste ein |
+| Fahreigenschaften | Fahreigenschaften-Diagramm anzeigen | Checkbox (Default an) | Pentagon-Diagramm der Fahreigenschaften |
+| Fahreigenschaften | Dimensionen anzeigen | Checkbox (Default an) | Tabelle und Board-Skizze mit Form/Shape/Waist/Nose/Tail |
+| Merkmalbilder | Merkmalbilder Anzeige aktiv | Checkbox | Aktiviert Bilder unter den Artikelboxen in der Listenansicht |
 | Merkmalbilder | Merkmalwerte mit Bildern | Mehrfachauswahl | Welche Merkmale (mit hinterlegten Bildern) angezeigt werden — dynamisch aus `tmerkmal` |
-| Countdown | Countdown aktiv | Ja/Nein | Zeigt den Timer an (zusätzliche Bedingung: aktiver Sonderpreis) |
+| Countdown | Countdown aktiv | Checkbox | Zeigt den Timer an (zusätzliche Bedingung: aktiver Sonderpreis) |
 | Countdown | Datum / Zeit | Date / Time | Ablauf-Zeitpunkt des Countdowns |
-| Lagerbestandsanzeige | Lagerbestandsanzeige aktiv | Ja/Nein | Zeigt den Fortschrittsbalken bei niedrigem Bestand |
+| Lagerbestandsanzeige | Lagerbestandsanzeige aktiv | Checkbox | Zeigt den Fortschrittsbalken bei niedrigem Bestand |
 | Lagerbestandsanzeige | Nur bei Lagerbestand unter | Number (Default 10) | Schwellenwert, ab dem die Anzeige erscheint |
 | Lagerbestandsanzeige | Farbe der Anzeige | Color (Default `#ffa54f`) | Farbe des Fortschrittsbalkens |
-| Günstiger gesehen | Formular aktiv | Ja/Nein | Schaltet Button und Modal auf der Artikeldetailseite ein |
+| Günstiger gesehen | Formular aktiv | Checkbox | Schaltet Button und Modal auf der Artikeldetailseite ein |
 
 ---
 
@@ -84,6 +84,10 @@ Alle frontend-relevanten Texte sind als Sprachvariablen hinterlegt und können u
 
 | Variable | Default DE | Default EN |
 |---|---|---|
+| `artikel_details_plus_weight_title` | Empfohlenes Körpergewicht: | Suggested Weight: |
+| `artikel_details_plus_level_title` | Fahrlevel: | Rider Skills: |
+| `artikel_details_plus_stock_text` | Nur noch %s Stück verfügbar! | Only %s pieces available! |
+| `artikel_details_plus_countdown_days` / `_hours` / `_minutes` / `_seconds` | Tage / Stunden / Minuten / Sekunden | Days / Hours / Minutes / Seconds |
 | `artikel_details_plus_specs_heading_characteristics` | Fahreigenschaften | Ride Characteristics |
 | `artikel_details_plus_specs_heading_dimensions` | Dimensionen | Dimensions |
 | `artikel_details_plus_countdown_heading` | Black Weekend Sale | Black Weekend Sale |
@@ -129,7 +133,7 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 
 Ab Version **0.1.1** sind die früheren Checkbox-Einstellungen auf **Selectbox (Ja/Nein)** umgestellt. `Migrations/Migration20260504120100.php` konvertiert beim Plugin-Update bestehende `'on'`-Werte automatisch zu `'Y'`; Einstellungen bleiben erhalten. (Die damalige Annahme, Checkboxen ließen sich im JTL-Core nicht abwählen, hat sich als falsch erwiesen; die Selectboxen bleiben trotzdem, weil sie funktionieren.)
 
-Die beiden neuen Schalter aus 0.2.0 werden beim Update mit dem Standardwert „Ja" angelegt.
+Ab **0.2.2** sind die Schalter wieder Checkboxen; `Migrations/Migration20260918120000.php` wandelt gespeicherte `Y`/`N` in `on`/leer um. Der Code akzeptiert zur Sicherheit beide Schreibweisen.
 
 ---
 
@@ -171,6 +175,11 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.2.2 (2026-09-18)
+- Alle acht Aktiv-Schalter sind wieder Checkboxen; Migration konvertiert gespeicherte Werte
+- Feste Texte als Sprachvariablen: Körpergewicht- und Fahrlevel-Überschrift, Lagerbestandstext (mit `%s` für die Stückzahl), Countdown-Beschriftungen (waren bisher nur deutsch)
+- Merkmalbilder in der Artikelliste: Schalter und Merkmalauswahl werden per `HOOK_SMARTY_INC` als Smarty-Variablen bereitgestellt, das Template liest keine Config-Werte mehr
 
 ### 0.2.1 (2026-09-18)
 - Fix: Division durch den Lagerbestand-Schwellenwert lief im Template auf jeder Artikelseite; bei Schwellenwert 0 führte das zu einem Fatal Error. Berechnung jetzt in PHP, Balken nur bei Schwellenwert > 0 und Bestand > 0

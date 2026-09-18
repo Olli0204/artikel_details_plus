@@ -14,11 +14,27 @@ class Bootstrap extends Bootstrapper
     {
         parent::boot($dispatcher);
 
+        // Artikellisten haben keinen eigenen Hook: Schalter fuer item_box.tpl beim Smarty-Start bereitstellen
+        $dispatcher->hookInto(\HOOK_SMARTY_INC, function (array $args): void {
+            $config  = $this->getPlugin()->getConfig();
+            $ids     = $config->getValue('artikel_details_plus_merkmalwerte');
+            $args['smarty']->assign('adpFeatureImagesActive', $this->isOn($config->getValue('artikel_details_plus_merkmalbilder_aktiv')))
+                ->assign('adpFeatureIds', \is_array($ids) ? \array_map('\intval', $ids) : []);
+        });
+
         $dispatcher->hookInto(\HOOK_ARTIKEL_PAGE, function (array $args): void {
             $this->handleCheaperForm();
             $this->assignSnowboardSpecs($args['oArtikel'] ?? null);
             $this->assignDetailExtras($args['oArtikel'] ?? null);
         });
+    }
+
+    /**
+     * Checkbox-Einstellungen: JTL speichert 'on' (angehakt) bzw. '' (abgewaehlt); 'Y' stammt aus den Selectboxen bis 0.2.1
+     */
+    private function isOn(mixed $value): bool
+    {
+        return \in_array((string)$value, ['on', 'Y'], true);
     }
 
     /**
@@ -43,7 +59,7 @@ class Bootstrap extends Bootstrapper
 
         $smarty->assign('adpCountdown', null)
             ->assign('adpStock', null)
-            ->assign('adpCheaperActive', $config->getValue('artikel_details_plus_cheaper_aktiv') === 'Y')
+            ->assign('adpCheaperActive', $this->isOn($config->getValue('artikel_details_plus_cheaper_aktiv')))
             ->assign('adpWeight', null)
             ->assign('adpLevel', null);
 
@@ -53,7 +69,7 @@ class Bootstrap extends Bootstrapper
 
         // Countdown: nur mit gültigem Datum und Uhrzeit und nur bei aktivem Sonderpreis
         if (
-            $config->getValue('artikel_details_plus_countdown_aktiv') === 'Y'
+            $this->isOn($config->getValue('artikel_details_plus_countdown_aktiv'))
             && !empty($artikel->Preise->Sonderpreis_aktiv)
         ) {
             $date = \trim((string)$config->getValue('artikel_details_plus_countdown_date'));
@@ -67,7 +83,7 @@ class Bootstrap extends Bootstrapper
         }
 
         // Lagerbestand: Balken nur unterhalb des Schwellenwerts, Division nur mit Schwellenwert > 0
-        if ($config->getValue('artikel_details_plus_lagerbestand_aktiv') === 'Y') {
+        if ($this->isOn($config->getValue('artikel_details_plus_lagerbestand_aktiv'))) {
             $threshold = (float)\str_replace(',', '.', (string)$config->getValue('artikel_details_plus_lagerbestand_wert'));
             $stock     = (float)($artikel->fLagerbestand ?? 0);
             $color     = (string)$config->getValue('artikel_details_plus_lagerbestand_farbe');
@@ -83,7 +99,7 @@ class Bootstrap extends Bootstrapper
             }
         }
 
-        if ($config->getValue('artikel_details_plus_merkmalwerte_aktiv') !== 'Y') {
+        if (!$this->isOn($config->getValue('artikel_details_plus_merkmalwerte_aktiv'))) {
             return;
         }
 
@@ -100,7 +116,7 @@ class Bootstrap extends Bootstrapper
         }
 
         // Fahrlevel
-        if ($config->getValue('artikel_details_plus_fahrlevel_aktiv') === 'Y') {
+        if ($this->isOn($config->getValue('artikel_details_plus_fahrlevel_aktiv'))) {
             $fromIdx = $this->levelIndex($this->attribute($artikel, 'fahrlevel_ab'));
             $toIdx   = $this->levelIndex($this->attribute($artikel, 'fahrlevel_bis'));
             if ($fromIdx !== null || $toIdx !== null) {
@@ -182,6 +198,7 @@ class Bootstrap extends Bootstrapper
     {
         $smarty = Shop::Smarty();
         $smarty->assign('adpFrontendURL', \rtrim($this->getPlugin()->getPaths()->getFrontendURL(), '/') . '/')
+            ->assign('adpSpecsActive', $this->isOn($this->getPlugin()->getConfig()->getValue('artikel_details_plus_merkmalwerte_aktiv')))
             ->assign('adpSpecsCharacteristics', [])
             ->assign('adpSpecsDimensions', [])
             ->assign('adpSpecsBoard', null);
@@ -190,11 +207,11 @@ class Bootstrap extends Bootstrapper
             return;
         }
         $config = $this->getPlugin()->getConfig();
-        if ($config->getValue('artikel_details_plus_merkmalwerte_aktiv') !== 'Y') {
+        if (!$this->isOn($config->getValue('artikel_details_plus_merkmalwerte_aktiv'))) {
             return;
         }
 
-        if ($config->getValue('artikel_details_plus_specs_characteristics_aktiv') === 'Y') {
+        if ($this->isOn($config->getValue('artikel_details_plus_specs_characteristics_aktiv'))) {
             $characteristics = [];
             foreach (self::CHARACTERISTICS as $key => $label) {
                 $value = $this->numericAttribute($artikel, $key);
@@ -214,7 +231,7 @@ class Bootstrap extends Bootstrapper
             }
         }
 
-        if ($config->getValue('artikel_details_plus_specs_dimensions_aktiv') === 'Y') {
+        if ($this->isOn($config->getValue('artikel_details_plus_specs_dimensions_aktiv'))) {
             $dimensions = [];
             foreach (self::DIMENSIONS as $key => $label) {
                 $value = $this->attribute($artikel, $key);
@@ -311,7 +328,7 @@ class Bootstrap extends Bootstrapper
             return;
         }
         // Formular deaktiviert: POST ignorieren, sonst könnte weiterhin Mail ausgelöst werden
-        if ($this->getPlugin()->getConfig()->getValue('artikel_details_plus_cheaper_aktiv') !== 'Y') {
+        if (!$this->isOn($this->getPlugin()->getConfig()->getValue('artikel_details_plus_cheaper_aktiv'))) {
             return;
         }
 

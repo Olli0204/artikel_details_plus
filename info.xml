@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -53,41 +53,25 @@ Link:     {$oPluginMail->cURL}
                     <Description>Allgemeine Einstellungen des Plugins</Description>
                     <ValueName>Spacer1</ValueName>
                 </Setting>
-                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="checkbox" sort="1" conf="Y">
                     <Name>Merkmalwert Anzeige auf Artikeldetailseite aktivieren</Name>
                     <Description>Aktiviert die Anzeige der Merkmalswerte auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_merkmalwerte_aktiv</ValueName>
-                    <SelectboxOptions>
-                        <Option value="Y" sort="0">Ja</Option>
-                        <Option value="N" sort="1">Nein</Option>
-                    </SelectboxOptions>
                 </Setting>
-                <Setting type="selectbox" initialValue="N" sort="2" conf="Y">
+                <Setting type="checkbox" sort="2" conf="Y">
                     <Name>Fahrlevelanzeige aktivieren</Name>
                     <Description>Aktiviert die Anzeige der Fahrlevel auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_fahrlevel_aktiv</ValueName>
-                    <SelectboxOptions>
-                        <Option value="Y" sort="0">Ja</Option>
-                        <Option value="N" sort="1">Nein</Option>
-                    </SelectboxOptions>
                 </Setting>
-                <Setting type="selectbox" initialValue="Y" sort="3" conf="Y">
+                <Setting type="checkbox" sort="3" conf="Y">
                     <Name>Fahreigenschaften-Diagramm anzeigen</Name>
                     <Description>Zeigt das Diagramm der Fahreigenschaften (Carving, Jib, Powder, All-Mountain, Jump) im Beschreibungs-Tab. Liest die Funktionsattribute carving, jib, powder, all_mountain und jump (0 bis 10), ersatzweise vom Vaterartikel.</Description>
                     <ValueName>artikel_details_plus_specs_characteristics_aktiv</ValueName>
-                    <SelectboxOptions>
-                        <Option value="Y" sort="0">Ja</Option>
-                        <Option value="N" sort="1">Nein</Option>
-                    </SelectboxOptions>
                 </Setting>
-                <Setting type="selectbox" initialValue="Y" sort="4" conf="Y">
+                <Setting type="checkbox" sort="4" conf="Y">
                     <Name>Dimensionen anzeigen</Name>
                     <Description>Zeigt Form, Shape, Waist, Nose und Tail als Tabelle mit Board-Skizze im Beschreibungs-Tab. Liest die gleichnamigen Funktionsattribute (Breiten in mm), ersatzweise vom Vaterartikel.</Description>
                     <ValueName>artikel_details_plus_specs_dimensions_aktiv</ValueName>
-                    <SelectboxOptions>
-                        <Option value="Y" sort="0">Ja</Option>
-                        <Option value="N" sort="1">Nein</Option>
-                    </SelectboxOptions>
                 </Setting>
             </Settingslink>
             <Settingslink sort="2">
@@ -97,14 +81,10 @@ Link:     {$oPluginMail->cURL}
                     <Description>Allgemeine Einstellungen der Merkmalsbilder</Description>
                     <ValueName>Spacer2</ValueName>
                 </Setting>
-                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="checkbox" sort="1" conf="Y">
                     <Name>Merkmalbilder Anzeige aktivieren</Name>
                     <Description>Aktiviert die Anzeige der Merkmalsbilder im Artikeldetail.</Description>
                     <ValueName>artikel_details_plus_merkmalbilder_aktiv</ValueName>
-                    <SelectboxOptions>
-                        <Option value="Y" sort="0">Ja</Option>
-                        <Option value="N" sort="1">Nein</Option>
-                    </SelectboxOptions>
                 </Setting>
                 <Setting type="selectbox" initialValue="1" sort="2" conf="Y" multiple="Y">
                     <Name>Merkmalwerte mit Bildern</Name>
@@ -125,14 +105,10 @@ Link:     {$oPluginMail->cURL}
                     <Description>Allgemeine Einstellungen des Countdowns</Description>
                     <ValueName>Spacer3</ValueName>
                 </Setting>
-                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="checkbox" sort="1" conf="Y">
                     <Name>Countdown aktivieren</Name>
                     <Description>Aktiviert die Anzeige des Countdowns auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_countdown_aktiv</ValueName>
-                    <SelectboxOptions>
-                        <Option value="Y" sort="0">Ja</Option>
-                        <Option value="N" sort="1">Nein</Option>
-                    </SelectboxOptions>
                 </Setting>
                 <Setting type="date" sort="3" conf="Y">
                     <Name>Datum</Name>
@@ -152,14 +128,10 @@ Link:     {$oPluginMail->cURL}
                     <Description>Allgemeine Einstellungen der Lagerbestandsanzeige</Description>
                     <ValueName>Spacer4</ValueName>
                 </Setting>
-                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="checkbox" sort="1" conf="Y">
                     <Name>Lagerbestandsanzeige aktivieren</Name>
                     <Description>Aktiviert die Anzeige des Lagerbestands auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_lagerbestand_aktiv</ValueName>
-                    <SelectboxOptions>
-                        <Option value="Y" sort="0">Ja</Option>
-                        <Option value="N" sort="1">Nein</Option>
-                    </SelectboxOptions>
                 </Setting>
                 <Setting type="number" initialValue="10" sort="2" conf="Y">
                     <Name>Nur bei Lagerbestand unter</Name>
@@ -179,18 +151,56 @@ Link:     {$oPluginMail->cURL}
                     <Description>Einstellungen für das "Günstiger gesehen?"-Formular</Description>
                     <ValueName>Spacer5</ValueName>
                 </Setting>
-                <Setting type="selectbox" initialValue="N" sort="1" conf="Y">
+                <Setting type="checkbox" sort="1" conf="Y">
                     <Name>Formular aktivieren</Name>
                     <Description>Aktiviert den "Günstiger gesehen?"-Button und das Formular auf der Artikeldetailseite.</Description>
                     <ValueName>artikel_details_plus_cheaper_aktiv</ValueName>
-                    <SelectboxOptions>
-                        <Option value="Y" sort="0">Ja</Option>
-                        <Option value="N" sort="1">Nein</Option>
-                    </SelectboxOptions>
                 </Setting>
             </Settingslink>
         </Adminmenu>
         <Locales>
+            <Variable>
+                <Name>artikel_details_plus_weight_title</Name>
+                <Description>Überschrift der Körpergewichtsleiste</Description>
+                <VariableLocalized iso="GER">Empfohlenes Körpergewicht:</VariableLocalized>
+                <VariableLocalized iso="ENG">Suggested Weight:</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_level_title</Name>
+                <Description>Überschrift der Fahrlevel-Leiste</Description>
+                <VariableLocalized iso="GER">Fahrlevel:</VariableLocalized>
+                <VariableLocalized iso="ENG">Rider Skills:</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_stock_text</Name>
+                <Description>Text der Lagerbestandsanzeige, %s wird durch die Stückzahl ersetzt</Description>
+                <VariableLocalized iso="GER">Nur noch %s Stück verfügbar!</VariableLocalized>
+                <VariableLocalized iso="ENG">Only %s pieces available!</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_countdown_days</Name>
+                <Description>Countdown: Beschriftung Tage</Description>
+                <VariableLocalized iso="GER">Tage</VariableLocalized>
+                <VariableLocalized iso="ENG">Days</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_countdown_hours</Name>
+                <Description>Countdown: Beschriftung Stunden</Description>
+                <VariableLocalized iso="GER">Stunden</VariableLocalized>
+                <VariableLocalized iso="ENG">Hours</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_countdown_minutes</Name>
+                <Description>Countdown: Beschriftung Minuten</Description>
+                <VariableLocalized iso="GER">Minuten</VariableLocalized>
+                <VariableLocalized iso="ENG">Minutes</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_countdown_seconds</Name>
+                <Description>Countdown: Beschriftung Sekunden</Description>
+                <VariableLocalized iso="GER">Sekunden</VariableLocalized>
+                <VariableLocalized iso="ENG">Seconds</VariableLocalized>
+            </Variable>
             <Variable>
                 <Name>artikel_details_plus_specs_heading_characteristics</Name>
                 <Description>Überschrift des Fahreigenschaften-Diagramms</Description>

@@ -44,9 +44,10 @@
 {* Körpergewicht und Fahrlevel: Werte kommen aus Bootstrap::assignDetailExtras() *}
 {if !empty($adpWeight)}
     {assign var=adpWeightSteps value=($isMobile) ? $adpWeight.mobile : $adpWeight.desktop}
-    <p class="ecm-gewicht-title">{if $lang eq "eng"}Suggested Weight:{else}Empfohlenes Körpergewicht:{/if}</p>
+    {assign var=adpWeightTitle value=$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_weight_title')}
+    <p class="ecm-gewicht-title">{$adpWeightTitle|escape:'html'}</p>
     <div class="ecm-gewicht-list" data-toggle="tooltip" data-placement="bottom" data-html="true"
-         title="{if $lang eq "eng"}Suggested Weight:{else}Empfohlenes Körpergewicht:{/if}<br>{$adpWeight.from} - {$adpWeight.to} kg">
+         title="{$adpWeightTitle|escape:'html'}<br>{$adpWeight.from} - {$adpWeight.to} kg">
         {foreach $adpWeightSteps as $step}
             <div class="ecm-gewicht-item{if $step.set} set{/if}" style="width: {100 / ($adpWeightSteps|count)}%;">{$step.label}</div>
         {/foreach}
@@ -54,9 +55,10 @@
 {/if}
 
 {if !empty($adpLevel)}
-    <p class="ecm-gewicht-title">{if $lang eq "eng"}Rider Skills:{else}Fahrlevel:{/if}</p>
+    {assign var=adpLevelTitle value=$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_level_title')}
+    <p class="ecm-gewicht-title">{$adpLevelTitle|escape:'html'}</p>
     <div class="ecm-gewicht-list" data-toggle="tooltip" data-placement="bottom" data-html="true"
-         title="{if $lang eq "eng"}Rider Skills:{else}Fahrlevel:{/if}<br>{if $adpLevel.from !== $adpLevel.to}{$adpLevel.from} - {$adpLevel.to}{else}{$adpLevel.from}{/if}">
+         title="{$adpLevelTitle|escape:'html'}<br>{if $adpLevel.from !== $adpLevel.to}{$adpLevel.from} - {$adpLevel.to}{else}{$adpLevel.from}{/if}">
         {foreach $adpLevel.steps as $step}
             <div class="ecm-gewicht-item{if $step.set} set{/if}" style="width: {100 / ($adpLevel.steps|count)}%;">{$step.label}</div>
         {/foreach}

@@ -1,6 +1,6 @@
 {block name="productlist-index-include-price" append}
-    {assign var=adpFeatureIds value=$oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_merkmalwerte')}
-    {if $oPlugin_artikel_details_plus->getConfig()->getValue('artikel_details_plus_merkmalbilder_aktiv') === 'Y' && is_array($adpFeatureIds)}
+    {* $adpFeatureImagesActive / $adpFeatureIds kommen aus Bootstrap (HOOK_SMARTY_INC) *}
+    {if !empty($adpFeatureImagesActive) && !empty($adpFeatureIds)}
         <ul style="padding: 0px; list-style-type: none; display:flex; justify-content: center;">
             {foreach $adpFeatureIds as $featureNumber}
                 {if isset ($Artikel->oMerkmale_arr.{$featureNumber})}

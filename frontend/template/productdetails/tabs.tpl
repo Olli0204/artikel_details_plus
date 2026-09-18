@@ -1,4 +1,4 @@
-{if $oPlugin_artikel_details_plus->getConfig()->getValue("artikel_details_plus_merkmalwerte_aktiv") === 'Y'}
+{if !empty($adpSpecsActive)}
 
 {capture name="adp_merkmal_styles"}
 <link rel="stylesheet" href="{$adpFrontendURL}css/artikel_details_plus.css?v={$oPlugin_artikel_details_plus->getMeta()->getVersion()}">

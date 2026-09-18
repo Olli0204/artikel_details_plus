@@ -53,10 +53,10 @@
             <span style="font-size: 20px;">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_countdown_heading')}</span>
             <table style="display: flex; justify-content: center;">
                 <tr>
-                    <th>Tage</th>
-                    <th>Stunden</th>
-                    <th>Minuten</th>
-                    <th>Sekunden</th>
+                    <th>{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_countdown_days')}</th>
+                    <th>{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_countdown_hours')}</th>
+                    <th>{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_countdown_minutes')}</th>
+                    <th>{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_countdown_seconds')}</th>
                 </tr>
                 <tr style="font-size: 18px; font-weight: bold;">
                     <td style="padding: 0 30px 0 30px;" id="dayid">00</td>
@@ -94,7 +94,7 @@
         </style>
         <div class="lagerbestand-anzeige">
             <div>
-                <span>{if $lang eq "eng"}Only {else}Nur noch {/if}<strong>{$adpStock.count}</strong>{if $lang eq "eng"} pieces available!{else} Stück verfügbar!{/if}</span>
+                <span>{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_stock_text')|escape:'html'|replace:'%s':"<strong>{$adpStock.count|escape:'html'}</strong>"}</span>
             </div>
             <div class="lagerbestand-fortschritt">
                 <div class="fortschritt"></div>
