@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.2.2
+**Version:** 0.3.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -29,8 +29,8 @@ Unterhalb jeder Produktbox in Kategorie- und Suchergebnislisten werden Bilder au
 ### 3. Lagerbestandsanzeige
 Sobald der Lagerbestand unter einen konfigurierbaren Schwellenwert fällt, erscheint ein **farbiger Fortschrittsbalken** mit der Restmenge. Der Balken füllt sich proportional zum Verhältnis Bestand/Schwellwert. Farbe ist im Backend per Color-Picker einstellbar.
 
-### 4. Countdown-Timer
-Zeigt einen JavaScript-basierten Countdown (Tage / Stunden / Minuten / Sekunden) auf der Artikeldetailseite an — **aber nur, solange ein Sonderpreis aktiv ist** (`Sonderpreis_aktiv`). Zieldatum/-uhrzeit sind im Backend frei konfigurierbar; nach Ablauf wird der Timer automatisch ausgeblendet. Überschrift ist als Sprachvariable übersetzbar (Default: „Black Weekend Sale").
+### 4. Countdown (umgezogen)
+Der Countdown auf der Artikeldetailseite wird seit 0.3.0 von der **Countdown-Verwaltung in Startseite Plus** (Plugin-Tab „Countdowns“, Option „Auf Artikeldetailseiten anzeigen“) bereitgestellt. Dort lassen sich mehrere Countdowns für verschiedene Aktionen pflegen, die auch der Aktions-Banner nutzt.
 
 ### 5. „Günstiger gesehen?"-Formular
 Ein Bootstrap-Modal mit Formular, in dem Kunden einen günstigeren Wettbewerberpreis melden können. Pflichtfelder: E-Mail und URL zum günstigeren Angebot, optional eine Nachricht.
@@ -59,7 +59,7 @@ Erfolgs- und Fehlermeldungen werden als Alerts oberhalb des Formulars angezeigt;
 
 ## Konfiguration
 
-Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen sind Checkboxen (seit 0.2.2; gespeichert wird `on` bzw. leer).
+Die Einstellungen sind in vier Tabs gegliedert. Alle „Aktiv"-Einstellungen sind Checkboxen (seit 0.2.2; gespeichert wird `on` bzw. leer).
 
 | Tab | Einstellung | Typ | Beschreibung |
 |---|---|---|---|
@@ -69,8 +69,6 @@ Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen si
 | Fahreigenschaften | Dimensionen anzeigen | Checkbox (Default an) | Tabelle und Board-Skizze mit Form/Shape/Waist/Nose/Tail |
 | Merkmalbilder | Merkmalbilder Anzeige aktiv | Checkbox | Aktiviert Bilder unter den Artikelboxen in der Listenansicht |
 | Merkmalbilder | Merkmalwerte mit Bildern | Mehrfachauswahl | Welche Merkmale (mit hinterlegten Bildern) angezeigt werden — dynamisch aus `tmerkmal` |
-| Countdown | Countdown aktiv | Checkbox | Zeigt den Timer an (zusätzliche Bedingung: aktiver Sonderpreis) |
-| Countdown | Datum / Zeit | Date / Time | Ablauf-Zeitpunkt des Countdowns |
 | Lagerbestandsanzeige | Lagerbestandsanzeige aktiv | Checkbox | Zeigt den Fortschrittsbalken bei niedrigem Bestand |
 | Lagerbestandsanzeige | Nur bei Lagerbestand unter | Number (Default 10) | Schwellenwert, ab dem die Anzeige erscheint |
 | Lagerbestandsanzeige | Farbe der Anzeige | Color (Default `#ffa54f`) | Farbe des Fortschrittsbalkens |
@@ -87,10 +85,8 @@ Alle frontend-relevanten Texte sind als Sprachvariablen hinterlegt und können u
 | `artikel_details_plus_weight_title` | Empfohlenes Körpergewicht: | Suggested Weight: |
 | `artikel_details_plus_level_title` | Fahrlevel: | Rider Skills: |
 | `artikel_details_plus_stock_text` | Nur noch %s Stück verfügbar! | Only %s pieces available! |
-| `artikel_details_plus_countdown_days` / `_hours` / `_minutes` / `_seconds` | Tage / Stunden / Minuten / Sekunden | Days / Hours / Minutes / Seconds |
 | `artikel_details_plus_specs_heading_characteristics` | Fahreigenschaften | Ride Characteristics |
 | `artikel_details_plus_specs_heading_dimensions` | Dimensionen | Dimensions |
-| `artikel_details_plus_countdown_heading` | Black Weekend Sale | Black Weekend Sale |
 | `artikel_details_plus_form_button` | Günstiger gesehen? | Seen it cheaper? |
 | `artikel_details_plus_cheaper_title` | Günstiger gesehen? | Seen it cheaper? |
 | `artikel_details_plus_cheaper_success` | Vielen Dank! Wir haben Ihren Preishinweis erhalten… | Thank you! We have received your price tip… |
@@ -111,14 +107,13 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 
 | Block | Datei | Wirkung |
 |---|---|---|
-| `productdetails-details-include-variation` | `details.tpl` | Countdown-Box oberhalb der Variationen |
 | `productdetails-details-stock` | `details.tpl` | Lagerbestand-Balken + „Günstiger gesehen"-Button |
 | `tab-description-media-types`, `productdetails-tabs-card-description-content` | `tabs.tpl` | Pentagon/Gewicht/Fahrlevel im Beschreibungs-Tab |
 | `productdetails-popups` | `popups.tpl` | Modal mit Formular |
 | `productlist-index-include-price` | `item_box.tpl` | Merkmalbilder unter Artikelboxen |
 
 ### Hooks
-- `HOOK_ARTIKEL_PAGE` (registriert in `Bootstrap.php`): verarbeitet POST-Submissions des „Günstiger gesehen"-Formulars (PRG-Redirect) und befüllt die Smarty-Variablen für alle Bauteile: `assignSnowboardSpecs()` setzt `adpSpecsCharacteristics`, `adpSpecsDimensions`, `adpSpecsBoard`, `adpFrontendURL`; `assignDetailExtras()` setzt `adpCountdown`, `adpStock`, `adpCheaperActive`, `adpWeight`, `adpLevel`. Die Templates rechnen nichts mehr selbst.
+- `HOOK_ARTIKEL_PAGE` (registriert in `Bootstrap.php`): verarbeitet POST-Submissions des „Günstiger gesehen"-Formulars (PRG-Redirect) und befüllt die Smarty-Variablen für alle Bauteile: `assignSnowboardSpecs()` setzt `adpSpecsCharacteristics`, `adpSpecsDimensions`, `adpSpecsBoard`, `adpFrontendURL`; `assignDetailExtras()` setzt `adpStock`, `adpCheaperActive`, `adpWeight`, `adpLevel`. Die Templates rechnen nichts mehr selbst.
 
 ### Dynamische Optionsquelle
 - `adminmenu/merkmalwerte.php`: SQL-Query über `tmerkmal`/`tmerkmalwert`, liefert nur Merkmale mit mindestens einem bebilderten Wert. Versorgt die Mehrfachauswahl „Merkmalwerte mit Bildern".
@@ -155,7 +150,7 @@ artikel_details_plus/
 │   └── merkmalwerte.php                   # Dynamische Optionsquelle (Selectbox)
 ├── frontend/template/
 │   ├── productdetails/
-│   │   ├── details.tpl                    # Countdown, Lagerbestand, Cheaper-Button
+│   │   ├── details.tpl                    # Lagerbestand, Cheaper-Button
 │   │   ├── tabs.tpl                       # Pentagon/Gewicht/Fahrlevel im Beschreibungs-Tab
 │   │   ├── svg_attributes.tpl             # Pentagon-SVG + Gewicht/Fahrlevel-Logik
 │   │   ├── snowboard_values.tpl           # Dimensionen: Board-Skizze + Tabelle (Form/Shape/Waist/Nose/Tail)
@@ -175,6 +170,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.3.0 (2026-09-18)
+- Countdown entfernt: Einstellungen, Sprachvariablen und Template-Block sind in die Countdown-Verwaltung von Startseite Plus 2.1.0 umgezogen (mehrere Countdowns, Anzeige auf Artikelseiten wahlweise nur bei Sonderpreis). Migration räumt die alten Einstellungswerte auf.
 
 ### 0.2.2 (2026-09-18)
 - Alle acht Aktiv-Schalter sind wieder Checkboxen; Migration konvertiert gespeicherte Werte

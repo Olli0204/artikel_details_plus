@@ -49,37 +49,22 @@ class Bootstrap extends Bootstrapper
     private const WEIGHT_STEPS_MOBILE  = [40, 50, 60, 70, 80, 90, 100];
 
     /**
-     * Countdown, Lagerbestandsanzeige, "Günstiger gesehen", Körpergewicht und Fahrlevel:
+     * Lagerbestandsanzeige, "Günstiger gesehen", Körpergewicht und Fahrlevel:
      * alle Berechnungen passieren hier, die Templates geben nur noch aus.
+     * (Der Countdown ist seit 0.3.0 in der Countdown-Verwaltung von Startseite Plus.)
      */
     public function assignDetailExtras(?object $artikel): void
     {
         $smarty = Shop::Smarty();
         $config = $this->getPlugin()->getConfig();
 
-        $smarty->assign('adpCountdown', null)
-            ->assign('adpStock', null)
+        $smarty->assign('adpStock', null)
             ->assign('adpCheaperActive', $this->isOn($config->getValue('artikel_details_plus_cheaper_aktiv')))
             ->assign('adpWeight', null)
             ->assign('adpLevel', null);
 
         if ($artikel === null) {
             return;
-        }
-
-        // Countdown: nur mit gültigem Datum und Uhrzeit und nur bei aktivem Sonderpreis
-        if (
-            $this->isOn($config->getValue('artikel_details_plus_countdown_aktiv'))
-            && !empty($artikel->Preise->Sonderpreis_aktiv)
-        ) {
-            $date = \trim((string)$config->getValue('artikel_details_plus_countdown_date'));
-            $time = \trim((string)$config->getValue('artikel_details_plus_countdown_time'));
-            if (\preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) && \preg_match('/^\d{2}:\d{2}(:\d{2})?$/', $time)) {
-                $target = \DateTime::createFromFormat('Y-m-d H:i', $date . ' ' . \substr($time, 0, 5));
-                if ($target !== false && $target->getTimestamp() > \time()) {
-                    $smarty->assign('adpCountdown', ['target' => $date . 'T' . \substr($time, 0, 5) . ':00']);
-                }
-            }
         }
 
         // Lagerbestand: Balken nur unterhalb des Schwellenwerts, Division nur mit Schwellenwert > 0
