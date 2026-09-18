@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.4.1
+**Version:** 0.4.2
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -107,7 +107,8 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 
 | Block | Datei | Wirkung |
 |---|---|---|
-| `productdetails-details-stock` | `details.tpl` | Stylesheet-Einbindung, Lagerbestand-Balken + „Günstiger gesehen"-Button |
+| `productdetails-details-stock` | `details.tpl` | Stylesheet-Einbindung + Lagerbestand-Balken (eigene `col col-12` unter dem Preis) |
+| `productdetails-details-question-on-item` | `details.tpl` | „Günstiger gesehen"-Button neben NOVAs „Frage zum Artikel" |
 | `tab-description-media-types`, `productdetails-tabs-card-description-content` | `tabs.tpl` | Pentagon/Gewicht/Fahrlevel im Beschreibungs-Tab |
 | `productdetails-popups` | `popups.tpl` | Modal mit Formular |
 | `productlist-index-include-price` | `item_box.tpl` | Merkmalbilder unter Artikelboxen |
@@ -130,7 +131,8 @@ Alle Bauteile teilen sich ein Design-System im Stylesheet — keine Inline-`<sty
 - **Radar-Diagramm:** Gitter und Fläche werden über die Klassen `.adp-radar__grid`, `.adp-radar__area`, `.adp-radar__hit` und `.adp-radar__label` gestylt (Akzentfarbe statt Rot). Unter dem Diagramm steht eine Chip-Liste mit allen Werten, damit die Zahlen auch ohne Hover (Touch) sichtbar sind; beim Überfahren eines Sektors wird der passende Chip hervorgehoben.
 - **Gewicht und Fahrlevel:** Pill-Leisten (`.adp-meter`) mit hellem Track, akzentfarbenem Bereich und der Spanne im Klartext neben der Überschrift statt im Tooltip.
 - **Dimensionen:** Board-Skizze und Tabelle stehen per Container-Query nebeneinander, sobald das Panel breit genug ist.
-- **„Günstiger gesehen?":** Pill-Button mit hellem Rahmen und Preisschild-Icon (`fa-tag`), rechtsbündig unter dem Preisblock. Bewusst eine andere Form als NOVAs Zeile „Frage zum Artikel" darunter, damit die beiden nicht wie Duplikate wirken; Hover und Fokus färben Rahmen, Text und Icon im Akzent.
+- **„Günstiger gesehen?":** Pill-Button mit hellem Rahmen und Preisschild-Icon (`fa-tag`). Er sitzt in NOVAs Spalte `.question-on-item`, also in derselben Zeile wie „Frage zum Artikel" statt in einem eigenen Band darüber. Die Pill-Form hält die beiden Aktionen trotz gemeinsamer Zeile auseinander; Hover und Fokus färben Rahmen, Text und Icon im Akzent.
+- **Positionen in NOVAs Preis-Row:** Preis, Lagerbalken und Lieferinfo liegen bei NOVA in einer gemeinsamen `.row`. Eigene Bauteile brauchen dort zwingend eine `col`-Klasse — ohne sie werden sie zum nackten Flex-Item, das auf Inhaltsbreite schrumpft, an den rechten Rand rutscht und den Preisblock schmaler macht.
 
 ---
 
@@ -180,6 +182,12 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.4.2 (2026-09-18)
+- Fix: Der Lagerbalken hing ohne `col`-Klasse als nacktes Flex-Item in NOVAs Preis-Row — er schrumpfte auf Inhaltsbreite, rutschte neben den Preis an den rechten Rand und verschmälerte den Preisblock von 625px auf 437px. Jetzt eigene `col col-12` in voller Breite unter dem Preis
+- Der „Günstiger gesehen?"-Button steht nicht mehr als eigenes Band zwischen Preis und Lieferinfo, sondern in NOVAs Button-Spalte direkt vor „Frage zum Artikel" — eine Aktionszeile statt zwei
+- Das Plugin-Stylesheet wird nicht mehr als (0px breites) Flex-Item in die Preis-Row gehängt, sondern in die eigene Spalte
+- Der Button erscheint nicht mehr im Quickview, wo NOVA das zugehörige Modal gar nicht rendert
 
 ### 0.4.1 (2026-09-18)
 - „Günstiger gesehen?" ist jetzt ein Pill-Button mit Preisschild-Icon statt eines Fragezeichen-Links: die NOVA-Zeile „Frage zum Artikel" steht direkt darunter, beide sahen vorher praktisch gleich aus
