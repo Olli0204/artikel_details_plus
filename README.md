@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.4.0
+**Version:** 0.4.1
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -130,6 +130,7 @@ Alle Bauteile teilen sich ein Design-System im Stylesheet — keine Inline-`<sty
 - **Radar-Diagramm:** Gitter und Fläche werden über die Klassen `.adp-radar__grid`, `.adp-radar__area`, `.adp-radar__hit` und `.adp-radar__label` gestylt (Akzentfarbe statt Rot). Unter dem Diagramm steht eine Chip-Liste mit allen Werten, damit die Zahlen auch ohne Hover (Touch) sichtbar sind; beim Überfahren eines Sektors wird der passende Chip hervorgehoben.
 - **Gewicht und Fahrlevel:** Pill-Leisten (`.adp-meter`) mit hellem Track, akzentfarbenem Bereich und der Spanne im Klartext neben der Überschrift statt im Tooltip.
 - **Dimensionen:** Board-Skizze und Tabelle stehen per Container-Query nebeneinander, sobald das Panel breit genug ist.
+- **„Günstiger gesehen?":** Pill-Button mit hellem Rahmen und Preisschild-Icon (`fa-tag`), rechtsbündig unter dem Preisblock. Bewusst eine andere Form als NOVAs Zeile „Frage zum Artikel" darunter, damit die beiden nicht wie Duplikate wirken; Hover und Fokus färben Rahmen, Text und Icon im Akzent.
 
 ---
 
@@ -180,12 +181,14 @@ artikel_details_plus/
 
 ## Versionsverlauf
 
+### 0.4.1 (2026-09-18)
+- „Günstiger gesehen?" ist jetzt ein Pill-Button mit Preisschild-Icon statt eines Fragezeichen-Links: die NOVA-Zeile „Frage zum Artikel" steht direkt darunter, beide sahen vorher praktisch gleich aus
+
 ### 0.4.0 (2026-09-18)
 - Design-Überarbeitung der Artikeldetailseite: Fahreigenschaften, Körpergewicht/Fahrlevel und Dimensionen liegen jetzt in einheitlichen Karten mit gemeinsamem Raster (ab 768px zweispaltig) statt frei im Beschreibungs-Tab
 - Radar-Diagramm in Akzentfarbe mit hellem Gitter und lesbaren Beschriftungen; neue Chip-Liste mit allen Werten (vorher nur per Hover sichtbar, auf Touch-Geräten gar nicht)
 - Gewichts- und Fahrlevel-Leisten als abgerundete Pill-Leisten mit Klartext-Spanne statt schwarzem Kasten mit Tooltip
 - Lagerbestandsanzeige als schlanker Balken ohne Rahmen; die eingestellte Farbe kommt als CSS-Variable ins Markup
-- „Günstiger gesehen?"-Zeile übernimmt Abstände und Trennlinie der NOVA-Zeile „Frage zum Artikel"
 - Alle Inline-`<style>`-Blöcke und die fest kodierten Farben in `ecm_polygon_svg.js` entfernt; das Stylesheet wird einmalig in `details.tpl` eingebunden, das Diagramm-Skript ist gegen doppeltes Laden abgesichert
 
 ### 0.3.0 (2026-09-18)

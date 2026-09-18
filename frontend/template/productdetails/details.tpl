@@ -22,8 +22,8 @@
         {assign var=adpCheaperLabel value=$adpL->getTranslation('artikel_details_plus_form_button')}
         <div class="col col-12">
             <div class="adp-cheaper">
-                <button type="button" class="btn btn-link question adp-cheaper__btn" id="adp-cheaper-btn-{$adpModalId}" title="{$adpCheaperLabel|escape:'html'}" data-toggle="modal" data-target="#cheaper-{$adpModalId}">
-                    <span class="fa fa-question-circle"></span>
+                <button type="button" class="btn adp-cheaper__btn" id="adp-cheaper-btn-{$adpModalId}" title="{$adpCheaperLabel|escape:'html'}" data-toggle="modal" data-target="#cheaper-{$adpModalId}">
+                    <span class="fa fa-tag" aria-hidden="true"></span>
                     <span>{$adpCheaperLabel|escape:'html'}</span>
                 </button>
             </div>

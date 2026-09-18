@@ -50,35 +50,46 @@
     background: var(--adp-stock-color, var(--adp-accent));
 }
 
-/* -------------------------------------------- "Günstiger gesehen?"-Link */
-/* Übernimmt Abstände und Trennlinie der NOVA-Zeile "Frage zum Artikel". */
+/* ------------------------------------------ "Günstiger gesehen?"-Button */
+/* Eigene Form (Pill mit Preisschild), damit der Button nicht wie ein Duplikat
+   der NOVA-Zeile "Frage zum Artikel" darunter wirkt. */
 .adp-cheaper {
     display: flex;
     justify-content: flex-end;
-    margin: .5rem 0 0;
-    padding-top: .5rem;
-    border-top: 1px solid var(--adp-border);
+    margin: .75rem 0 0;
 }
 .adp-cheaper__btn.btn {
     display: inline-flex;
     align-items: center;
-    gap: .45rem;
+    gap: .5rem;
     margin: 0;
-    padding: .25rem 0;
-    font-size: .9rem;
+    padding: .4rem .9rem;
+    font-size: .85rem;
     font-weight: 600;
-    color: var(--adp-muted);
-    text-decoration: none;
+    line-height: 1.4;
+    color: var(--adp-ink);
+    background: #fff;
+    border: 1px solid var(--adp-border);
+    border-radius: 999px;
     box-shadow: none;
+    text-decoration: none;
+    transition: border-color .15s ease, color .15s ease;
 }
 .adp-cheaper__btn.btn:hover,
 .adp-cheaper__btn.btn:focus {
     color: var(--adp-accent);
+    background: #fff;
+    border-color: var(--adp-accent);
     text-decoration: none;
 }
+.adp-cheaper__btn.btn:focus-visible {
+    outline: 2px solid var(--adp-accent);
+    outline-offset: 2px;
+}
 .adp-cheaper__btn .fa {
-    font-size: 1.05rem;
+    font-size: .95rem;
     line-height: 1;
+    color: var(--adp-accent);
 }
 
 /* ------------------------------------------------ Specs: Raster + Panels */
