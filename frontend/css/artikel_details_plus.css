@@ -6,7 +6,6 @@
    ========================================================================== */
 
 .adp-stock,
-.adp-cheaper,
 .adp-specs {
     --adp-accent: var(--primary, #FFA54F);
     --adp-ink: #1b1b1b;
@@ -18,7 +17,7 @@
 
 /* ------------------------------------------------------- Lagerbestand */
 .adp-stock {
-    margin: 0 0 1rem;
+    margin: 0 0 .75rem;
 }
 .adp-stock__label {
     display: flex;
@@ -51,19 +50,26 @@
 }
 
 /* ------------------------------------------ "Günstiger gesehen?"-Button */
-/* Eigene Form (Pill mit Preisschild), damit der Button nicht wie ein Duplikat
-   der NOVA-Zeile "Frage zum Artikel" darunter wirkt. */
-.adp-cheaper {
+/* Sitzt in NOVAs Spalte ".question-on-item", direkt vor "Frage zum Artikel".
+   Eigene Form (Pill mit Preisschild), damit die beiden Aktionen unterscheidbar
+   bleiben, obwohl sie sich eine Zeile teilen. */
+.question-on-item {
     display: flex;
+    flex-wrap: wrap;
+    align-items: center;
     justify-content: flex-end;
-    margin: .75rem 0 0;
 }
 .adp-cheaper__btn.btn {
+    --adp-accent: var(--primary, #FFA54F);
+    --adp-ink: #1b1b1b;
+    --adp-border: #e1e5ea;
     display: inline-flex;
     align-items: center;
     gap: .5rem;
-    margin: 0;
-    padding: .4rem .9rem;
+    /* Abstand zu "Frage zum Artikel" als margin, damit er auch ohne Flex-Kontext greift */
+    margin: 0 .5rem 0 0;
+    padding: .35rem .85rem;
+    vertical-align: middle;
     font-size: .85rem;
     font-weight: 600;
     line-height: 1.4;
@@ -73,6 +79,7 @@
     border-radius: 999px;
     box-shadow: none;
     text-decoration: none;
+    white-space: nowrap;
     transition: border-color .15s ease, color .15s ease;
 }
 .adp-cheaper__btn.btn:hover,
