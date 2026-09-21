@@ -265,6 +265,27 @@ class Bootstrap extends Bootstrapper
         '4x4'     => '4x4',
     ];
 
+    /**
+     * Zonen der Seitenansicht je Profiltyp: [von, bis, Art] entlang der Länge (0 = Nose, 1 = Tail).
+     * Art: kick (Aufbiegung der Spitze), rocker (Reverse Camber), camber (Positive Camber), flat (Zero Camber)
+     */
+    private const PROFILE_ZONES = [
+        'camber'        => [[0, 0.12, 'kick'], [0.12, 0.88, 'camber'], [0.88, 1, 'kick']],
+        'flat'          => [[0, 0.12, 'kick'], [0.12, 0.88, 'flat'], [0.88, 1, 'kick']],
+        'rocker'        => [[0, 1, 'rocker']],
+        'hybrid camber' => [[0, 0.25, 'rocker'], [0.25, 0.75, 'camber'], [0.75, 1, 'rocker']],
+        'hybrid rocker' => [[0, 0.2, 'kick'], [0.2, 0.36, 'camber'], [0.36, 0.64, 'rocker'], [0.64, 0.8, 'camber'], [0.8, 1, 'kick']],
+        'flat rocker'   => [[0, 0.25, 'rocker'], [0.25, 0.75, 'flat'], [0.75, 1, 'rocker']],
+    ];
+
+    /** Zonenarten => Sprachvariable der Legende */
+    private const PROFILE_ZONE_LABELS = [
+        'camber' => 'artikel_details_plus_profile_zone_camber',
+        'rocker' => 'artikel_details_plus_profile_zone_rocker',
+        'flat'   => 'artikel_details_plus_profile_zone_flat',
+        'kick'   => 'artikel_details_plus_profile_zone_kick',
+    ];
+
     /** Profile der Seitenansicht: Typ => Anzeigename */
     private const PROFILES = [
         'camber'        => 'Camber',
@@ -390,9 +411,10 @@ class Bootstrap extends Bootstrapper
         }
         if ($profileType !== null) {
             $smarty->assign('adpProfile', [
-                'type'  => $profileType,
-                'label' => self::PROFILES[$profileType],
-                'text'  => \trim((string)$profileText),
+                'type'    => $profileType,
+                'label'   => self::PROFILES[$profileType],
+                'text'    => \trim((string)$profileText),
+                'colored' => $this->isOn($config->getValue('artikel_details_plus_profile_zones_aktiv')),
             ] + $this->buildProfileSketch($profileType));
         }
     }
@@ -440,9 +462,11 @@ class Bootstrap extends Bootstrapper
     /**
      * Seitenansicht als Polylinie: Höhe über dem Boden entlang der Länge (0 = Nose, 1 = Tail),
      * vertikal übertrieben, damit Camber und Rocker auf den ersten Blick zu unterscheiden sind.
-     * Zurück kommen der Pfad des Bretts, die Bodenlinie und die viewBox.
+     * Zurück kommen der Pfad des Bretts, die Zonen als eigene Teilpfade (für die farbige Darstellung),
+     * die Legende, die Bodenlinie und die viewBox.
      *
-     * @return array{path: string, ground: float, viewBox: string}
+     * @return array{path: string, zones: list<array{kind: string, path: string}>,
+     *               legend: list<array{kind: string, label: string}>, ground: float, viewBox: string}
      */
     private function buildProfileSketch(string $type): array
     {
@@ -482,14 +506,40 @@ class Bootstrap extends Bootstrapper
         $x1 = 580.0;
         $ground = 52.0;
         $thick  = 6.0;
+        $steps  = 112;
+        $point  = static fn(float $u): string => \sprintf(
+            '%s %s',
+            \round($x0 + ($x1 - $x0) * $u, 1),
+            \round($ground - $thick / 2 - $height($u), 1)
+        );
         $points = [];
-        for ($i = 0; $i <= 112; $i++) {
-            $u = $i / 112;
-            $points[] = \sprintf('%s %s', \round($x0 + ($x1 - $x0) * $u, 1), \round($ground - $thick / 2 - $height($u), 1));
+        for ($i = 0; $i <= $steps; $i++) {
+            $points[] = $point($i / $steps);
+        }
+
+        // Zonen: Teilpfade mit gemeinsamen Randpunkten, damit die Farbwechsel nahtlos sind
+        $zones  = [];
+        $legend = [];
+        $loc    = $this->getPlugin()->getLocalization();
+        foreach (self::PROFILE_ZONES[$type] ?? [] as [$from, $to, $kind]) {
+            $zonePoints = [$point($from)];
+            for ($i = 0; $i <= $steps; $i++) {
+                $u = $i / $steps;
+                if ($u > $from && $u < $to) {
+                    $zonePoints[] = $point($u);
+                }
+            }
+            $zonePoints[] = $point($to);
+            $zones[] = ['kind' => $kind, 'path' => 'M ' . \implode(' L ', $zonePoints)];
+            if (!isset($legend[$kind])) {
+                $legend[$kind] = ['kind' => $kind, 'label' => $loc->getTranslation(self::PROFILE_ZONE_LABELS[$kind])];
+            }
         }
 
         return [
             'path'    => 'M ' . \implode(' L ', $points),
+            'zones'   => $zones,
+            'legend'  => \array_values($legend),
             'ground'  => $ground,
             'viewBox' => \sprintf('0 0 600 %s', $ground + 12),
         ];

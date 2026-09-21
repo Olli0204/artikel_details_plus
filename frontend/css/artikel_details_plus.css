@@ -363,6 +363,46 @@
     stroke-linecap: round;
     stroke-linejoin: round;
 }
+.adp-profile {
+    --adp-zone-camber: #3d7ee8;
+    --adp-zone-rocker: #e0473f;
+    --adp-zone-flat: #f2c230;
+    --adp-zone-kick: #4caf50;
+}
+/* Farbige Zonen (Backend-Schalter "Profil-Zonen farbig markieren") */
+.adp-profile__seg--camber { stroke: var(--adp-zone-camber); }
+.adp-profile__seg--rocker { stroke: var(--adp-zone-rocker); }
+.adp-profile__seg--flat   { stroke: var(--adp-zone-flat); }
+.adp-profile__seg--kick   { stroke: var(--adp-zone-kick); }
+.adp-profile__seg {
+    stroke-linecap: butt;
+}
+.adp-profile__legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: .35rem 1.1rem;
+    margin: .6rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: .78rem;
+    color: var(--adp-muted);
+}
+.adp-profile__legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+}
+.adp-profile__dot {
+    width: .7rem;
+    height: .7rem;
+    border-radius: 50%;
+    background: var(--adp-accent);
+}
+.adp-profile__dot--camber { background: var(--adp-zone-camber); }
+.adp-profile__dot--rocker { background: var(--adp-zone-rocker); }
+.adp-profile__dot--flat   { background: var(--adp-zone-flat); }
+.adp-profile__dot--kick   { background: var(--adp-zone-kick); }
 .adp-profile__caption {
     margin: .75rem 0 0;
     text-align: center;

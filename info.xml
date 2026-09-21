@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.8.0</Version>
+    <Version>0.9.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -67,6 +67,11 @@ Link:     {$oPluginMail->cURL}
                     <Name>Fahreigenschaften-Diagramm anzeigen</Name>
                     <Description>Zeigt das Diagramm der Fahreigenschaften (Carving, Jib, Powder, All-Mountain, Jump) im Beschreibungs-Tab. Liest die Funktionsattribute carving, jib, powder, all_mountain und jump (0 bis 10), ersatzweise vom Vaterartikel.</Description>
                     <ValueName>artikel_details_plus_specs_characteristics_aktiv</ValueName>
+                </Setting>
+                <Setting type="checkbox" initialValue="on" sort="5" conf="Y">
+                    <Name>Profil-Zonen farbig markieren</Name>
+                    <Description>Teilt die Seitenansicht des Profils farbig in ihre Abschnitte (Camber, Rocker, Flat, Kick) und zeigt eine Legende. Abgewählt wird das Profil einfarbig gezeichnet.</Description>
+                    <ValueName>artikel_details_plus_profile_zones_aktiv</ValueName>
                 </Setting>
                 <Setting type="checkbox" sort="4" conf="Y">
                     <Name>Dimensionen anzeigen</Name>
@@ -153,6 +158,30 @@ Link:     {$oPluginMail->cURL}
                 <Description>Überschrift der Profil-Seitenansicht (Camber/Rocker)</Description>
                 <VariableLocalized iso="GER">Profil</VariableLocalized>
                 <VariableLocalized iso="ENG">Profile</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_profile_zone_camber</Name>
+                <Description>Legende Profil: Positive-Camber-Zone</Description>
+                <VariableLocalized iso="GER">Camber</VariableLocalized>
+                <VariableLocalized iso="ENG">Camber</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_profile_zone_rocker</Name>
+                <Description>Legende Profil: Rocker-/Reverse-Camber-Zone</Description>
+                <VariableLocalized iso="GER">Rocker</VariableLocalized>
+                <VariableLocalized iso="ENG">Rocker</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_profile_zone_flat</Name>
+                <Description>Legende Profil: Flat-/Zero-Camber-Zone</Description>
+                <VariableLocalized iso="GER">Flat</VariableLocalized>
+                <VariableLocalized iso="ENG">Flat</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_profile_zone_kick</Name>
+                <Description>Legende Profil: Aufbiegung von Nose und Tail</Description>
+                <VariableLocalized iso="GER">Kick</VariableLocalized>
+                <VariableLocalized iso="ENG">Kick</VariableLocalized>
             </Variable>
             <Variable>
                 <Name>artikel_details_plus_flex_title</Name>
