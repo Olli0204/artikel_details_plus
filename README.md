@@ -78,6 +78,102 @@ Die Einstellungen sind in vier Tabs gegliedert. Alle „Aktiv"-Einstellungen sin
 
 ---
 
+## Datenpflege in der Wawi
+
+Alle Snowboard-Daten kommen aus **Funktionsattributen** des Artikels — in JTL-Wawi im Artikel unter **Attribute → Funktionsattribute** (Name/Wert-Paare). Nicht zu verwechseln mit den *Artikelattributen* im selben Reiter: die haben Übersetzungen, landen im Shop in `tattribut` und werden vom Plugin nicht gelesen. Funktionsattribute landen in `tartikelattribut`; der Shop legt die Namen beim Laden kleingeschrieben ab (`Artikel::holArtikelAttribute()`), Groß-/Kleinschreibung der Namen ist also egal.
+
+**Vater und Kind:** Jedes Attribut wird zuerst am Artikel gesucht, dann am Vaterartikel. Bei Variationskombinationen reicht die Pflege am Vater; ein Kind mit eigenem Wert gewinnt. Praktisch bei Boards: Form, Shape, Flex und Fahreigenschaften an den Vater, abweichende Breiten je Länge ans Kind.
+
+**Nach dem Pflegen:** Wawi-Abgleich, dann im Shop-Backend unter Artikel → Artikel → [Artikel] → Attribute kontrollieren. Zeigt die Artikelseite noch alte Werte, den Shop-Cache leeren (System → Cache).
+
+### Übersicht aller Attribute
+
+| Attribut | Wert | Pflicht | Wirkung |
+|---|---|---|---|
+| `carving`, `jib`, `powder`, `all_mountain`, `jump` | `0`–`10`, Dezimal erlaubt | ab 3 Werten | Radar-Diagramm „Fahreigenschaften" + Chips |
+| `flex` | `1`–`10`, Dezimal erlaubt (`7,5` = halbes Segment) | – | Karte „Flex" |
+| `flex_ab`, `flex_bis` | Bereich `1`–`10`, z. B. `5` / `7` | – | wie `flex`, markiert mehrere Segmente/Zonen |
+| `koerpergewicht_ab`, `koerpergewicht_bis` | kg, z. B. `40` / `70` | beide | Gewichtsleiste 35–100 kg |
+| `fahrlevel_ab`, `fahrlevel_bis` | `Beginner`, `Advanced`, `Professional` | eines reicht | Fahrlevel-Leiste |
+| `laenge` | cm, z. B. `157` (Werte über 400 gelten als mm) | – | Maßstab und Längenmaß der Board-Skizze, Tabellenzeile „Länge" |
+| `shape` | Umriss, siehe Liste unten | – | Tabellenzeile „Shape", steuert Twin/Directional in der Skizze |
+| `form` | Profil, siehe Liste unten | – | Tabellenzeile „Form", steuert die Seitenansicht „Profil" |
+| `nose`, `waist`, `tail` | mm, reine Zahl, Komma erlaubt (`298,5`) | alle drei für die Skizze | Board-Skizze + Tabellenzeilen |
+| `inserts` | `channel`, `2x4`, `4x4` (Text darf mehr enthalten) | – | Inserts in der Skizze, Tabellenzeile „Inserts" |
+| `stance` | cm, z. B. `56` | – | Referenzstance der Inserts (sonst 36 % der Länge, 40–60 cm) |
+| `setback` | cm Richtung Tail, z. B. `2` | – | Versatz der Inserts (sonst 0 / 1 / 2 cm je Umriss) |
+| `outline` | `twin`, `directional`, `directional twin` | – | überstimmt die Umriss-Erkennung aus `shape`/`form` |
+| `profil` | einer der sechs Profiltypen, siehe unten | – | überstimmt die Profil-Erkennung aus `form`/`shape` |
+
+Alle Karten hängen am Hauptschalter „Merkmalwert-Anzeige aktiv"; Diagramm, Dimensionen und Fahrlevel haben zusätzlich eigene Schalter. Karten ohne Daten werden nicht ausgegeben.
+
+### Fahreigenschaften (`carving` … `jump`)
+
+Das Diagramm hat so viele Ecken wie gepflegte Werte — mit vier Werten wird das Fünfeck zum Viereck. Am besten immer alle fünf pflegen. Werte über 10 werden auf 10 gekappt, unter 0 auf 0.
+
+### Flex (`flex` oder `flex_ab`/`flex_bis`)
+
+Skala 1–10 in fünf Zonen:
+
+| Wert | Zone |
+|---|---|
+| 1–2 | Soft |
+| 3–4 | Medium-Soft |
+| 5–6 | Medium |
+| 7–8 | Medium-Stiff |
+| 9–10 | Stiff |
+
+Ein Einzelwert füllt die Segmente bis zum Wert; ein Bereich markiert nur die Segmente dazwischen. Die Zonennamen sind Sprachvariablen (`artikel_details_plus_flex_zone_*`) und lassen sich im Backend umbenennen, z. B. auf Deutsch.
+
+### Körpergewicht und Fahrlevel
+
+- `koerpergewicht_ab`/`_bis`: beide nötig, `bis` ≥ `ab`. Die Skala läuft 35–100 kg (auf Mobilgeräten 40–100 in 10er-Schritten); Werte außerhalb landen im „+"-Feld am Rand.
+- `fahrlevel_ab`/`_bis`: exakt `Beginner`, `Advanced` oder `Professional` (Schreibweise egal). Andere Wörter werden ignoriert — steht in beiden Feldern etwas Unbekanntes, verschwindet die Leiste. Ist nur eines gesetzt, gilt es für beide; vertauschte Reihenfolge wird korrigiert.
+
+### Länge (`laenge`)
+
+Optional. Fehlt das Attribut, liest das Plugin beim **Kind-Artikel** den gewählten Wert der Variation, deren Name „Läng", „Length", „Size" oder „Grö" enthält, und nimmt die führende Zahl (`156 Wide` → 156, gültig 80–200). Auf der Vaterseite ohne gewählte Variation bleibt die Länge unbekannt: die Skizze nutzt dann das typische Verhältnis 5,2:1 zur breitesten Stelle, und das Längenmaß entfällt. `laenge` als Attribut gewinnt gegenüber der Variation.
+
+### Shape — Umriss (`shape`, Fallback `form`, Override `outline`)
+
+Freitext, erscheint 1:1 in der Tabelle. Für die Skizze zählen nur die Wörter „Directional" und „Twin":
+
+| Wert (Vorschlag für die Auswahlliste) | Skizze |
+|---|---|
+| `True Twin`, `Twin`, `Asymmetrical Twin` | symmetrisch, Inserts mittig |
+| `Directional Twin` | symmetrisch, Inserts 1 cm Richtung Tail |
+| `Directional`, `Tapered Directional` | längere Nose (14,5 % der Länge bis zur breitesten Stelle), kürzeres, stumpferes Tail (8,5 %), Inserts 2 cm Richtung Tail |
+
+Regel: enthält der Text „directional" → Directional; zusätzlich „twin" → Directional Twin; sonst Twin. Die Verjüngung (Taper) ergibt sich automatisch aus `tail` < `nose`. Ausgewertet werden `shape` und `form` gemeinsam — ein Profil wie „Directional Camber" in `form` schlägt daher auf den Umriss durch. Wenn das falsch ist, `outline` setzen; enthält `outline` keines der beiden Wörter, wird es ignoriert.
+
+### Form — Profil (`form`, Fallback `shape`, Override `profil`)
+
+Freitext, erscheint 1:1 in der Tabelle; die Seitenansicht erkennt daraus einen von sechs Typen:
+
+| Typ | Seitenansicht | erkannte Schreibweisen |
+|---|---|---|
+| Camber | Bogen nach oben zwischen den Kontaktpunkten, Spitzen angehoben | `Camber` |
+| Rocker | durchgehender Bogen, berührt nur in der Mitte | `Rocker`, `Reverse Camber`, `Banana` |
+| Flat | flach zwischen den Kontaktpunkten | `Flat`, `Zero`, `Zero Camber`, `Flat Kick` |
+| Hybrid Camber | Camber zwischen den Füßen, Rocker zu den Spitzen | `Hybrid Camber`, `CamRock`, `Directional Camber` |
+| Hybrid Rocker | Rocker zwischen den Füßen, kleine Camber-Bögen unter den Füßen | `Hybrid Rocker`, `Flying V` |
+| Flat Rocker | flach unter den Füßen, Rocker zu den Spitzen | `Flat Rocker` |
+
+**Dreiteilige Schreibweise `X/Y/X`** (auch `X-Y-X`): das *mittlere* Wort beschreibt den Bereich zwischen den Füßen — `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Diese Notation ist in der Branche nicht einheitlich; zeigt ein Board das falsche Bild, `profil` auf einen der sechs Typen setzen (`camber`, `rocker`, `flat`, `hybrid camber`, `hybrid rocker`, `flat rocker`). Unbekannte Texte wie `3BT` zeichnen nichts — die Tabellenzeile bleibt, nur die Karte „Profil" fehlt.
+
+Vorschlag für die Auswahlliste: `Camber`, `Rocker`, `Flat`, `Hybrid Camber`, `Hybrid Rocker`, `Camber/Rocker/Camber`, `Flying V`, `3BT`, `Directional Camber`.
+
+### Breiten und Inserts (`nose`, `waist`, `tail`, `inserts`, `stance`, `setback`)
+
+- Breiten als **reine Zahl in mm** — `252`, nicht `252 mm`. Mit Einheit ist der Wert nicht numerisch: die Skizze entfällt und die Tabelle zeigt „252 mm mm", weil das Template die Einheit selbst anhängt. Komma oder Punkt sind beide erlaubt; in der Tabelle erscheint der Wert so, wie er gepflegt ist.
+- Die Skizze braucht alle drei Breiten > 0; einzelne Werte erscheinen trotzdem in der Tabelle.
+- `inserts`: enthält „channel" → Channel (ein Schlitz pro Fuß); `2x4`/`2 x 4` → 6 Spalten × 2 Reihen; `4x4` → 3 Spalten × 2 Reihen. Andere Werte zeichnen keine Inserts.
+- `stance` (Referenzstance in cm) und `setback` (cm Richtung Tail) sind optional und erscheinen nur als Tabellenzeilen, wenn sie gepflegt sind; für die Skizze gelten sonst die Standardwerte.
+
+### Massenpflege
+
+Für viele Artikel bietet sich die JTL-Ameise an (Import Artikel-Funktionsattribute: Artikelnummer, Attributname, Wert). Bewährte Reihenfolge: zuerst `shape`, `form`, `flex` und die fünf Fahreigenschaften am Vater, danach Breiten und `laenge` je Kind.
+
 ## Übersetzbare Texte
 
 Alle frontend-relevanten Texte sind als Sprachvariablen hinterlegt und können unter **Inhalte → Sprachvariablen → Plugins → Artikeldetails Plus** angepasst werden:
