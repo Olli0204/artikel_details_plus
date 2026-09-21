@@ -395,21 +395,34 @@ class Bootstrap extends Bootstrapper
     }
 
     /**
-     * Umriss der Skizze: Attribut "outline" (twin | directional | directional twin),
-     * ersatzweise aus den Texten von "form" und "shape" erkannt. Standard ist Twin.
+     * Umriss der Skizze: Attribut "outline" (twin | directional | directional twin) hat Vorrang,
+     * sonst wird aus den Texten von "form" und "shape" erkannt. Standard ist Twin.
      */
     private function outlineType(object $artikel): string
     {
-        $text = \mb_strtolower(\implode(' ', \array_filter([
-            $this->attribute($artikel, 'outline'),
+        // Explizites "outline" hat Vorrang vor der Erkennung aus form/shape
+        $explicit = $this->detectOutline($this->attribute($artikel, 'outline') ?? '');
+        if ($explicit !== null) {
+            return $explicit;
+        }
+
+        return $this->detectOutline(\implode(' ', \array_filter([
             $this->attribute($artikel, 'form'),
             $this->attribute($artikel, 'shape'),
-        ])));
+        ]))) ?? 'twin';
+    }
+
+    /**
+     * "directional twin", "directional" oder "twin" aus einem Text; null, wenn keines der Wörter vorkommt.
+     */
+    private function detectOutline(string $text): ?string
+    {
+        $text = \mb_strtolower($text);
         if (\str_contains($text, 'directional')) {
             return \str_contains($text, 'twin') ? 'directional twin' : 'directional';
         }
 
-        return 'twin';
+        return \str_contains($text, 'twin') ? 'twin' : null;
     }
 
     /**

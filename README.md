@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.7.0
+**Version:** 0.7.1
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -186,7 +186,7 @@ artikel_details_plus/
 `Bootstrap::buildBoardSketch()` berechnet die Geometrie in SVG-Einheiten (viewBox 600 × dynamische Höhe): die **Boardlänge** wird auf 560 Einheiten skaliert, alle Breiten im selben Maßstab – ein 157er Board mit 300 mm Nose erscheint also im echten Verhältnis 5,2:1. Ohne bekannte Länge gilt dieses typische Verhältnis zur breitesten Stelle, und die Längenbemaßung entfällt.
 
 - **Länge:** Funktionsattribut `laenge` in cm (Werte über 400 gelten als mm). Fehlt es, liest `boardLength()` beim Kind-Artikel den gewählten Wert einer Variation, deren Name „Läng“, „Length“, „Size“ oder „Grö“ enthält, und nimmt die führende Zahl (`156 Wide` → 156). Auf der Vaterseite ohne gewählte Variation bleibt die Länge unbekannt.
-- **Umriss:** `outlineType()` erkennt aus `outline`, `form` und `shape` (Texte, Groß-/Kleinschreibung egal) `twin`, `directional twin` oder `directional`. Die Proportionen stehen in `Bootstrap::OUTLINES`: Anteil der Länge bis zur breitesten Stelle an Nose/Tail (Twin 11,5 % / 11,5 %, Directional 14,5 % / 8,5 %), Rundung der Enden (Directional-Tail stumpfer) und Standard-Setback (0 / 1 / 2 cm). Die Enden sind kubische Bézier-Kurven mit senkrechter Tangente an der Spitze und waagerechter an der breitesten Stelle, die Sidecuts S-Kurven.
+- **Umriss:** `outlineType()` nimmt zuerst das Attribut `outline` (`twin`, `directional`, `directional twin`); fehlt es oder enthält es keines der Wörter, wird aus den Texten von `form` und `shape` erkannt (Groß-/Kleinschreibung egal): „directional" → Directional, „directional" + „twin" → Directional Twin, sonst Twin. Die Proportionen stehen in `Bootstrap::OUTLINES`: Anteil der Länge bis zur breitesten Stelle an Nose/Tail (Twin 11,5 % / 11,5 %, Directional 14,5 % / 8,5 %), Rundung der Enden (Directional-Tail stumpfer) und Standard-Setback (0 / 1 / 2 cm). Die Enden sind kubische Bézier-Kurven mit senkrechter Tangente an der Spitze und waagerechter an der breitesten Stelle, die Sidecuts S-Kurven.
 - **Inserts:** `insertType()` normalisiert das Attribut `inserts` auf `channel` (enthält „channel“), `2x4` oder `4x4`; andere Werte zeichnen nichts. Gezeichnet wird pro Fuß: 4x4 = 3 Spalten × 2 Reihen im 4-cm-Raster, 2x4 = 6 Spalten (2 cm) × 2 Reihen (4 cm), Channel = ein 17 cm langer Schlitz. Die Füße stehen im Referenzstance (`stance` in cm, sonst 36 % der Länge, begrenzt auf 40–60 cm) um die Boardmitte plus Setback (`setback` in cm Richtung Tail, sonst der Umriss-Standard).
 
 `snowboard_values.tpl` zeichnet Umriss, Inserts, Längenmaß oben, Breitenmaße unten; Werte werden so ausgegeben, wie sie im Shop gepflegt sind (z. B. `298,5`). Der Harness zum Prüfen der Geometrie liegt nicht im Repo: Stubs für `JTL\Plugin\Bootstrapper`, `JTL\Shop` und `JTL\Events\Dispatcher`, dann `buildBoardSketch()` per Reflection mit Beispielboards aufrufen und das SVG mit dem Plugin-CSS rendern.
@@ -194,6 +194,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.7.1 (2026-09-21)
+- Fix: Das Attribut `outline` hat jetzt Vorrang vor der Erkennung aus `form`/`shape` (vorher wurden alle drei Texte zusammen ausgewertet, ein explizites `twin` konnte ein „Directional Camber" im Profil nicht überstimmen)
 
 ### 0.7.0 (2026-09-21)
 - Flex-Skala als eigene Karte unter den Fahreigenschaften (vorher am unteren Rand der Diagramm-Karte)
