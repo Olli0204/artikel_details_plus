@@ -323,6 +323,24 @@
     font-size: 18px;
     font-weight: 600;
 }
+.adp-board__label--length {
+    font-size: 15px;
+    font-weight: 500;
+}
+.adp-board__measure--length {
+    stroke-dasharray: none;
+}
+/* Inserts: Lochmuster (2x4 / 4x4) bzw. Channel-Schlitze als Draufsicht */
+.adp-board__hole {
+    fill: #fff;
+    stroke: #8a9199;
+    stroke-width: 1.2;
+}
+.adp-board__slot {
+    fill: #fff;
+    stroke: #8a9199;
+    stroke-width: 1.2;
+}
 .adp-dims__table {
     width: 100%;
     max-width: 420px;

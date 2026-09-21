@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.4.2</Version>
+    <Version>0.5.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -70,7 +70,7 @@ Link:     {$oPluginMail->cURL}
                 </Setting>
                 <Setting type="checkbox" sort="4" conf="Y">
                     <Name>Dimensionen anzeigen</Name>
-                    <Description>Zeigt Form, Shape, Waist, Nose und Tail als Tabelle mit Board-Skizze im Beschreibungs-Tab. Liest die gleichnamigen Funktionsattribute (Breiten in mm), ersatzweise vom Vaterartikel.</Description>
+                    <Description>Zeigt Länge, Form, Shape, Waist, Nose, Tail und Inserts als Tabelle mit maßstäblicher Board-Skizze im Beschreibungs-Tab. Liest die Funktionsattribute form, shape, waist, nose, tail (mm), laenge (cm, ersatzweise aus der Variation "Länge"), inserts (channel, 2x4, 4x4), optional outline (twin, directional, directional twin), stance und setback (cm) – jeweils ersatzweise vom Vaterartikel.</Description>
                     <ValueName>artikel_details_plus_specs_dimensions_aktiv</ValueName>
                 </Setting>
             </Settingslink>
