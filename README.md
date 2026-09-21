@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.5.0
+**Version:** 0.6.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -19,6 +19,7 @@ Auf der Artikeldetailseite werden im Beschreibungs-Tab die Snowboard-Eigenschaft
 | Fahreigenschaften | interaktives **Pentagon-SVG-Diagramm** (`ecm_polygon_svg.js`), Werte 0–10; erscheint ab drei vorhandenen Werten | `carving`, `jib`, `powder`, `all_mountain`, `jump` |
 | Körpergewicht | Skalenleiste in kg | `koerpergewicht_ab`, `koerpergewicht_bis` |
 | Fahrlevel | Leiste Beginner / Advanced / Professional | `fahrlevel_ab`, `fahrlevel_bis` |
+| Flex | **Skala 1–10** aus zehn Segmenten mit fünf Zonen (Soft, Medium-Soft, Medium, Medium-Stiff, Stiff), am unteren Rand der Fahreigenschaften-Karte; Einzelwert oder Bereich, halbe Werte als halbes Segment | `flex` oder `flex_ab`, `flex_bis` (1–10, Dezimal erlaubt) |
 | Dimensionen | Tabelle Länge / Form / Shape / Waist / Nose / Tail / Inserts plus **maßstäbliche SVG-Board-Skizze** (Draufsicht, Nose links, Tail rechts) mit Längen- und Breitenbemaßung, Twin- oder Directional-Umriss und Inserts (Lochmuster oder Channel); die Skizze erscheint, wenn `nose`, `waist` und `tail` numerisch sind | `form`, `shape`, `waist`, `nose`, `tail` (mm), `laenge` (cm), `inserts`, optional `outline`, `stance`, `setback` |
 
 Fahreigenschaften-Diagramm und Dimensionen lassen sich einzeln abschalten; der Schalter „Merkmalwert-Anzeige aktiv" bleibt der Hauptschalter für den gesamten Bereich. Die Überschriften „Fahreigenschaften" und „Dimensionen" sind Sprachvariablen. Dieser Bereich ersetzt das frühere Plugin `snowboard_specs` (September 2026 integriert).
@@ -84,6 +85,8 @@ Alle frontend-relevanten Texte sind als Sprachvariablen hinterlegt und können u
 |---|---|---|
 | `artikel_details_plus_weight_title` | Empfohlenes Körpergewicht: | Suggested Weight: |
 | `artikel_details_plus_level_title` | Fahrlevel: | Rider Skills: |
+| `artikel_details_plus_flex_title` | Flex | Flex |
+| `artikel_details_plus_flex_zone_soft` … `_stiff` | Soft, Medium-Soft, Medium, Medium-Stiff, Stiff | (gleich) |
 | `artikel_details_plus_stock_text` | Nur noch %s Stück verfügbar! | Only %s pieces available! |
 | `artikel_details_plus_specs_heading_characteristics` | Fahreigenschaften | Ride Characteristics |
 | `artikel_details_plus_specs_heading_dimensions` | Dimensionen | Dimensions |
@@ -129,6 +132,7 @@ Alle Bauteile teilen sich ein Design-System im Stylesheet — keine Inline-`<sty
 - **Panels:** Jeder Specs-Bereich sitzt in einer eigenen Karte (`.adp-panel`, 1px Rahmen, 6px Radius) mit kleiner Versal-Überschrift und Akzentstrich.
 - **Raster:** `.adp-specs__grid` ist ab 768px zweispaltig — Diagramm links über beide Zeilen, Gewicht/Fahrlevel und Dimensionen rechts darunter; darunter einspaltig. Fehlt ein Bereich, füllen die übrigen die Breite.
 - **Radar-Diagramm:** Gitter und Fläche werden über die Klassen `.adp-radar__grid`, `.adp-radar__area`, `.adp-radar__hit` und `.adp-radar__label` gestylt (Akzentfarbe statt Rot). Unter dem Diagramm steht eine Chip-Liste mit allen Werten, damit die Zahlen auch ohne Hover (Touch) sichtbar sind; beim Überfahren eines Sektors wird der passende Chip hervorgehoben.
+- **Flex:** Die Skala hängt am unteren Rand der Fahreigenschaften-Karte, die dafür per `align-self: stretch` auf die Höhe der rechten Spalte gestreckt wird; die Resthöhe verteilt sich über und unter dem Diagramm (`margin: auto`). So bleiben linke und rechte Spalte immer gleich hoch, unabhängig davon, wie lang die Dimensionen-Tabelle ist. Ohne Fahreigenschaften bekommt die Skala eine eigene Karte. Zonennamen sind Sprachvariablen (`artikel_details_plus_flex_zone_*`).
 - **Gewicht und Fahrlevel:** Pill-Leisten (`.adp-meter`) mit hellem Track, akzentfarbenem Bereich und der Spanne im Klartext neben der Überschrift statt im Tooltip.
 - **Dimensionen:** Board-Skizze und Tabelle stehen per Container-Query nebeneinander, sobald das Panel breit genug ist.
 - **„Günstiger gesehen?":** Pill-Button mit hellem Rahmen und Preisschild-Icon (`fa-tag`). Er sitzt in NOVAs Spalte `.question-on-item`, also in derselben Zeile wie „Frage zum Artikel" statt in einem eigenen Band darüber. Die Pill-Form hält die beiden Aktionen trotz gemeinsamer Zeile auseinander; Hover und Fokus färben Rahmen, Text und Icon im Akzent.
@@ -188,6 +192,10 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.6.0 (2026-09-21)
+- Neu: Flex-Skala 1–10 mit fünf Zonen (Soft bis Stiff) am unteren Rand der Fahreigenschaften-Karte; Funktionsattribut `flex` oder Bereich `flex_ab`/`flex_bis`, Dezimalwerte als halbes Segment, Zonennamen als Sprachvariablen
+- Layout: Die Fahreigenschaften-Karte wird auf die Höhe der rechten Spalte gestreckt – die Lücke unter dem Diagramm, die je nach Länge der Dimensionen-Tabelle entstand, ist damit weg
 
 ### 0.5.0 (2026-09-21)
 - Board-Skizze maßstäblich: die Boardlänge bestimmt den Maßstab, Breiten werden im selben Verhältnis gezeichnet (vorher wurde die breiteste Stelle fix auf 140 von 600 Einheiten gestreckt – jedes Board sah gleich dick aus)

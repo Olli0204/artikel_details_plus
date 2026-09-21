@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.5.0</Version>
+    <Version>0.6.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -147,6 +147,42 @@ Link:     {$oPluginMail->cURL}
                 <Description>Überschrift der Fahrlevel-Leiste</Description>
                 <VariableLocalized iso="GER">Fahrlevel:</VariableLocalized>
                 <VariableLocalized iso="ENG">Rider Skills:</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_flex_title</Name>
+                <Description>Überschrift der Flex-Skala</Description>
+                <VariableLocalized iso="GER">Flex</VariableLocalized>
+                <VariableLocalized iso="ENG">Flex</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_flex_zone_soft</Name>
+                <Description>Flex-Zone 1-2</Description>
+                <VariableLocalized iso="GER">Soft</VariableLocalized>
+                <VariableLocalized iso="ENG">Soft</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_flex_zone_medium_soft</Name>
+                <Description>Flex-Zone 3-4</Description>
+                <VariableLocalized iso="GER">Medium-Soft</VariableLocalized>
+                <VariableLocalized iso="ENG">Medium-Soft</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_flex_zone_medium</Name>
+                <Description>Flex-Zone 5-6</Description>
+                <VariableLocalized iso="GER">Medium</VariableLocalized>
+                <VariableLocalized iso="ENG">Medium</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_flex_zone_medium_stiff</Name>
+                <Description>Flex-Zone 7-8</Description>
+                <VariableLocalized iso="GER">Medium-Stiff</VariableLocalized>
+                <VariableLocalized iso="ENG">Medium-Stiff</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_flex_zone_stiff</Name>
+                <Description>Flex-Zone 9-10</Description>
+                <VariableLocalized iso="GER">Stiff</VariableLocalized>
+                <VariableLocalized iso="ENG">Stiff</VariableLocalized>
             </Variable>
             <Variable>
                 <Name>artikel_details_plus_stock_text</Name>
