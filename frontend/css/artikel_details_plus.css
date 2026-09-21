@@ -337,6 +337,42 @@
     padding: .35rem .25rem;
 }
 
+/* ---------------------------------------------- Profil (Seitenansicht) */
+.adp-profile {
+    margin-top: 1rem;
+}
+.adp-profile__sketch {
+    max-width: 720px;
+    margin: 0 auto;
+}
+.adp-profile__svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+}
+.adp-profile__ground {
+    stroke: #c9cfd6;
+    stroke-width: 1;
+    stroke-dasharray: 3 4;
+}
+.adp-profile__board {
+    fill: none;
+    stroke: var(--adp-accent);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+.adp-profile__caption {
+    margin: .75rem 0 0;
+    text-align: center;
+    font-size: .9rem;
+    color: var(--adp-ink);
+}
+.adp-profile__raw {
+    color: var(--adp-muted);
+}
+
 /* -------------------------------------------------------- Dimensionen */
 .adp-dims__body {
     display: grid;

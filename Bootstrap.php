@@ -265,6 +265,16 @@ class Bootstrap extends Bootstrapper
         '4x4'     => '4x4',
     ];
 
+    /** Profile der Seitenansicht: Typ => Anzeigename */
+    private const PROFILES = [
+        'camber'        => 'Camber',
+        'rocker'        => 'Rocker',
+        'flat'          => 'Flat',
+        'hybrid camber' => 'Hybrid Camber',
+        'hybrid rocker' => 'Hybrid Rocker',
+        'flat rocker'   => 'Flat Rocker',
+    ];
+
     /**
      * Skizzen-Proportionen je Umriss: Anteil der Boardlänge von der Spitze bis zur
      * breitesten Stelle (Nose/Tail), Standard-Setback in cm, Rundung der Enden (0 = spitz, 1 = eckig)
@@ -287,7 +297,8 @@ class Bootstrap extends Bootstrapper
             ->assign('adpSpecsActive', $this->isOn($this->getPlugin()->getConfig()->getValue('artikel_details_plus_merkmalwerte_aktiv')))
             ->assign('adpSpecsCharacteristics', [])
             ->assign('adpSpecsDimensions', [])
-            ->assign('adpSpecsBoard', null);
+            ->assign('adpSpecsBoard', null)
+            ->assign('adpProfile', null);
 
         if ($artikel === null) {
             return;
@@ -365,6 +376,123 @@ class Bootstrap extends Bootstrapper
                 $smarty->assign('adpSpecsBoard', $board);
             }
         }
+
+        // Seitenansicht (Camber/Rocker/Flat …): Attribut "profil" hat Vorrang, sonst aus "form"/"shape"
+        $profileText = $this->attribute($artikel, 'profil') ?? $this->attribute($artikel, 'profile');
+        $profileType = $this->profileType($profileText ?? '');
+        if ($profileType === null) {
+            $profileText = $this->attribute($artikel, 'form');
+            $profileType = $this->profileType($profileText ?? '');
+        }
+        if ($profileType === null) {
+            $profileText = $this->attribute($artikel, 'shape');
+            $profileType = $this->profileType($profileText ?? '');
+        }
+        if ($profileType !== null) {
+            $smarty->assign('adpProfile', [
+                'type'  => $profileType,
+                'label' => self::PROFILES[$profileType],
+                'text'  => \trim((string)$profileText),
+            ] + $this->buildProfileSketch($profileType));
+        }
+    }
+
+    /**
+     * Profiltyp aus einem Freitext ("Hybrid Camber", "Flying V", "Camber/Rocker/Camber", "Zero" …).
+     */
+    private function profileType(string $text): ?string
+    {
+        $t = \mb_strtolower($text);
+        if ($t === '') {
+            return null;
+        }
+        // Dreiteilige Notation "X/Y/X": das mittlere Element beschreibt den Bereich zwischen den Füßen
+        if (\preg_match('/^\s*(camber|rocker|flat)\s*[\/\-|]\s*(camber|rocker|flat)\s*[\/\-|]\s*(camber|rocker|flat)\s*$/u', $t, $m)) {
+            return match ($m[2]) {
+                'rocker' => 'hybrid rocker',
+                'camber' => 'hybrid camber',
+                default  => $m[1] === 'rocker' ? 'flat rocker' : 'flat',
+            };
+        }
+        $has = static fn(string $needle): bool => \str_contains($t, $needle);
+        if ($has('flying v') || $has('hybrid rocker') || $has('rocker/camber') || $has('rocker-camber') || $has('rocker camber')) {
+            return 'hybrid rocker';
+        }
+        if ($has('hybrid camber') || $has('camber/rocker') || $has('camber-rocker') || $has('camber rocker') || $has('camrock') || $has('directional camber')) {
+            return 'hybrid camber';
+        }
+        if (($has('flat') || $has('zero')) && $has('rocker')) {
+            return 'flat rocker';
+        }
+        if ($has('flat') || $has('zero')) {
+            return 'flat';
+        }
+        if ($has('rocker') || $has('reverse') || $has('banana')) {
+            return 'rocker';
+        }
+        if ($has('camber')) {
+            return 'camber';
+        }
+
+        return null;
+    }
+
+    /**
+     * Seitenansicht als Polylinie: Höhe über dem Boden entlang der Länge (0 = Nose, 1 = Tail),
+     * vertikal übertrieben, damit Camber und Rocker auf den ersten Blick zu unterscheiden sind.
+     * Zurück kommen der Pfad des Bretts, die Bodenlinie und die viewBox.
+     *
+     * @return array{path: string, ground: float, viewBox: string}
+     */
+    private function buildProfileSketch(string $type): array
+    {
+        $tipKick = 26.0;   // Anhebung der Spitzen
+        $camber  = 12.0;   // Höhe des Camber-Bogens
+        $tip     = static fn(float $d, float $zone): float => $tipKick * (($zone - $d) / $zone) ** 2;
+        $arch    = static fn(float $u, float $from, float $to, float $h): float => $h * \sin(\M_PI * ($u - $from) / ($to - $from));
+
+        $height = function (float $u) use ($type, $tip, $arch, $camber, $tipKick): float {
+            $d = \min($u, 1 - $u); // Abstand zur nächsten Spitze
+            switch ($type) {
+                case 'camber':
+                    return $d < 0.12 ? $tip($d, 0.12) : $arch($u, 0.12, 0.88, $camber);
+                case 'flat':
+                    return $d < 0.12 ? $tip($d, 0.12) : 0.0;
+                case 'rocker':
+                    return $tipKick * ((($u - 0.5) / 0.5) ** 2);
+                case 'hybrid camber':
+                    return $d < 0.25 ? $tip($d, 0.25) : $arch($u, 0.25, 0.75, $camber * 0.8);
+                case 'flat rocker':
+                    return $d < 0.25 ? $tip($d, 0.25) : 0.0;
+                case 'hybrid rocker':
+                    if ($d < 0.2) {
+                        return $tip($d, 0.2);
+                    }
+                    if ($d < 0.36) {
+                        return $arch($d, 0.2, 0.36, 3.5); // kleiner Camber-Bogen unter dem Fuß
+                    }
+
+                    return 7.0 * (1 - ((($u - 0.5) / 0.14) ** 2)); // Rocker zwischen den Füßen
+            }
+
+            return 0.0;
+        };
+
+        $x0 = 20.0;
+        $x1 = 580.0;
+        $ground = 52.0;
+        $thick  = 6.0;
+        $points = [];
+        for ($i = 0; $i <= 112; $i++) {
+            $u = $i / 112;
+            $points[] = \sprintf('%s %s', \round($x0 + ($x1 - $x0) * $u, 1), \round($ground - $thick / 2 - $height($u), 1));
+        }
+
+        return [
+            'path'    => 'M ' . \implode(' L ', $points),
+            'ground'  => $ground,
+            'viewBox' => \sprintf('0 0 600 %s', $ground + 12),
+        ];
     }
 
     /**
