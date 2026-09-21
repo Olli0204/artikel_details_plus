@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.7.1
+**Version:** 0.7.2
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -194,6 +194,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.7.2 (2026-09-21)
+- Fix: Twin-Boards waren in der Skizze nicht spiegelsymmetrisch. Die Kurve vom breitesten Punkt zur Spitze setzte ihren waagerechten Handle vom breitesten Punkt aus statt von der Spitze – das Board war punkt- statt spiegelsymmetrisch (Tail oben spitzer, Nose unten spitzer). Jetzt ist jede Spitze das exakte Spiegelbild der Gegenseite; Prüfung: alle Pfadpunkte haben ein Gegenstück bei 600 − x
 
 ### 0.7.1 (2026-09-21)
 - Fix: Das Attribut `outline` hat jetzt Vorrang vor der Erkennung aus `form`/`shape` (vorher wurden alle drei Texte zusammen ausgewertet, ein explizites `twin` konnte ein „Directional Camber" im Profil nicht überstimmen)

@@ -514,10 +514,11 @@ class Bootstrap extends Bootstrapper
                 $r($ye)
             );
         };
+        // Exaktes Spiegelbild von $tipOut: waagerechter Handle im selben Abstand zur Spitze
         $tipIn = static function (float $xs, float $ys, float $xe, float $ye, float $k) use ($r): string {
             return \sprintf(
                 'C %s %s %s %s %s %s',
-                $r($xs + ($xe - $xs) * (1 - $k) * 0.9),
+                $r($xe - ($xe - $xs) * (1 - $k) * 0.9),
                 $r($ys),
                 $r($xe),
                 $r($ys + ($ye - $ys) * (1 - $k)),
