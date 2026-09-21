@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.8.0
+**Version:** 0.9.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -69,6 +69,7 @@ Die Einstellungen sind in vier Tabs gegliedert. Alle „Aktiv"-Einstellungen sin
 | Fahreigenschaften | Fahrlevelanzeige aktiv | Checkbox | Schaltet die Beginner/Advanced/Professional-Leiste ein |
 | Fahreigenschaften | Fahreigenschaften-Diagramm anzeigen | Checkbox (Default an) | Pentagon-Diagramm der Fahreigenschaften |
 | Fahreigenschaften | Dimensionen anzeigen | Checkbox (Default an) | Tabelle und maßstäbliche Board-Skizze (Länge, Form/Shape, Waist/Nose/Tail, Inserts) |
+| Fahreigenschaften | Profil-Zonen farbig markieren | Checkbox (Default an, `initialValue="on"`) | Teilt die Seitenansicht farbig in Camber (blau), Rocker (rot), Flat (gelb) und Kick (grün) und zeigt eine Legende; abgewählt wird das Profil einfarbig in der Akzentfarbe gezeichnet |
 | Merkmalbilder | Merkmalbilder Anzeige aktiv | Checkbox | Aktiviert Bilder unter den Artikelboxen in der Listenansicht |
 | Merkmalbilder | Merkmalwerte mit Bildern | Mehrfachauswahl | Welche Merkmale (mit hinterlegten Bildern) angezeigt werden — dynamisch aus `tmerkmal` |
 | Lagerbestandsanzeige | Lagerbestandsanzeige aktiv | Checkbox | Zeigt den Fortschrittsbalken bei niedrigem Bestand |
@@ -163,6 +164,8 @@ Freitext, erscheint 1:1 in der Tabelle; die Seitenansicht erkennt daraus einen v
 
 Vorschlag für die Auswahlliste: `Camber`, `Rocker`, `Flat`, `Hybrid Camber`, `Hybrid Rocker`, `Camber/Rocker/Camber`, `Flying V`, `3BT`, `Directional Camber`.
 
+Mit dem Schalter „Profil-Zonen farbig markieren" wird die Seitenansicht in ihre Abschnitte unterteilt — Camber blau, Rocker (Reverse Camber) rot, Flat (Zero Camber) gelb, Kick (Aufbiegung der Spitzen) grün — mit Legende unter der Skizze. Welche Zonen ein Profiltyp hat, ist fest hinterlegt (`Bootstrap::PROFILE_ZONES`): Camber und Flat = Kick / Mitte / Kick, Rocker = durchgehend, Hybrid Camber und Flat Rocker = Rocker / Mitte / Rocker, Hybrid Rocker = Kick / Camber / Rocker / Camber / Kick.
+
 ### Breiten und Inserts (`nose`, `waist`, `tail`, `inserts`, `stance`, `setback`)
 
 - Breiten als **reine Zahl in mm** — `252`, nicht `252 mm`. Mit Einheit ist der Wert nicht numerisch: die Skizze entfällt und die Tabelle zeigt „252 mm mm", weil das Template die Einheit selbst anhängt. Komma oder Punkt sind beide erlaubt; in der Tabelle erscheint der Wert so, wie er gepflegt ist.
@@ -188,6 +191,7 @@ Alle frontend-relevanten Texte sind als Sprachvariablen hinterlegt und können u
 | `artikel_details_plus_specs_heading_characteristics` | Fahreigenschaften | Ride Characteristics |
 | `artikel_details_plus_specs_heading_dimensions` | Dimensionen | Dimensions |
 | `artikel_details_plus_specs_heading_profile` | Profil | Profile |
+| `artikel_details_plus_profile_zone_camber` … `_rocker`, `_flat`, `_kick` | Camber, Rocker, Flat, Kick | (gleich) |
 | `artikel_details_plus_form_button` | Günstiger gesehen? | Seen it cheaper? |
 | `artikel_details_plus_cheaper_title` | Günstiger gesehen? | Seen it cheaper? |
 | `artikel_details_plus_cheaper_success` | Vielen Dank! Wir haben Ihren Preishinweis erhalten… | Thank you! We have received your price tip… |
@@ -230,7 +234,7 @@ Alle Bauteile teilen sich ein Design-System im Stylesheet — keine Inline-`<sty
 - **Panels:** Jeder Specs-Bereich sitzt in einer eigenen Karte (`.adp-panel`, 1px Rahmen, 6px Radius) mit kleiner Versal-Überschrift und Akzentstrich.
 - **Raster:** `.adp-specs__grid` enthält zwei echte Spalten (`.adp-specs__col`, Flex-Column): links Fahreigenschaften + Flex, rechts Gewicht/Fahrlevel + Dimensionen; ab 768px nebeneinander, darunter gestapelt. Die Spalten sind als Grid-Zellen gleich hoch, die Fahreigenschaften-Karte wächst (`flex: 1 0 auto`) und verteilt die Resthöhe über und unter dem Diagramm — so enden beide Spalten bündig, egal wie lang die Dimensionen-Tabelle ist. Eine leere Spalte wird in `tabs.tpl` gar nicht ausgegeben, die verbleibende spannt dann über die volle Breite (`:only-child`).
 - **Radar-Diagramm:** Gitter und Fläche werden über die Klassen `.adp-radar__grid`, `.adp-radar__area`, `.adp-radar__hit` und `.adp-radar__label` gestylt (Akzentfarbe statt Rot). Unter dem Diagramm steht eine Chip-Liste mit allen Werten, damit die Zahlen auch ohne Hover (Touch) sichtbar sind; beim Überfahren eines Sektors wird der passende Chip hervorgehoben.
-- **Profil:** `profileType()` erkennt den Typ aus Freitext. Dreiteilige Notation `X/Y/X` (auch mit `-`) wird nach dem *mittleren* Element gelesen — es beschreibt den Bereich zwischen den Füßen: `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Sonst Schlüsselwörter: „Flying V", „Hybrid Rocker" → Hybrid Rocker; „Hybrid Camber", „CamRock", „Directional Camber" → Hybrid Camber; „Flat"/„Zero" (+ „Rocker") → Flat (Rocker); „Rocker", „Reverse", „Banana" → Rocker; „Camber" → Camber. Unbekannte Texte (z. B. „3BT") zeichnen nichts. `buildProfileSketch()` erzeugt eine Polylinie aus 113 Stützpunkten über eine Höhenfunktion je Typ (Spitzen 26, Camber 12 Einheiten) — die Werte sind bewusst übertrieben, damit die Unterschiede auf den ersten Blick sichtbar sind.
+- **Profil:** `profileType()` erkennt den Typ aus Freitext. Dreiteilige Notation `X/Y/X` (auch mit `-`) wird nach dem *mittleren* Element gelesen — es beschreibt den Bereich zwischen den Füßen: `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Sonst Schlüsselwörter: „Flying V", „Hybrid Rocker" → Hybrid Rocker; „Hybrid Camber", „CamRock", „Directional Camber" → Hybrid Camber; „Flat"/„Zero" (+ „Rocker") → Flat (Rocker); „Rocker", „Reverse", „Banana" → Rocker; „Camber" → Camber. Unbekannte Texte (z. B. „3BT") zeichnen nichts. `buildProfileSketch()` erzeugt eine Polylinie aus 113 Stützpunkten über eine Höhenfunktion je Typ (Spitzen 26, Camber 12 Einheiten) — die Werte sind bewusst übertrieben, damit die Unterschiede auf den ersten Blick sichtbar sind. Für die farbige Darstellung liefert sie zusätzlich je Zone (`PROFILE_ZONES`) einen Teilpfad mit gemeinsamen Randpunkten (nahtlose Farbwechsel, `stroke-linecap: butt`) und die Legende; die Zonenfarben sind CSS-Variablen `--adp-zone-*` auf `.adp-profile`.
 - **Flex:** Eigene Karte unter den Fahreigenschaften: Titel, Kopfzeile mit Zone (fett) und Wert, zehn Segmente, fünf Zonenbeschriftungen. Zonennamen sind Sprachvariablen (`artikel_details_plus_flex_zone_*`).
 - **Gewicht und Fahrlevel:** Pill-Leisten (`.adp-meter`) mit hellem Track, akzentfarbenem Bereich und der Spanne im Klartext neben der Überschrift statt im Tooltip.
 - **Dimensionen:** Board-Skizze und Tabelle stehen per Container-Query nebeneinander, sobald das Panel breit genug ist.
@@ -294,6 +298,10 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.9.0 (2026-09-21)
+- Neu: Schalter „Profil-Zonen farbig markieren" (Default an) — die Seitenansicht wird in Camber (blau), Rocker (rot), Flat (gelb) und Kick (grün) unterteilt, mit Legende; abgewählt bleibt sie einfarbig
+- Neue Sprachvariablen `artikel_details_plus_profile_zone_camber/_rocker/_flat/_kick`
 
 ### 0.8.0 (2026-09-21)
 - Neu: Karte „Profil" mit Seitenansicht des Bretts (Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker, Flat Rocker) über die volle Breite unter den beiden Spalten; erkannt aus `form` (ersatzweise `shape`), Attribut `profil` hat Vorrang; `X/Y/X`-Notation wird nach dem mittleren Element gelesen
