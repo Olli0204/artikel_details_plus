@@ -110,21 +110,23 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 1rem;
 }
+/* Zwei echte Spalten: links Fahreigenschaften + Flex, rechts Gewicht/Fahrlevel + Dimensionen.
+   Die Spalten sind gleich hoch; die Diagramm-Karte nimmt die Differenz auf. */
+.adp-specs__col {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+}
 @media (min-width: 768px) {
     .adp-specs__grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        align-items: start;
     }
-    /* Genau drei Panels: Diagramm links über beide Zeilen, Leisten und Dimensionen rechts */
-    .adp-specs__grid > .adp-radar:nth-child(1):nth-last-child(3) {
-        grid-row: span 2;
+    .adp-specs__col:only-child {
+        grid-column: 1 / -1;
     }
-    /* Diagramm-Karte auf Spaltenhöhe strecken; die Flex-Skala sitzt am unteren Rand */
-    .adp-specs__grid > .adp-radar {
-        align-self: stretch;
-    }
-    .adp-specs__grid > .adp-radar:nth-child(1):nth-last-child(3) ~ .adp-panel--wide {
-        grid-column: 2;
+    .adp-specs__col > .adp-radar {
+        flex: 1 0 auto;
     }
 }
 .adp-panel {
@@ -133,9 +135,6 @@
     border: 1px solid var(--adp-border);
     border-radius: var(--adp-radius);
     background: #fff;
-}
-.adp-panel--wide {
-    grid-column: 1 / -1;
 }
 .adp-panel__title {
     margin: 0 0 1.1rem;
@@ -231,21 +230,19 @@
 }
 
 /* ------------------------------------------------------------ Flex */
-/* Sitzt am unteren Rand der Fahreigenschaften-Karte; der Luftraum liegt
-   zwischen Chips und Skala, nicht unter der Karte. */
-.adp-radar .adp-flex {
-    padding-top: 1rem;
-}
-/* Restliche Höhe gleichmäßig über und unter dem Diagramm verteilen */
+/* Restliche Höhe der Diagramm-Karte gleichmäßig über und unter dem Diagramm verteilen */
 .adp-radar__chart {
     margin-top: auto;
 }
 .adp-radar__legend {
     margin-bottom: auto;
-    padding-bottom: 1.1rem;
 }
-.adp-radar:not(.adp-radar--flex-only) .adp-flex {
-    border-top: 1px solid var(--adp-border);
+.adp-flex__zone-text {
+    font-weight: 700;
+    color: var(--adp-ink);
+}
+.adp-flex__value {
+    white-space: nowrap;
 }
 
 .adp-flex__segments {

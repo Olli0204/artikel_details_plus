@@ -1,6 +1,6 @@
 {* Dimensionen: Werte kommen aus Bootstrap::assignSnowboardSpecs() (Funktionsattribute mit Vater-Fallback) *}
 {if !empty($adpSpecsDimensions)}
-<section class="adp-panel adp-panel--wide adp-dims{if $adpSpecsBoard !== null} adp-dims--sketch{/if}">
+<section class="adp-panel adp-dims{if $adpSpecsBoard !== null} adp-dims--sketch{/if}">
     <h3 class="adp-panel__title">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_specs_heading_dimensions')|escape:'html'}</h3>
 
     <div class="adp-dims__body">

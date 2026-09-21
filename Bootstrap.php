@@ -140,7 +140,7 @@ class Bootstrap extends Bootstrapper
      * Liefert zehn Segmente (fill 0 / 0.5 / 1), fünf Zonen mit Aktiv-Flag und den Klartext für die Kopfzeile.
      *
      * @return array{from: float, to: float, segments: list<array{fill: float}>,
-     *               zones: list<array{label: string, set: bool}>, text: string}|null
+     *               zones: list<array{label: string, set: bool}>, zone: string, value: string, text: string}|null
      */
     private function flexScale(object $artikel): ?array
     {
@@ -187,6 +187,8 @@ class Bootstrap extends Bootstrapper
             'to'       => $to,
             'segments' => $segments,
             'zones'    => $zones,
+            'zone'     => $zoneText,
+            'value'    => $valText,
             'text'     => \trim($zoneText . ' · ' . $valText, ' ·'),
         ];
     }
