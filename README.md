@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.7.2
+**Version:** 0.8.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -19,6 +19,7 @@ Auf der Artikeldetailseite werden im Beschreibungs-Tab die Snowboard-Eigenschaft
 | Fahreigenschaften | interaktives **Pentagon-SVG-Diagramm** (`ecm_polygon_svg.js`), Werte 0–10; erscheint ab drei vorhandenen Werten | `carving`, `jib`, `powder`, `all_mountain`, `jump` |
 | Körpergewicht | Skalenleiste in kg | `koerpergewicht_ab`, `koerpergewicht_bis` |
 | Fahrlevel | Leiste Beginner / Advanced / Professional | `fahrlevel_ab`, `fahrlevel_bis` |
+| Profil | **Seitenansicht** (Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker, Flat Rocker) als vollbreite Karte unter den Spalten, vertikal übertrieben, mit Bodenlinie | `profil` (Vorrang), sonst erkannt aus `form`, ersatzweise `shape` |
 | Flex | **Skala 1–10** aus zehn Segmenten mit fünf Zonen (Soft, Medium-Soft, Medium, Medium-Stiff, Stiff) in eigener Karte; Einzelwert oder Bereich, halbe Werte als halbes Segment | `flex` oder `flex_ab`, `flex_bis` (1–10, Dezimal erlaubt) |
 | Dimensionen | Tabelle Länge / Form / Shape / Waist / Nose / Tail / Inserts plus **maßstäbliche SVG-Board-Skizze** (Draufsicht, Nose links, Tail rechts) mit Längen- und Breitenbemaßung, Twin- oder Directional-Umriss und Inserts (Lochmuster oder Channel); die Skizze erscheint, wenn `nose`, `waist` und `tail` numerisch sind | `form`, `shape`, `waist`, `nose`, `tail` (mm), `laenge` (cm), `inserts`, optional `outline`, `stance`, `setback` |
 
@@ -90,6 +91,7 @@ Alle frontend-relevanten Texte sind als Sprachvariablen hinterlegt und können u
 | `artikel_details_plus_stock_text` | Nur noch %s Stück verfügbar! | Only %s pieces available! |
 | `artikel_details_plus_specs_heading_characteristics` | Fahreigenschaften | Ride Characteristics |
 | `artikel_details_plus_specs_heading_dimensions` | Dimensionen | Dimensions |
+| `artikel_details_plus_specs_heading_profile` | Profil | Profile |
 | `artikel_details_plus_form_button` | Günstiger gesehen? | Seen it cheaper? |
 | `artikel_details_plus_cheaper_title` | Günstiger gesehen? | Seen it cheaper? |
 | `artikel_details_plus_cheaper_success` | Vielen Dank! Wir haben Ihren Preishinweis erhalten… | Thank you! We have received your price tip… |
@@ -112,7 +114,7 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 |---|---|---|
 | `productdetails-details-stock` | `details.tpl` | Stylesheet-Einbindung + Lagerbestand-Balken (eigene `col col-12` unter dem Preis) |
 | `productdetails-details-question-on-item` | `details.tpl` | „Günstiger gesehen"-Button neben NOVAs „Frage zum Artikel" |
-| `tab-description-media-types`, `productdetails-tabs-card-description-content` | `tabs.tpl` | Zwei Spalten mit den Karten `characteristics.tpl` (Diagramm), `flex.tpl`, `fit.tpl` (Gewicht/Fahrlevel), `snowboard_values.tpl` (Dimensionen) |
+| `tab-description-media-types`, `productdetails-tabs-card-description-content` | `tabs.tpl` | Zwei Spalten mit den Karten `characteristics.tpl` (Diagramm), `flex.tpl`, `fit.tpl` (Gewicht/Fahrlevel), `snowboard_values.tpl` (Dimensionen); darunter vollbreit `profile.tpl` (Seitenansicht) |
 | `productdetails-popups` | `popups.tpl` | Modal mit Formular |
 | `productlist-index-include-price` | `item_box.tpl` | Merkmalbilder unter Artikelboxen |
 
@@ -132,6 +134,7 @@ Alle Bauteile teilen sich ein Design-System im Stylesheet — keine Inline-`<sty
 - **Panels:** Jeder Specs-Bereich sitzt in einer eigenen Karte (`.adp-panel`, 1px Rahmen, 6px Radius) mit kleiner Versal-Überschrift und Akzentstrich.
 - **Raster:** `.adp-specs__grid` enthält zwei echte Spalten (`.adp-specs__col`, Flex-Column): links Fahreigenschaften + Flex, rechts Gewicht/Fahrlevel + Dimensionen; ab 768px nebeneinander, darunter gestapelt. Die Spalten sind als Grid-Zellen gleich hoch, die Fahreigenschaften-Karte wächst (`flex: 1 0 auto`) und verteilt die Resthöhe über und unter dem Diagramm — so enden beide Spalten bündig, egal wie lang die Dimensionen-Tabelle ist. Eine leere Spalte wird in `tabs.tpl` gar nicht ausgegeben, die verbleibende spannt dann über die volle Breite (`:only-child`).
 - **Radar-Diagramm:** Gitter und Fläche werden über die Klassen `.adp-radar__grid`, `.adp-radar__area`, `.adp-radar__hit` und `.adp-radar__label` gestylt (Akzentfarbe statt Rot). Unter dem Diagramm steht eine Chip-Liste mit allen Werten, damit die Zahlen auch ohne Hover (Touch) sichtbar sind; beim Überfahren eines Sektors wird der passende Chip hervorgehoben.
+- **Profil:** `profileType()` erkennt den Typ aus Freitext. Dreiteilige Notation `X/Y/X` (auch mit `-`) wird nach dem *mittleren* Element gelesen — es beschreibt den Bereich zwischen den Füßen: `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Sonst Schlüsselwörter: „Flying V", „Hybrid Rocker" → Hybrid Rocker; „Hybrid Camber", „CamRock", „Directional Camber" → Hybrid Camber; „Flat"/„Zero" (+ „Rocker") → Flat (Rocker); „Rocker", „Reverse", „Banana" → Rocker; „Camber" → Camber. Unbekannte Texte (z. B. „3BT") zeichnen nichts. `buildProfileSketch()` erzeugt eine Polylinie aus 113 Stützpunkten über eine Höhenfunktion je Typ (Spitzen 26, Camber 12 Einheiten) — die Werte sind bewusst übertrieben, damit die Unterschiede auf den ersten Blick sichtbar sind.
 - **Flex:** Eigene Karte unter den Fahreigenschaften: Titel, Kopfzeile mit Zone (fett) und Wert, zehn Segmente, fünf Zonenbeschriftungen. Zonennamen sind Sprachvariablen (`artikel_details_plus_flex_zone_*`).
 - **Gewicht und Fahrlevel:** Pill-Leisten (`.adp-meter`) mit hellem Track, akzentfarbenem Bereich und der Spanne im Klartext neben der Überschrift statt im Tooltip.
 - **Dimensionen:** Board-Skizze und Tabelle stehen per Container-Query nebeneinander, sobald das Panel breit genug ist.
@@ -171,6 +174,7 @@ artikel_details_plus/
 │   │   ├── characteristics.tpl            # Fahreigenschaften: Radar-Diagramm + Chips
 │   │   ├── flex.tpl                       # Flex-Skala
 │   │   ├── fit.tpl                        # Körpergewicht und Fahrlevel
+│   │   ├── profile.tpl                    # Seitenansicht Camber/Rocker
 │   │   ├── snowboard_values.tpl           # Dimensionen: Board-Skizze + Tabelle (Form/Shape/Waist/Nose/Tail)
 │   │   ├── popups.tpl                     # Modal-Wrapper
 │   │   └── cheaper.tpl                    # Formular-Markup
@@ -194,6 +198,10 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.8.0 (2026-09-21)
+- Neu: Karte „Profil" mit Seitenansicht des Bretts (Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker, Flat Rocker) über die volle Breite unter den beiden Spalten; erkannt aus `form` (ersatzweise `shape`), Attribut `profil` hat Vorrang; `X/Y/X`-Notation wird nach dem mittleren Element gelesen
+- Neue Sprachvariable `artikel_details_plus_specs_heading_profile`
 
 ### 0.7.2 (2026-09-21)
 - Fix: Twin-Boards waren in der Skizze nicht spiegelsymmetrisch. Die Kurve vom breitesten Punkt zur Spitze setzte ihren waagerechten Handle vom breitesten Punkt aus statt von der Spitze – das Board war punkt- statt spiegelsymmetrisch (Tail oben spitzer, Nose unten spitzer). Jetzt ist jede Spitze das exakte Spiegelbild der Gegenseite; Prüfung: alle Pfadpunkte haben ein Gegenstück bei 600 − x

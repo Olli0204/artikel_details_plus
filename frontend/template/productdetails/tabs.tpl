@@ -17,6 +17,7 @@
                 </div>
             {/if}
         </div>
+        {include file='productdetails/profile.tpl' tplscope='details'}
     </div>
 {/capture}
 
