@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.4.2
+**Version:** 0.5.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -19,7 +19,7 @@ Auf der Artikeldetailseite werden im Beschreibungs-Tab die Snowboard-Eigenschaft
 | Fahreigenschaften | interaktives **Pentagon-SVG-Diagramm** (`ecm_polygon_svg.js`), Werte 0–10; erscheint ab drei vorhandenen Werten | `carving`, `jib`, `powder`, `all_mountain`, `jump` |
 | Körpergewicht | Skalenleiste in kg | `koerpergewicht_ab`, `koerpergewicht_bis` |
 | Fahrlevel | Leiste Beginner / Advanced / Professional | `fahrlevel_ab`, `fahrlevel_bis` |
-| Dimensionen | Tabelle Form / Shape / Waist / Nose / Tail plus **SVG-Board-Skizze** mit Breitenmaßen (Nose links, Tail rechts, breiteste Stelle als Referenz); die Skizze erscheint, wenn `nose`, `waist` und `tail` numerisch sind | `form`, `shape`, `waist`, `nose`, `tail` (Breiten in mm) |
+| Dimensionen | Tabelle Länge / Form / Shape / Waist / Nose / Tail / Inserts plus **maßstäbliche SVG-Board-Skizze** (Draufsicht, Nose links, Tail rechts) mit Längen- und Breitenbemaßung, Twin- oder Directional-Umriss und Inserts (Lochmuster oder Channel); die Skizze erscheint, wenn `nose`, `waist` und `tail` numerisch sind | `form`, `shape`, `waist`, `nose`, `tail` (mm), `laenge` (cm), `inserts`, optional `outline`, `stance`, `setback` |
 
 Fahreigenschaften-Diagramm und Dimensionen lassen sich einzeln abschalten; der Schalter „Merkmalwert-Anzeige aktiv" bleibt der Hauptschalter für den gesamten Bereich. Die Überschriften „Fahreigenschaften" und „Dimensionen" sind Sprachvariablen. Dieser Bereich ersetzt das frühere Plugin `snowboard_specs` (September 2026 integriert).
 
@@ -66,7 +66,7 @@ Die Einstellungen sind in vier Tabs gegliedert. Alle „Aktiv"-Einstellungen sin
 | Fahreigenschaften | Merkmalwert-Anzeige aktiv | Checkbox | Schaltet Pentagon-Diagramm und Gewichtsleiste im Beschreibungs-Tab ein |
 | Fahreigenschaften | Fahrlevelanzeige aktiv | Checkbox | Schaltet die Beginner/Advanced/Professional-Leiste ein |
 | Fahreigenschaften | Fahreigenschaften-Diagramm anzeigen | Checkbox (Default an) | Pentagon-Diagramm der Fahreigenschaften |
-| Fahreigenschaften | Dimensionen anzeigen | Checkbox (Default an) | Tabelle und Board-Skizze mit Form/Shape/Waist/Nose/Tail |
+| Fahreigenschaften | Dimensionen anzeigen | Checkbox (Default an) | Tabelle und maßstäbliche Board-Skizze (Länge, Form/Shape, Waist/Nose/Tail, Inserts) |
 | Merkmalbilder | Merkmalbilder Anzeige aktiv | Checkbox | Aktiviert Bilder unter den Artikelboxen in der Listenansicht |
 | Merkmalbilder | Merkmalwerte mit Bildern | Mehrfachauswahl | Welche Merkmale (mit hinterlegten Bildern) angezeigt werden — dynamisch aus `tmerkmal` |
 | Lagerbestandsanzeige | Lagerbestandsanzeige aktiv | Checkbox | Zeigt den Fortschrittsbalken bei niedrigem Bestand |
@@ -177,11 +177,24 @@ artikel_details_plus/
 ```
 
 ### Board-Skizze
-`Bootstrap::buildBoardSketch()` berechnet den SVG-Pfad (viewBox 600×220): die breiteste der drei Breiten wird auf 140 Einheiten skaliert, Nose/Waist/Tail liegen bei x = 80 / 300 / 520, die Kanten sind kubische Bézier-Kurven. `snowboard_values.tpl` zeichnet Umriss, gestrichelte Maßlinien und Beschriftungen; Werte werden so ausgegeben, wie sie im Shop gepflegt sind (z. B. `298,5`).
+`Bootstrap::buildBoardSketch()` berechnet die Geometrie in SVG-Einheiten (viewBox 600 × dynamische Höhe): die **Boardlänge** wird auf 560 Einheiten skaliert, alle Breiten im selben Maßstab – ein 157er Board mit 300 mm Nose erscheint also im echten Verhältnis 5,2:1. Ohne bekannte Länge gilt dieses typische Verhältnis zur breitesten Stelle, und die Längenbemaßung entfällt.
+
+- **Länge:** Funktionsattribut `laenge` in cm (Werte über 400 gelten als mm). Fehlt es, liest `boardLength()` beim Kind-Artikel den gewählten Wert einer Variation, deren Name „Läng“, „Length“, „Size“ oder „Grö“ enthält, und nimmt die führende Zahl (`156 Wide` → 156). Auf der Vaterseite ohne gewählte Variation bleibt die Länge unbekannt.
+- **Umriss:** `outlineType()` erkennt aus `outline`, `form` und `shape` (Texte, Groß-/Kleinschreibung egal) `twin`, `directional twin` oder `directional`. Die Proportionen stehen in `Bootstrap::OUTLINES`: Anteil der Länge bis zur breitesten Stelle an Nose/Tail (Twin 11,5 % / 11,5 %, Directional 14,5 % / 8,5 %), Rundung der Enden (Directional-Tail stumpfer) und Standard-Setback (0 / 1 / 2 cm). Die Enden sind kubische Bézier-Kurven mit senkrechter Tangente an der Spitze und waagerechter an der breitesten Stelle, die Sidecuts S-Kurven.
+- **Inserts:** `insertType()` normalisiert das Attribut `inserts` auf `channel` (enthält „channel“), `2x4` oder `4x4`; andere Werte zeichnen nichts. Gezeichnet wird pro Fuß: 4x4 = 3 Spalten × 2 Reihen im 4-cm-Raster, 2x4 = 6 Spalten (2 cm) × 2 Reihen (4 cm), Channel = ein 17 cm langer Schlitz. Die Füße stehen im Referenzstance (`stance` in cm, sonst 36 % der Länge, begrenzt auf 40–60 cm) um die Boardmitte plus Setback (`setback` in cm Richtung Tail, sonst der Umriss-Standard).
+
+`snowboard_values.tpl` zeichnet Umriss, Inserts, Längenmaß oben, Breitenmaße unten; Werte werden so ausgegeben, wie sie im Shop gepflegt sind (z. B. `298,5`). Der Harness zum Prüfen der Geometrie liegt nicht im Repo: Stubs für `JTL\Plugin\Bootstrapper`, `JTL\Shop` und `JTL\Events\Dispatcher`, dann `buildBoardSketch()` per Reflection mit Beispielboards aufrufen und das SVG mit dem Plugin-CSS rendern.
 
 ---
 
 ## Versionsverlauf
+
+### 0.5.0 (2026-09-21)
+- Board-Skizze maßstäblich: die Boardlänge bestimmt den Maßstab, Breiten werden im selben Verhältnis gezeichnet (vorher wurde die breiteste Stelle fix auf 140 von 600 Einheiten gestreckt – jedes Board sah gleich dick aus)
+- Länge aus dem Funktionsattribut `laenge` (cm) oder automatisch aus der gewählten Variation „Länge“ des Kind-Artikels; erscheint als Längenmaß über der Skizze und als erste Tabellenzeile
+- Directional-Umriss (längere, spitzere Nose, kürzeres, stumpferes Tail) neben Twin und Directional Twin; erkannt aus `form`/`shape` oder per Attribut `outline`
+- Inserts in der Skizze: Lochmuster 4x4 und 2x4 oder Burtons Channel, über das Attribut `inserts`; Referenzstance und Setback optional über `stance`/`setback` (cm), sonst plausible Standardwerte
+- Tabelle um Länge, Inserts, Stance und Setback erweitert
 
 ### 0.4.2 (2026-09-18)
 - Fix: Der Lagerbalken hing ohne `col`-Klasse als nacktes Flex-Item in NOVAs Preis-Row — er schrumpfte auf Inhaltsbreite, rutschte neben den Preis an den rechten Rand und verschmälerte den Preisblock von 625px auf 437px. Jetzt eigene `col col-12` in voller Breite unter dem Preis

@@ -167,11 +167,42 @@ class Bootstrap extends Bootstrapper
      * Dimensionen – Funktionsattribut => Beschriftung in der Tabelle (Breiten in mm)
      */
     private const DIMENSIONS = [
-        'form'  => 'Form',
-        'shape' => 'Shape',
-        'waist' => 'Waist',
-        'nose'  => 'Nose',
-        'tail'  => 'Tail',
+        'laenge'  => 'Länge',
+        'form'    => 'Form',
+        'shape'   => 'Shape',
+        'waist'   => 'Waist',
+        'nose'    => 'Nose',
+        'tail'    => 'Tail',
+        'inserts' => 'Inserts',
+        'stance'  => 'Stance',
+        'setback' => 'Setback',
+    ];
+
+    /** Einheiten der Dimensionen-Tabelle */
+    private const DIMENSION_UNITS = [
+        'laenge'  => 'cm',
+        'waist'   => 'mm',
+        'nose'    => 'mm',
+        'tail'    => 'mm',
+        'stance'  => 'cm',
+        'setback' => 'cm',
+    ];
+
+    /** Anzeigename der Insert-Systeme (Schlüssel = normalisierter Wert) */
+    private const INSERT_LABELS = [
+        'channel' => 'The Channel',
+        '2x4'     => '2x4',
+        '4x4'     => '4x4',
+    ];
+
+    /**
+     * Skizzen-Proportionen je Umriss: Anteil der Boardlänge von der Spitze bis zur
+     * breitesten Stelle (Nose/Tail), Standard-Setback in cm, Rundung der Enden (0 = spitz, 1 = eckig)
+     */
+    private const OUTLINES = [
+        'twin'             => ['nose' => 0.115, 'tail' => 0.115, 'setback' => 0.0, 'noseTip' => 0.55, 'tailTip' => 0.55],
+        'directional twin' => ['nose' => 0.115, 'tail' => 0.115, 'setback' => 1.0, 'noseTip' => 0.55, 'tailTip' => 0.55],
+        'directional'      => ['nose' => 0.145, 'tail' => 0.085, 'setback' => 2.0, 'noseTip' => 0.5,  'tailTip' => 0.8],
     ];
 
     /**
@@ -217,16 +248,28 @@ class Bootstrap extends Bootstrapper
         }
 
         if ($this->isOn($config->getValue('artikel_details_plus_specs_dimensions_aktiv'))) {
+            $lengthCm    = $this->boardLength($artikel);
+            $outline     = $this->outlineType($artikel);
+            $inserts     = $this->insertType($this->attribute($artikel, 'inserts'));
+            $stanceCm    = $this->numericAttribute($artikel, 'stance');
+            $setbackCm   = $this->numericAttribute($artikel, 'setback');
+
             $dimensions = [];
             foreach (self::DIMENSIONS as $key => $label) {
                 $value = $this->attribute($artikel, $key);
+                if ($key === 'laenge') {
+                    // Attribut oder gewählte Variation, siehe boardLength()
+                    $value = $lengthCm !== null ? $this->formatNumber($lengthCm) : null;
+                } elseif ($key === 'inserts') {
+                    $value = $inserts !== null ? self::INSERT_LABELS[$inserts] : null;
+                }
                 if ($value === null || $value === '') {
                     continue;
                 }
                 $dimensions[$key] = [
                     'label' => $label,
                     'value' => $value,
-                    'unit'  => \in_array($key, ['waist', 'nose', 'tail'], true) ? 'mm' : '',
+                    'unit'  => self::DIMENSION_UNITS[$key] ?? '',
                 ];
             }
             $smarty->assign('adpSpecsDimensions', $dimensions);
@@ -235,7 +278,16 @@ class Bootstrap extends Bootstrapper
             $waist = $this->numericAttribute($artikel, 'waist');
             $tail  = $this->numericAttribute($artikel, 'tail');
             if ($nose !== null && $waist !== null && $tail !== null && $nose > 0 && $waist > 0 && $tail > 0) {
-                $board = $this->buildBoardSketch($nose, $waist, $tail);
+                $board = $this->buildBoardSketch(
+                    $nose,
+                    $waist,
+                    $tail,
+                    $lengthCm,
+                    $outline,
+                    $inserts,
+                    $stanceCm,
+                    $setbackCm
+                );
                 // Beschriftung wie im Shop gepflegt (z. B. "298,5"), nicht als Float
                 foreach (['nose', 'waist', 'tail'] as $part) {
                     $board[$part]['value'] = $dimensions[$part]['value'];
@@ -246,38 +298,208 @@ class Bootstrap extends Bootstrapper
     }
 
     /**
-     * Geometrie für die Board-Skizze (SVG viewBox 0 0 600 220): Nose links, Tail rechts.
-     * Die breiteste Stelle wird auf 140 Einheiten skaliert, die anderen proportional dazu.
-     *
-     * @return array{path: string, nose: array{x: int, y1: float, y2: float, value: float},
-     *               waist: array{x: int, y1: float, y2: float, value: float},
-     *               tail: array{x: int, y1: float, y2: float, value: float}}
+     * Boardlänge in cm: Funktionsattribut "laenge" (cm, Werte über 400 gelten als mm),
+     * ersatzweise der gewählte Wert einer Variation "Länge"/"Length" beim Kind-Artikel ("156 Wide" => 156).
      */
-    private function buildBoardSketch(float $nose, float $waist, float $tail): array
+    private function boardLength(object $artikel): ?float
     {
-        $cy    = 100.0;
-        $scale = 140.0 / \max($nose, $waist, $tail);
-        $nh    = \round($nose * $scale / 2, 1);
-        $wh    = \round($waist * $scale / 2, 1);
-        $th    = \round($tail * $scale / 2, 1);
+        $value = $this->numericAttribute($artikel, 'laenge') ?? $this->numericAttribute($artikel, 'length');
+        if ($value !== null && $value > 0) {
+            return $value > 400 ? $value / 10 : $value;
+        }
+        foreach ($artikel->oVariationenNurKind_arr ?? [] as $variation) {
+            if (!\preg_match('/l[äa]ng|length|size|gr[öo]/iu', (string)($variation->cName ?? ''))) {
+                continue;
+            }
+            foreach ($variation->Werte ?? [] as $wert) {
+                if (\preg_match('/^\s*(\d{2,3}(?:[.,]\d)?)/', (string)($wert->cName ?? ''), $m)) {
+                    $cm = (float)\str_replace(',', '.', $m[1]);
+                    if ($cm >= 80 && $cm <= 200) {
+                        return $cm;
+                    }
+                }
+            }
+        }
 
-        $path = \sprintf(
-            'M 20 %1$s Q 20 %2$s 80 %2$s C 200 %2$s 200 %3$s 300 %3$s C 400 %3$s 400 %4$s 520 %4$s Q 580 %4$s 580 %1$s'
-            . ' Q 580 %5$s 520 %5$s C 400 %5$s 400 %6$s 300 %6$s C 200 %6$s 200 %7$s 80 %7$s Q 20 %7$s 20 %1$s Z',
-            $cy,
-            $cy - $nh,
-            $cy - $wh,
-            $cy - $th,
-            $cy + $th,
-            $cy + $wh,
-            $cy + $nh
-        );
+        return null;
+    }
+
+    /**
+     * Umriss der Skizze: Attribut "outline" (twin | directional | directional twin),
+     * ersatzweise aus den Texten von "form" und "shape" erkannt. Standard ist Twin.
+     */
+    private function outlineType(object $artikel): string
+    {
+        $text = \mb_strtolower(\implode(' ', \array_filter([
+            $this->attribute($artikel, 'outline'),
+            $this->attribute($artikel, 'form'),
+            $this->attribute($artikel, 'shape'),
+        ])));
+        if (\str_contains($text, 'directional')) {
+            return \str_contains($text, 'twin') ? 'directional twin' : 'directional';
+        }
+
+        return 'twin';
+    }
+
+    /**
+     * Insert-System aus dem Attribut "inserts": channel | 2x4 | 4x4, sonst null (keine Inserts in der Skizze).
+     */
+    private function insertType(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        $value = \mb_strtolower($value);
+        if (\str_contains($value, 'channel')) {
+            return 'channel';
+        }
+        if (\preg_match('/2\s*x\s*4/', $value)) {
+            return '2x4';
+        }
+        if (\preg_match('/4\s*x\s*4/', $value)) {
+            return '4x4';
+        }
+
+        return null;
+    }
+
+    private function formatNumber(float $value): string
+    {
+        return \fmod($value, 1.0) === 0.0 ? (string)(int)$value : \str_replace('.', ',', (string)$value);
+    }
+
+    /**
+     * Geometrie für die Board-Skizze (Draufsicht, Nose links, Tail rechts) in SVG-Einheiten.
+     * Die Boardlänge wird auf 560 Einheiten skaliert, alle Breiten im selben Maßstab – das Board
+     * erscheint damit im echten Seitenverhältnis. Ohne bekannte Länge gilt ein typisches
+     * Verhältnis von 5,2:1 zur breitesten Stelle, und die Längenbemaßung entfällt.
+     *
+     * @return array{
+     *     viewBox: string, path: string, cy: float, labelY: float,
+     *     length: array{x1: float, x2: float, y: float, label: string}|null,
+     *     inserts: array{type: string, holes: list<array{cx: float, cy: float, r: float}>,
+     *                    slots: list<array{x: float, y: float, w: float, h: float}>}|null,
+     *     nose: array{x: float, y1: float, y2: float, value: float},
+     *     waist: array{x: float, y1: float, y2: float, value: float},
+     *     tail: array{x: float, y1: float, y2: float, value: float}
+     * }
+     */
+    private function buildBoardSketch(
+        float $nose,
+        float $waist,
+        float $tail,
+        ?float $lengthCm,
+        string $outline,
+        ?string $inserts,
+        ?float $stanceCm,
+        ?float $setbackCm
+    ): array {
+        $prop     = self::OUTLINES[$outline] ?? self::OUTLINES['twin'];
+        $lengthMm = $lengthCm !== null ? $lengthCm * 10 : \max($nose, $waist, $tail) * 5.2;
+        $scale    = 560.0 / $lengthMm;
+        $x0       = 20.0;
+        $x1       = 580.0;
+
+        $nh = $nose * $scale / 2;
+        $wh = $waist * $scale / 2;
+        $th = $tail * $scale / 2;
+        $maxHalf = \max($nh, $wh, $th);
+
+        $yTop = $lengthCm !== null ? 40.0 : 16.0;
+        $cy   = $yTop + $maxHalf;
+        $labelY = $cy + $maxHalf + 30;
+        $height = $labelY + 12;
+
+        // breiteste Stellen und Taille entlang der Länge
+        $xN = $x0 + 560 * $prop['nose'];
+        $xT = $x1 - 560 * $prop['tail'];
+        $xW = ($xN + $xT) / 2;
+
+        $r = static fn(float $v): float => \round($v, 1);
+
+        // Enden: kubische Kurven zwischen Spitze und breitester Stelle. "k" steuert die Rundung
+        // (0,5 = gleichmäßig rund, 0,8 = stumpf), an der breitesten Stelle ist die Tangente waagerecht.
+        $tipOut = static function (float $xs, float $ys, float $xe, float $ye, float $k) use ($r): string {
+            return \sprintf(
+                'C %s %s %s %s %s %s',
+                $r($xs),
+                $r($ys + ($ye - $ys) * $k),
+                $r($xs + ($xe - $xs) * (1 - $k) * 0.9),
+                $r($ye),
+                $r($xe),
+                $r($ye)
+            );
+        };
+        $tipIn = static function (float $xs, float $ys, float $xe, float $ye, float $k) use ($r): string {
+            return \sprintf(
+                'C %s %s %s %s %s %s',
+                $r($xs + ($xe - $xs) * (1 - $k) * 0.9),
+                $r($ys),
+                $r($xe),
+                $r($ys + ($ye - $ys) * (1 - $k)),
+                $r($xe),
+                $r($ye)
+            );
+        };
+        // Sidecut: S-Kurve mit waagerechten Tangenten
+        $side = static function (float $xs, float $ys, float $xe, float $ye) use ($r): string {
+            $mid = ($xs + $xe) / 2;
+
+            return \sprintf('C %s %s %s %s %s %s', $r($mid), $r($ys), $r($mid), $r($ye), $r($xe), $r($ye));
+        };
+
+        $path = \sprintf('M %s %s ', $r($x0), $r($cy))
+            . $tipOut($x0, $cy, $xN, $cy - $nh, $prop['noseTip']) . ' '
+            . $side($xN, $cy - $nh, $xW, $cy - $wh) . ' '
+            . $side($xW, $cy - $wh, $xT, $cy - $th) . ' '
+            . $tipIn($xT, $cy - $th, $x1, $cy, $prop['tailTip']) . ' '
+            . $tipOut($x1, $cy, $xT, $cy + $th, $prop['tailTip']) . ' '
+            . $side($xT, $cy + $th, $xW, $cy + $wh) . ' '
+            . $side($xW, $cy + $wh, $xN, $cy + $nh) . ' '
+            . $tipIn($xN, $cy + $nh, $x0, $cy, $prop['noseTip']) . ' Z';
+
+        // Inserts: Referenzstance mittig (plus Setback Richtung Tail), Maße in mm
+        $insertData = null;
+        if ($inserts !== null) {
+            $stanceMm  = ($stanceCm ?? \min(60.0, \max(40.0, $lengthMm / 10 * 0.36))) * 10;
+            $setbackMm = ($setbackCm ?? $prop['setback']) * 10;
+            $centerX   = $x0 + ($lengthMm / 2 + $setbackMm) * $scale;
+            $feet      = [$centerX - $stanceMm / 2 * $scale, $centerX + $stanceMm / 2 * $scale];
+            $holes     = [];
+            $slots     = [];
+            if ($inserts === 'channel') {
+                $len = 170 * $scale;
+                $wid = \max(4.0, 12 * $scale);
+                foreach ($feet as $fx) {
+                    $slots[] = ['x' => $r($fx - $len / 2), 'y' => $r($cy - $wid / 2), 'w' => $r($len), 'h' => $r($wid)];
+                }
+            } else {
+                $cols   = $inserts === '2x4' ? [-50, -30, -10, 10, 30, 50] : [-40, 0, 40];
+                $radius = \max(2.4, 4 * $scale);
+                foreach ($feet as $fx) {
+                    foreach ($cols as $dx) {
+                        foreach ([-20, 20] as $dy) {
+                            $holes[] = ['cx' => $r($fx + $dx * $scale), 'cy' => $r($cy + $dy * $scale), 'r' => $r($radius)];
+                        }
+                    }
+                }
+            }
+            $insertData = ['type' => $inserts, 'holes' => $holes, 'slots' => $slots];
+        }
 
         return [
-            'path'  => $path,
-            'nose'  => ['x' => 80, 'y1' => $cy - $nh, 'y2' => $cy + $nh, 'value' => $nose],
-            'waist' => ['x' => 300, 'y1' => $cy - $wh, 'y2' => $cy + $wh, 'value' => $waist],
-            'tail'  => ['x' => 520, 'y1' => $cy - $th, 'y2' => $cy + $th, 'value' => $tail],
+            'viewBox' => \sprintf('0 0 600 %s', $r($height)),
+            'path'    => $path,
+            'cy'      => $r($cy),
+            'labelY'  => $r($labelY),
+            'length'  => $lengthCm !== null
+                ? ['x1' => $x0, 'x2' => $x1, 'y' => 18.0, 'label' => $this->formatNumber($lengthCm) . ' cm']
+                : null,
+            'inserts' => $insertData,
+            'nose'    => ['x' => $r($xN), 'y1' => $r($cy - $nh), 'y2' => $r($cy + $nh), 'value' => $nose],
+            'waist'   => ['x' => $r($xW), 'y1' => $r($cy - $wh), 'y2' => $r($cy + $wh), 'value' => $waist],
+            'tail'    => ['x' => $r($xT), 'y1' => $r($cy - $th), 'y2' => $r($cy + $th), 'value' => $tail],
         ];
     }
 
