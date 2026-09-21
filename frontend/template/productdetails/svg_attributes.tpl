@@ -1,3 +1,25 @@
+{* Flex-Skala: Werte aus Bootstrap::flexScale() *}
+{capture name="adp_flex"}
+{if !empty($adpFlex)}
+    <div class="adp-flex">
+        <p class="adp-meter__head">
+            <span class="adp-meter__label">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_flex_title')|escape:'html'}</span>
+            <span class="adp-meter__range">{$adpFlex.text|escape:'html'}</span>
+        </p>
+        <div class="adp-flex__segments" role="img" aria-label="{$adpFlex.text|escape:'html'}">
+            {foreach $adpFlex.segments as $seg}
+                <span class="adp-flex__seg{if $seg.fill >= 1} is-on{elseif $seg.fill > 0} is-half{/if}"></span>
+            {/foreach}
+        </div>
+        <div class="adp-flex__zones">
+            {foreach $adpFlex.zones as $zone}
+                <span class="adp-flex__zone{if $zone.set} is-set{/if}">{$zone.label|escape:'html'}</span>
+            {/foreach}
+        </div>
+    </div>
+{/if}
+{/capture}
+
 {* Fahreigenschaften: Werte kommen aus Bootstrap::assignSnowboardSpecs() (Funktionsattribute mit Vater-Fallback) *}
 {if !empty($adpSpecsCharacteristics)}
 <section class="adp-panel adp-radar">
@@ -35,6 +57,12 @@
             });
         });
     </script>
+
+    {$smarty.capture.adp_flex}
+</section>
+{elseif !empty($adpFlex)}
+<section class="adp-panel adp-radar adp-radar--flex-only">
+    {$smarty.capture.adp_flex}
 </section>
 {/if}
 

@@ -42,6 +42,15 @@ class Bootstrap extends Bootstrapper
      */
     private const LEVELS = ['Beginner', 'Advanced', 'Professional'];
 
+    /** Flex-Skala 1-10 in fünf Zonen: [von, bis, Sprachvariable] */
+    private const FLEX_ZONES = [
+        [1, 2, 'artikel_details_plus_flex_zone_soft'],
+        [3, 4, 'artikel_details_plus_flex_zone_medium_soft'],
+        [5, 6, 'artikel_details_plus_flex_zone_medium'],
+        [7, 8, 'artikel_details_plus_flex_zone_medium_stiff'],
+        [9, 10, 'artikel_details_plus_flex_zone_stiff'],
+    ];
+
     /**
      * Skalen der Körpergewichtsleiste (kg), jeweils mit "+" am Anfang und Ende
      */
@@ -61,7 +70,8 @@ class Bootstrap extends Bootstrapper
         $smarty->assign('adpStock', null)
             ->assign('adpCheaperActive', $this->isOn($config->getValue('artikel_details_plus_cheaper_aktiv')))
             ->assign('adpWeight', null)
-            ->assign('adpLevel', null);
+            ->assign('adpLevel', null)
+            ->assign('adpFlex', null);
 
         if ($artikel === null) {
             return;
@@ -121,6 +131,64 @@ class Bootstrap extends Bootstrapper
                 ]);
             }
         }
+
+        $smarty->assign('adpFlex', $this->flexScale($artikel));
+    }
+
+    /**
+     * Flex-Skala: Funktionsattribut "flex" (1-10, Dezimal erlaubt) oder Bereich "flex_ab"/"flex_bis".
+     * Liefert zehn Segmente (fill 0 / 0.5 / 1), fünf Zonen mit Aktiv-Flag und den Klartext für die Kopfzeile.
+     *
+     * @return array{from: float, to: float, segments: list<array{fill: float}>,
+     *               zones: list<array{label: string, set: bool}>, text: string}|null
+     */
+    private function flexScale(object $artikel): ?array
+    {
+        $single = $this->numericAttribute($artikel, 'flex');
+        $from   = $this->numericAttribute($artikel, 'flex_ab') ?? $single;
+        $to     = $this->numericAttribute($artikel, 'flex_bis') ?? $single;
+        if ($from === null && $to === null) {
+            return null;
+        }
+        $from ??= $to;
+        $to   ??= $from;
+        if ($from > $to) {
+            [$from, $to] = [$to, $from];
+        }
+        $from = \max(1.0, \min(10.0, $from));
+        $to   = \max(1.0, \min(10.0, $to));
+
+        $segments = [];
+        for ($i = 1; $i <= 10; $i++) {
+            // Segment i deckt den Wertebereich (i-1, i] ab; beim Einzelwert zählt alles bis zum Wert
+            $lo = $from === $to ? 0.0 : $from - 1;
+            $covered = \max(0.0, \min((float)$i, $to) - \max((float)($i - 1), $lo));
+            $segments[] = ['fill' => $covered >= 0.99 ? 1.0 : ($covered >= 0.4 ? 0.5 : 0.0)];
+        }
+
+        $loc    = $this->getPlugin()->getLocalization();
+        $zones  = [];
+        $labels = [];
+        foreach (self::FLEX_ZONES as [$zFrom, $zTo, $var]) {
+            $label = $loc->getTranslation($var);
+            $set   = $to >= $zFrom && $from <= $zTo;
+            $zones[] = ['label' => $label, 'set' => $set];
+            if ($set) {
+                $labels[] = $label;
+            }
+        }
+        $zoneText = \count($labels) > 1 ? $labels[0] . ' – ' . $labels[\count($labels) - 1] : ($labels[0] ?? '');
+        $valText  = $from === $to
+            ? $this->formatNumber($from) . '/10'
+            : $this->formatNumber($from) . '–' . $this->formatNumber($to) . '/10';
+
+        return [
+            'from'     => $from,
+            'to'       => $to,
+            'segments' => $segments,
+            'zones'    => $zones,
+            'text'     => \trim($zoneText . ' · ' . $valText, ' ·'),
+        ];
     }
 
     /**
