@@ -4,8 +4,18 @@
     {* Stylesheet wird einmalig in productdetails/details.tpl eingebunden *}
     <div class="adp-specs">
         <div class="adp-specs__grid">
-            {include file='productdetails/svg_attributes.tpl' tplscope='details'}
-            {include file='productdetails/snowboard_values.tpl' tplscope='details'}
+            {if !empty($adpSpecsCharacteristics) || !empty($adpFlex)}
+                <div class="adp-specs__col">
+                    {include file='productdetails/characteristics.tpl' tplscope='details'}
+                    {include file='productdetails/flex.tpl' tplscope='details'}
+                </div>
+            {/if}
+            {if !empty($adpWeight) || !empty($adpLevel) || !empty($adpSpecsDimensions)}
+                <div class="adp-specs__col">
+                    {include file='productdetails/fit.tpl' tplscope='details'}
+                    {include file='productdetails/snowboard_values.tpl' tplscope='details'}
+                </div>
+            {/if}
         </div>
     </div>
 {/capture}
