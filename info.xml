@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.10.0</Version>
+    <Version>0.10.1</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -237,6 +237,24 @@ Link:     {$oPluginMail->cURL}
                 <Description>Überschrift der Fahrlevel-Leiste</Description>
                 <VariableLocalized iso="GER">Fahrlevel:</VariableLocalized>
                 <VariableLocalized iso="ENG">Rider Skills:</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_level_beginner</Name>
+                <Description>Fahrlevel-Stufe 1 (fahrlevel Beginner)</Description>
+                <VariableLocalized iso="GER">Beginner</VariableLocalized>
+                <VariableLocalized iso="ENG">Beginner</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_level_intermediate</Name>
+                <Description>Fahrlevel-Stufe 2 (fahrlevel Advanced/Intermediate)</Description>
+                <VariableLocalized iso="GER">Intermediate</VariableLocalized>
+                <VariableLocalized iso="ENG">Intermediate</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_level_expert</Name>
+                <Description>Fahrlevel-Stufe 3 (fahrlevel Professional/Expert)</Description>
+                <VariableLocalized iso="GER">Advanced/Expert</VariableLocalized>
+                <VariableLocalized iso="ENG">Advanced/Expert</VariableLocalized>
             </Variable>
             <Variable>
                 <Name>artikel_details_plus_specs_heading_profile</Name>
