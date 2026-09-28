@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.9.0</Version>
+    <Version>0.10.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -100,6 +100,91 @@ Link:     {$oPluginMail->cURL}
                     </OptionsSource>
                     <SelectboxOptions>
                         <Option value="0" sort="1">Leider fehlgeschlagen</Option>
+                    </SelectboxOptions>
+                </Setting>
+            </Settingslink>
+            <Settingslink sort="3">
+                <Name>Merkmal-Zuordnung</Name>
+                <Setting type="text" initialValue="" sort="0" conf="N">
+                    <Name>Merkmale als Ersatz für Funktionsattribute</Name>
+                    <Description>Hat ein Artikel das Funktionsattribut nicht (auch nicht am Vaterartikel), liest die Anzeige die Werte aus dem hier zugeordneten Merkmal – zuerst vom Artikel, sonst vom Vaterartikel, immer in der Standardsprache. Gepflegte Funktionsattribute haben Vorrang.</Description>
+                    <ValueName>Spacer3</ValueName>
+                </Setting>
+                <Setting type="selectbox" initialValue="0" sort="1" conf="Y">
+                    <Name>Flex</Name>
+                    <Description>Ersatz für flex bzw. flex_ab/flex_bis. Zahlen 1-10 ("6", "5-7", "6/10"; mehrere Werte ergeben den Bereich) oder Wörter wie Soft, Medium, Stiff bzw. weich, mittel, hart.</Description>
+                    <ValueName>artikel_details_plus_merkmal_flex</ValueName>
+                    <OptionsSource>
+                        <File>merkmale.php</File>
+                    </OptionsSource>
+                    <SelectboxOptions>
+                        <Option value="0" sort="1">– kein Merkmal –</Option>
+                    </SelectboxOptions>
+                </Setting>
+                <Setting type="selectbox" initialValue="0" sort="2" conf="Y">
+                    <Name>Fahrlevel</Name>
+                    <Description>Ersatz für fahrlevel_ab/fahrlevel_bis. Werte Beginner/Anfänger/Einsteiger, Advanced/Fortgeschritten, Professional/Profi/Experte; mehrere Werte ergeben den Bereich.</Description>
+                    <ValueName>artikel_details_plus_merkmal_fahrlevel</ValueName>
+                    <OptionsSource>
+                        <File>merkmale.php</File>
+                    </OptionsSource>
+                    <SelectboxOptions>
+                        <Option value="0" sort="1">– kein Merkmal –</Option>
+                    </SelectboxOptions>
+                </Setting>
+                <Setting type="selectbox" initialValue="0" sort="3" conf="Y">
+                    <Name>Körpergewicht</Name>
+                    <Description>Ersatz für koerpergewicht_ab/koerpergewicht_bis. Werte wie "50 - 70 kg"; bei mehreren Werten gilt kleinste bis größte Zahl.</Description>
+                    <ValueName>artikel_details_plus_merkmal_koerpergewicht</ValueName>
+                    <OptionsSource>
+                        <File>merkmale.php</File>
+                    </OptionsSource>
+                    <SelectboxOptions>
+                        <Option value="0" sort="1">– kein Merkmal –</Option>
+                    </SelectboxOptions>
+                </Setting>
+                <Setting type="selectbox" initialValue="0" sort="4" conf="Y">
+                    <Name>Brettlänge</Name>
+                    <Description>Ersatz für laenge. Werte wie "156", "156 cm" oder "156 Wide". Wird nur verwendet, wenn am Artikel (bzw. Vaterartikel) genau eine Länge gepflegt ist – sonst gilt die gewählte Variation.</Description>
+                    <ValueName>artikel_details_plus_merkmal_laenge</ValueName>
+                    <OptionsSource>
+                        <File>merkmale.php</File>
+                    </OptionsSource>
+                    <SelectboxOptions>
+                        <Option value="0" sort="1">– kein Merkmal –</Option>
+                    </SelectboxOptions>
+                </Setting>
+                <Setting type="selectbox" initialValue="0" sort="5" conf="Y">
+                    <Name>Form (Profil)</Name>
+                    <Description>Ersatz für form, z. B. "Hybrid Camber" oder "Rocker". Steuert Profil-Seitenansicht und Tabellenzeile Form.</Description>
+                    <ValueName>artikel_details_plus_merkmal_form</ValueName>
+                    <OptionsSource>
+                        <File>merkmale.php</File>
+                    </OptionsSource>
+                    <SelectboxOptions>
+                        <Option value="0" sort="1">– kein Merkmal –</Option>
+                    </SelectboxOptions>
+                </Setting>
+                <Setting type="selectbox" initialValue="0" sort="6" conf="Y">
+                    <Name>Shape (Umriss)</Name>
+                    <Description>Ersatz für shape, z. B. "True Twin" oder "Directional". Steuert den Umriss der Board-Skizze und die Tabellenzeile Shape.</Description>
+                    <ValueName>artikel_details_plus_merkmal_shape</ValueName>
+                    <OptionsSource>
+                        <File>merkmale.php</File>
+                    </OptionsSource>
+                    <SelectboxOptions>
+                        <Option value="0" sort="1">– kein Merkmal –</Option>
+                    </SelectboxOptions>
+                </Setting>
+                <Setting type="selectbox" initialValue="0" sort="7" conf="Y">
+                    <Name>Inserts</Name>
+                    <Description>Ersatz für inserts: Werte mit "Channel", "2x4" oder "4x4".</Description>
+                    <ValueName>artikel_details_plus_merkmal_inserts</ValueName>
+                    <OptionsSource>
+                        <File>merkmale.php</File>
+                    </OptionsSource>
+                    <SelectboxOptions>
+                        <Option value="0" sort="1">– kein Merkmal –</Option>
                     </SelectboxOptions>
                 </Setting>
             </Settingslink>

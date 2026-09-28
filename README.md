@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.9.0
+**Version:** 0.10.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -22,6 +22,8 @@ Auf der Artikeldetailseite werden im Beschreibungs-Tab die Snowboard-Eigenschaft
 | Profil | **Seitenansicht** (Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker, Flat Rocker) als vollbreite Karte unter den Spalten, vertikal übertrieben, mit Bodenlinie | `profil` (Vorrang), sonst erkannt aus `form`, ersatzweise `shape` |
 | Flex | **Skala 1–10** aus zehn Segmenten mit fünf Zonen (Soft, Medium-Soft, Medium, Medium-Stiff, Stiff) in eigener Karte; Einzelwert oder Bereich, halbe Werte als halbes Segment | `flex` oder `flex_ab`, `flex_bis` (1–10, Dezimal erlaubt) |
 | Dimensionen | Tabelle Länge / Form / Shape / Waist / Nose / Tail / Inserts plus **maßstäbliche SVG-Board-Skizze** (Draufsicht, Nose links, Tail rechts) mit Längen- und Breitenbemaßung, Twin- oder Directional-Umriss und Inserts (Lochmuster oder Channel); die Skizze erscheint, wenn `nose`, `waist` und `tail` numerisch sind | `form`, `shape`, `waist`, `nose`, `tail` (mm), `laenge` (cm), `inserts`, optional `outline`, `stance`, `setback` |
+
+Seit 0.10.0 können Flex, Fahrlevel, Körpergewicht, Länge, Form, Shape und Inserts ersatzweise aus **Merkmalen** kommen (Tab „Merkmal-Zuordnung“, siehe [Merkmale statt Funktionsattribute](#merkmale-statt-funktionsattribute)).
 
 Fahreigenschaften-Diagramm und Dimensionen lassen sich einzeln abschalten; der Schalter „Merkmalwert-Anzeige aktiv" bleibt der Hauptschalter für den gesamten Bereich. Die Überschriften „Fahreigenschaften" und „Dimensionen" sind Sprachvariablen. Dieser Bereich ersetzt das frühere Plugin `snowboard_specs` (September 2026 integriert).
 
@@ -61,7 +63,7 @@ Erfolgs- und Fehlermeldungen werden als Alerts oberhalb des Formulars angezeigt;
 
 ## Konfiguration
 
-Die Einstellungen sind in vier Tabs gegliedert. Alle „Aktiv"-Einstellungen sind Checkboxen (seit 0.2.2; gespeichert wird `on` bzw. leer).
+Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen sind Checkboxen (seit 0.2.2; gespeichert wird `on` bzw. leer).
 
 | Tab | Einstellung | Typ | Beschreibung |
 |---|---|---|---|
@@ -72,6 +74,7 @@ Die Einstellungen sind in vier Tabs gegliedert. Alle „Aktiv"-Einstellungen sin
 | Fahreigenschaften | Profil-Zonen farbig markieren | Checkbox (Default an, `initialValue="on"`) | Teilt die Seitenansicht farbig in Camber (blau), Rocker (rot), Flat (gelb) und Kick (grün) und zeigt eine Legende; abgewählt wird das Profil einfarbig in der Akzentfarbe gezeichnet |
 | Merkmalbilder | Merkmalbilder Anzeige aktiv | Checkbox | Aktiviert Bilder unter den Artikelboxen in der Listenansicht |
 | Merkmalbilder | Merkmalwerte mit Bildern | Mehrfachauswahl | Welche Merkmale (mit hinterlegten Bildern) angezeigt werden — dynamisch aus `tmerkmal` |
+| Merkmal-Zuordnung | Flex, Fahrlevel, Körpergewicht, Brettlänge, Form (Profil), Shape (Umriss), Inserts | Auswahl je Feld (Default „– kein Merkmal –“) | Merkmal, das einspringt, wenn das Funktionsattribut fehlt — dynamisch aus `tmerkmal` |
 | Lagerbestandsanzeige | Lagerbestandsanzeige aktiv | Checkbox | Zeigt den Fortschrittsbalken bei niedrigem Bestand |
 | Lagerbestandsanzeige | Nur bei Lagerbestand unter | Number (Default 10) | Schwellenwert, ab dem die Anzeige erscheint |
 | Lagerbestandsanzeige | Farbe der Anzeige | Color (Default `#ffa54f`) | Farbe des Fortschrittsbalkens |
@@ -173,6 +176,25 @@ Mit dem Schalter „Profil-Zonen farbig markieren" wird die Seitenansicht in ihr
 - `inserts`: enthält „channel" → Channel (ein Schlitz pro Fuß); `2x4`/`2 x 4` → 6 Spalten × 2 Reihen; `4x4` → 3 Spalten × 2 Reihen. Andere Werte zeichnen keine Inserts.
 - `stance` (Referenzstance in cm) und `setback` (cm Richtung Tail) sind optional und erscheinen nur als Tabellenzeilen, wenn sie gepflegt sind; für die Skizze gelten sonst die Standardwerte.
 
+### Merkmale statt Funktionsattribute
+
+Werte, die ohnehin als **Merkmal** für die Filter gepflegt sind, müssen nicht doppelt als Funktionsattribut angelegt werden. Im Tab **Merkmal-Zuordnung** wird je Feld das passende Merkmal gewählt. `Bootstrap::loadFeatureAttributes()` liest diese Merkmale beim Aufruf der Artikelseite mit einer Abfrage (`tartikelmerkmal` → `tmerkmalwertsprache`, **Standardsprache** des Shops, damit die Worterkennung unabhängig von der Besuchersprache ist) und legt daraus Ersatz-Attribute an, die `attribute()` nach Artikel- und Vater-Funktionsattribut zurückgibt.
+
+- **Vorrang:** Ist für ein Feld irgendein Funktionsattribut seiner Gruppe gepflegt (am Artikel oder Vater, z. B. `flex` *oder* `flex_ab`/`flex_bis`), bleibt das Merkmal für dieses Feld unbeachtet. Bestehende Artikel ändern sich also nicht.
+- **Vater und Kind:** Hat der Artikel das Merkmal selbst, zählen nur seine Werte, sonst die des Vaterartikels.
+
+| Feld | Ersatz für | Erkennung der Merkmalwerte |
+|---|---|---|
+| Flex | `flex_ab`/`flex_bis` | Zahlen 1–10 (`6`, `5-7`, `6/10`, `7,5`); mehrere Werte → kleinster bis größter. Ohne Zahl Wörter: Soft/weich 1–2, Medium Soft/mittelweich 3–4, Medium/mittel 5–6, Medium Stiff/mittelhart 7–8, Stiff/hart/steif 9–10 |
+| Fahrlevel | `fahrlevel_ab`/`fahrlevel_bis` | Beginner/Anfänger/Einsteiger, Advanced/Fortgeschritten/Intermediate, Professional/Pro/Profi/Experte; mehrere Werte oder „Anfänger bis Profi“ → Bereich |
+| Körpergewicht | `koerpergewicht_ab`/`_bis` | alle Zahlen 20–200 aller Werte, kleinste bis größte (`50 - 70 kg`; „ab 80 kg“ ergibt 80–80) |
+| Brettlänge | `laenge` | Zahlen 80–200 cm (über 400 als mm); nur wenn **genau eine** Länge vorkommt – ein Vater mit `154`, `156`, `158` liefert nichts, dann greift wie bisher die gewählte Variation |
+| Form (Profil) | `form` | Text wie beim Attribut, mehrere Werte mit Komma verbunden |
+| Shape (Umriss) | `shape` | Text wie beim Attribut |
+| Inserts | `inserts` | Text wie beim Attribut (`channel`, `2x4`, `4x4`) |
+
+Maße (`nose`, `waist`, `tail`, `stance`, `setback`) und die Fahreigenschaften bleiben Funktionsattribute.
+
 ### Massenpflege
 
 Für viele Artikel bietet sich die JTL-Ameise an (Import Artikel-Funktionsattribute: Artikelnummer, Attributname, Wert). Bewährte Reihenfolge: zuerst `shape`, `form`, `flex` und die fünf Fahreigenschaften am Vater, danach Breiten und `laenge` je Kind.
@@ -219,10 +241,11 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 | `productlist-index-include-price` | `item_box.tpl` | Merkmalbilder unter Artikelboxen |
 
 ### Hooks
-- `HOOK_ARTIKEL_PAGE` (registriert in `Bootstrap.php`): verarbeitet POST-Submissions des „Günstiger gesehen"-Formulars (PRG-Redirect) und befüllt die Smarty-Variablen für alle Bauteile: `assignSnowboardSpecs()` setzt `adpSpecsCharacteristics`, `adpSpecsDimensions`, `adpSpecsBoard`, `adpFrontendURL`; `assignDetailExtras()` setzt `adpStock`, `adpCheaperActive`, `adpWeight`, `adpLevel`. Die Templates rechnen nichts mehr selbst.
+- `HOOK_ARTIKEL_PAGE` (registriert in `Bootstrap.php`): verarbeitet POST-Submissions des „Günstiger gesehen"-Formulars (PRG-Redirect) und befüllt die Smarty-Variablen für alle Bauteile (vorher lädt `loadFeatureAttributes()` die zugeordneten Merkmale): `assignSnowboardSpecs()` setzt `adpSpecsCharacteristics`, `adpSpecsDimensions`, `adpSpecsBoard`, `adpFrontendURL`; `assignDetailExtras()` setzt `adpStock`, `adpCheaperActive`, `adpWeight`, `adpLevel`. Die Templates rechnen nichts mehr selbst.
 
 ### Dynamische Optionsquelle
 - `adminmenu/merkmalwerte.php`: SQL-Query über `tmerkmal`/`tmerkmalwert`, liefert nur Merkmale mit mindestens einem bebilderten Wert. Versorgt die Mehrfachauswahl „Merkmalwerte mit Bildern".
+- `adminmenu/merkmale.php`: alle Merkmale aus `tmerkmal` plus „– kein Merkmal –“ (Wert `0`); versorgt die Auswahlfelder im Tab „Merkmal-Zuordnung“.
 
 ### Assets
 - `frontend/js/ecm_polygon_svg.js`: JS-Klasse zur Berechnung und Darstellung des Pentagon-Radar-Diagramms (eigenständige ES6-Klasse, benötigt jQuery aus dem Template). Wird via `<script src>` in `svg_attributes.tpl` eingebunden.

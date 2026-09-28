@@ -24,6 +24,7 @@ class Bootstrap extends Bootstrapper
 
         $dispatcher->hookInto(\HOOK_ARTIKEL_PAGE, function (array $args): void {
             $this->handleCheaperForm();
+            $this->loadFeatureAttributes($args['oArtikel'] ?? null);
             $this->assignSnowboardSpecs($args['oArtikel'] ?? null);
             $this->assignDetailExtras($args['oArtikel'] ?? null);
         });
@@ -766,7 +767,8 @@ class Bootstrap extends Bootstrapper
     }
 
     /**
-     * Funktionsattribut vom Artikel, ersatzweise vom Vaterartikel (Keys sind im Core kleingeschrieben).
+     * Funktionsattribut vom Artikel, ersatzweise vom Vaterartikel (Keys sind im Core kleingeschrieben),
+     * zuletzt der aus einem zugeordneten Merkmal abgeleitete Wert (siehe loadFeatureAttributes()).
      */
     private function attribute(object $artikel, string $name): ?string
     {
@@ -777,7 +779,200 @@ class Bootstrap extends Bootstrapper
             return \trim((string)$artikel->VaterFunktionsAttribute[$name]);
         }
 
-        return null;
+        return $this->featureAttributes[$name] ?? null;
+    }
+
+    /**
+     * Merkmal-Zuordnung: Feld => [Einstellung, Funktionsattribute der Gruppe].
+     * Ist eines der Funktionsattribute gepflegt, bleibt das Merkmal für die ganze Gruppe unbeachtet.
+     */
+    private const FEATURE_FIELDS = [
+        'flex'           => ['artikel_details_plus_merkmal_flex', ['flex', 'flex_ab', 'flex_bis']],
+        'fahrlevel'      => ['artikel_details_plus_merkmal_fahrlevel', ['fahrlevel_ab', 'fahrlevel_bis']],
+        'koerpergewicht' => ['artikel_details_plus_merkmal_koerpergewicht', ['koerpergewicht_ab', 'koerpergewicht_bis']],
+        'laenge'         => ['artikel_details_plus_merkmal_laenge', ['laenge', 'length']],
+        'form'           => ['artikel_details_plus_merkmal_form', ['form']],
+        'shape'          => ['artikel_details_plus_merkmal_shape', ['shape']],
+        'inserts'        => ['artikel_details_plus_merkmal_inserts', ['inserts']],
+    ];
+
+    /** Fahrlevel-Wörter in Merkmalwerten => Index in LEVELS */
+    private const LEVEL_WORDS = [
+        '/beginner|anf(?:ä|ae)nger|einsteiger|novice/u'     => 0,
+        '/advanced|fortgeschritten|intermediate/u'          => 1,
+        '/professional|\bpro\b|profi|expert|experte/u'      => 2,
+    ];
+
+    /** Flex-Wörter in Merkmalwerten => Bereich auf der Skala 1-10 (zusammengesetzte zuerst prüfen) */
+    private const FLEX_WORDS = [
+        '/medium\s*stiff|mittel\s*(?:hart|steif)/u' => [7, 8],
+        '/medium\s*soft|mittel\s*weich/u'           => [3, 4],
+        '/stiff|hart|steif/u'                       => [9, 10],
+        '/soft|weich/u'                             => [1, 2],
+        '/medium|mittel/u'                          => [5, 6],
+    ];
+
+    /**
+     * Ersatz-Attribute des aktuellen Artikels aus den zugeordneten Merkmalen, gleiche Schlüssel wie die Funktionsattribute
+     *
+     * @var array<string, string>
+     */
+    private array $featureAttributes = [];
+
+    /**
+     * Liest die im Pluginmenü zugeordneten Merkmale des Artikels (ersatzweise des Vaterartikels) in der
+     * Standardsprache und übersetzt sie in Ersatz-Attribute. Felder, deren Funktionsattribute gepflegt sind,
+     * werden übersprungen – so ändert sich an Artikeln mit Funktionsattributen nichts.
+     */
+    public function loadFeatureAttributes(?object $artikel): void
+    {
+        $this->featureAttributes = [];
+        if ($artikel === null || (int)($artikel->kArtikel ?? 0) <= 0) {
+            return;
+        }
+        $config = $this->getPlugin()->getConfig();
+        $fields = [];
+        foreach (self::FEATURE_FIELDS as $field => [$setting, $attributes]) {
+            $featureID = (int)$config->getValue($setting);
+            if ($featureID <= 0) {
+                continue;
+            }
+            foreach ($attributes as $name) {
+                if (($this->attribute($artikel, $name) ?? '') !== '') {
+                    continue 2;
+                }
+            }
+            $fields[$field] = $featureID;
+        }
+        if (\count($fields) === 0) {
+            return;
+        }
+
+        $productID = (int)$artikel->kArtikel;
+        $parentID  = (int)($artikel->kVaterArtikel ?? 0);
+        $rows      = $this->getDB()->getObjects(
+            "SELECT am.kArtikel, am.kMerkmal, mws.cWert
+                FROM tartikelmerkmal am
+                JOIN tmerkmalwert mw
+                    ON mw.kMerkmalWert = am.kMerkmalWert
+                JOIN tmerkmalwertsprache mws
+                    ON mws.kMerkmalWert = am.kMerkmalWert
+                JOIN tsprache s
+                    ON s.kSprache = mws.kSprache
+                    AND s.cShopStandard = 'Y'
+                WHERE am.kArtikel IN (" . \implode(',', \array_unique(\array_filter([$productID, $parentID]))) . ')
+                    AND am.kMerkmal IN (' . \implode(',', \array_unique($fields)) . ')
+                ORDER BY mw.nSort, mws.cWert'
+        );
+        // Werte je Merkmal, getrennt nach Artikel und Vaterartikel
+        $values = [];
+        foreach ($rows as $row) {
+            $text = \trim(\html_entity_decode(\strip_tags((string)$row->cWert), \ENT_QUOTES | \ENT_HTML5, 'UTF-8'));
+            if ($text !== '') {
+                $values[(int)$row->kMerkmal][(int)$row->kArtikel === $productID ? 'own' : 'parent'][] = $text;
+            }
+        }
+
+        foreach ($fields as $field => $featureID) {
+            // Merkmale des Artikels selbst haben Vorrang vor denen des Vaterartikels
+            $texts = $values[$featureID]['own'] ?? $values[$featureID]['parent'] ?? [];
+            if (\count($texts) > 0) {
+                $this->featureAttributes += $this->featureToAttributes($field, \array_values(\array_unique($texts)));
+            }
+        }
+    }
+
+    /**
+     * Übersetzt die Merkmalwerte eines Feldes in Ersatz-Attribute.
+     *
+     * @param string[] $texts
+     * @return array<string, string>
+     */
+    private function featureToAttributes(string $field, array $texts): array
+    {
+        switch ($field) {
+            case 'flex':
+                $range = $this->flexRange($texts);
+                return $range === null ? [] : ['flex_ab' => (string)$range[0], 'flex_bis' => (string)$range[1]];
+            case 'fahrlevel':
+                $found = [];
+                foreach ($texts as $text) {
+                    foreach (self::LEVEL_WORDS as $pattern => $idx) {
+                        if (\preg_match($pattern, \mb_strtolower($text))) {
+                            $found[] = $idx;
+                        }
+                    }
+                }
+                return \count($found) === 0 ? [] : [
+                    'fahrlevel_ab'  => self::LEVELS[\min($found)],
+                    'fahrlevel_bis' => self::LEVELS[\max($found)],
+                ];
+            case 'koerpergewicht':
+                $numbers = \array_filter(
+                    $this->numbersIn(\implode(' ', $texts)),
+                    static fn(float $kg): bool => $kg >= 20 && $kg <= 200
+                );
+                return \count($numbers) === 0 ? [] : [
+                    'koerpergewicht_ab'  => (string)\min($numbers),
+                    'koerpergewicht_bis' => (string)\max($numbers),
+                ];
+            case 'laenge':
+                // Nur eine eindeutige Länge übernehmen; mehrere Längen (Vaterartikel) überlässt man der Variation
+                $lengths = [];
+                foreach ($this->numbersIn(\implode(' ', $texts)) as $number) {
+                    $number = $number > 400 ? $number / 10 : $number;
+                    if ($number >= 80 && $number <= 200) {
+                        $lengths[(string)$number] = true;
+                    }
+                }
+                return \count($lengths) === 1 ? ['laenge' => (string)\array_key_first($lengths)] : [];
+            default:
+                return [$field => \implode(', ', $texts)];
+        }
+    }
+
+    /**
+     * Flex-Bereich aus Merkmalwerten: Zahlen 1-10 ("6", "5-7", "6/10"), sonst Wörter (soft … stiff).
+     *
+     * @param string[] $texts
+     * @return array{0: float, 1: float}|null
+     */
+    private function flexRange(array $texts): ?array
+    {
+        $numbers = [];
+        $words   = [];
+        foreach ($texts as $text) {
+            // "6/10" ist Wert von Skala, die 10 zählt nicht
+            $clean   = (string)\preg_replace('~/\s*10\b~', '', $text);
+            $numbers = [...$numbers, ...\array_filter(
+                $this->numbersIn($clean),
+                static fn(float $n): bool => $n >= 1 && $n <= 10
+            )];
+            $lower = \mb_strtolower(\str_replace(['-', '_'], ' ', $text));
+            foreach (self::FLEX_WORDS as $pattern => $range) {
+                if (\preg_match($pattern, $lower)) {
+                    $words = [...$words, ...$range];
+                    break;
+                }
+            }
+        }
+        if (\count($numbers) > 0) {
+            return [\min($numbers), \max($numbers)];
+        }
+
+        return \count($words) > 0 ? [(float)\min($words), (float)\max($words)] : null;
+    }
+
+    /**
+     * Alle Zahlen eines Textes (Dezimalkomma erlaubt, Bindestriche gelten als Trenner, nicht als Minus).
+     *
+     * @return float[]
+     */
+    private function numbersIn(string $text): array
+    {
+        \preg_match_all('/\d+(?:[.,]\d+)?/u', $text, $hits);
+
+        return \array_map(static fn(string $n): float => (float)\str_replace(',', '.', $n), $hits[0]);
     }
 
     private function numericAttribute(object $artikel, string $name): ?float
