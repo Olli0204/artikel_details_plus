@@ -39,9 +39,24 @@ class Bootstrap extends Bootstrapper
     }
 
     /**
-     * Fahrlevel-Stufen in der Reihenfolge der Leiste (Werte der Funktionsattribute fahrlevel_ab/_bis)
+     * Fahrlevel-Stufen in der Reihenfolge der Leiste: Schlüsselwert (fahrlevel_ab/_bis) => Sprachvariable der Beschriftung
      */
-    private const LEVELS = ['Beginner', 'Advanced', 'Professional'];
+    private const LEVELS = [
+        'Beginner'     => 'artikel_details_plus_level_beginner',
+        'Advanced'     => 'artikel_details_plus_level_intermediate',
+        'Professional' => 'artikel_details_plus_level_expert',
+    ];
+
+    /**
+     * Fahrlevel-Wörter => Stufe (0-2). Die Reihenfolge zählt: je Wert gewinnt das erste Muster,
+     * damit "Advanced/Expert" (Shop-Merkmal) die oberste Stufe ist, "Advanced" allein aber die mittlere.
+     */
+    private const LEVEL_WORDS = [
+        '/expert|professional|\bpro\b|profi/u'                => 2,
+        '/interm|fortgeschritten|mittel/u'                    => 1,
+        '/beginner|anf(?:ä|ae)nger|einsteiger|novice|entry/u' => 0,
+        '/advanced/u'                                         => 1,
+    ];
 
     /** Flex-Skala 1-10 in fünf Zonen: [von, bis, Sprachvariable] */
     private const FLEX_ZONES = [
@@ -121,13 +136,18 @@ class Bootstrap extends Bootstrapper
                 if ($fromIdx > $toIdx) {
                     [$fromIdx, $toIdx] = [$toIdx, $fromIdx];
                 }
-                $steps = [];
-                foreach (self::LEVELS as $idx => $label) {
+                $loc    = $this->getPlugin()->getLocalization();
+                $labels = \array_map(
+                    static fn(string $var): string => (string)$loc->getTranslation($var),
+                    \array_values(self::LEVELS)
+                );
+                $steps  = [];
+                foreach ($labels as $idx => $label) {
                     $steps[] = ['label' => $label, 'set' => $idx >= $fromIdx && $idx <= $toIdx];
                 }
                 $smarty->assign('adpLevel', [
-                    'from'  => self::LEVELS[$fromIdx],
-                    'to'    => self::LEVELS[$toIdx],
+                    'from'  => $labels[$fromIdx],
+                    'to'    => $labels[$toIdx],
                     'steps' => $steps,
                 ]);
             }
@@ -209,13 +229,14 @@ class Bootstrap extends Bootstrapper
         return $steps;
     }
 
+    /**
+     * Stufe (0-2) eines Fahrlevel-Textes, z. B. "Beginner", "Intermediate", "Advanced/Expert", "Profi"; sonst null.
+     */
     private function levelIndex(?string $value): ?int
     {
-        if ($value === null || $value === '') {
-            return null;
-        }
-        foreach (self::LEVELS as $idx => $label) {
-            if (\strcasecmp($label, $value) === 0) {
+        $value = \mb_strtolower((string)$value);
+        foreach (self::LEVEL_WORDS as $pattern => $idx) {
+            if (\preg_match($pattern, $value)) {
                 return $idx;
             }
         }
@@ -796,13 +817,6 @@ class Bootstrap extends Bootstrapper
         'inserts'        => ['artikel_details_plus_merkmal_inserts', ['inserts']],
     ];
 
-    /** Fahrlevel-Wörter in Merkmalwerten => Index in LEVELS */
-    private const LEVEL_WORDS = [
-        '/beginner|anf(?:ä|ae)nger|einsteiger|novice/u'     => 0,
-        '/advanced|fortgeschritten|intermediate/u'          => 1,
-        '/professional|\bpro\b|profi|expert|experte/u'      => 2,
-    ];
-
     /** Flex-Wörter in Merkmalwerten => Bereich auf der Skala 1-10 (zusammengesetzte zuerst prüfen) */
     private const FLEX_WORDS = [
         '/medium\s*stiff|mittel\s*(?:hart|steif)/u' => [7, 8],
@@ -895,17 +909,20 @@ class Bootstrap extends Bootstrapper
                 $range = $this->flexRange($texts);
                 return $range === null ? [] : ['flex_ab' => (string)$range[0], 'flex_bis' => (string)$range[1]];
             case 'fahrlevel':
+                // Jeder Wert ist eine Stufe; "Beginner - Advanced" / "Anfänger bis Profi" in einem Wert sind zwei
                 $found = [];
                 foreach ($texts as $text) {
-                    foreach (self::LEVEL_WORDS as $pattern => $idx) {
-                        if (\preg_match($pattern, \mb_strtolower($text))) {
+                    foreach (\preg_split('/\s+(?:-|–|bis|to)\s+/u', $text) ?: [] as $part) {
+                        $idx = $this->levelIndex($part);
+                        if ($idx !== null) {
                             $found[] = $idx;
                         }
                     }
                 }
+                $keys = \array_keys(self::LEVELS);
                 return \count($found) === 0 ? [] : [
-                    'fahrlevel_ab'  => self::LEVELS[\min($found)],
-                    'fahrlevel_bis' => self::LEVELS[\max($found)],
+                    'fahrlevel_ab'  => $keys[\min($found)],
+                    'fahrlevel_bis' => $keys[\max($found)],
                 ];
             case 'koerpergewicht':
                 $numbers = \array_filter(

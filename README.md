@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.10.0
+**Version:** 0.10.1
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -18,7 +18,7 @@ Auf der Artikeldetailseite werden im Beschreibungs-Tab die Snowboard-Eigenschaft
 |---|---|---|
 | Fahreigenschaften | interaktives **Pentagon-SVG-Diagramm** (`ecm_polygon_svg.js`), Werte 0–10; erscheint ab drei vorhandenen Werten | `carving`, `jib`, `powder`, `all_mountain`, `jump` |
 | Körpergewicht | Skalenleiste in kg | `koerpergewicht_ab`, `koerpergewicht_bis` |
-| Fahrlevel | Leiste Beginner / Advanced / Professional | `fahrlevel_ab`, `fahrlevel_bis` |
+| Fahrlevel | Leiste Beginner / Intermediate / Advanced/Expert (Beschriftung per Sprachvariable) | `fahrlevel_ab`, `fahrlevel_bis` |
 | Profil | **Seitenansicht** (Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker, Flat Rocker) als vollbreite Karte unter den Spalten, vertikal übertrieben, mit Bodenlinie | `profil` (Vorrang), sonst erkannt aus `form`, ersatzweise `shape` |
 | Flex | **Skala 1–10** aus zehn Segmenten mit fünf Zonen (Soft, Medium-Soft, Medium, Medium-Stiff, Stiff) in eigener Karte; Einzelwert oder Bereich, halbe Werte als halbes Segment | `flex` oder `flex_ab`, `flex_bis` (1–10, Dezimal erlaubt) |
 | Dimensionen | Tabelle Länge / Form / Shape / Waist / Nose / Tail / Inserts plus **maßstäbliche SVG-Board-Skizze** (Draufsicht, Nose links, Tail rechts) mit Längen- und Breitenbemaßung, Twin- oder Directional-Umriss und Inserts (Lochmuster oder Channel); die Skizze erscheint, wenn `nose`, `waist` und `tail` numerisch sind | `form`, `shape`, `waist`, `nose`, `tail` (mm), `laenge` (cm), `inserts`, optional `outline`, `stance`, `setback` |
@@ -68,7 +68,7 @@ Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen si
 | Tab | Einstellung | Typ | Beschreibung |
 |---|---|---|---|
 | Fahreigenschaften | Merkmalwert-Anzeige aktiv | Checkbox | Schaltet Pentagon-Diagramm und Gewichtsleiste im Beschreibungs-Tab ein |
-| Fahreigenschaften | Fahrlevelanzeige aktiv | Checkbox | Schaltet die Beginner/Advanced/Professional-Leiste ein |
+| Fahreigenschaften | Fahrlevelanzeige aktiv | Checkbox | Schaltet die dreistufige Fahrlevel-Leiste ein |
 | Fahreigenschaften | Fahreigenschaften-Diagramm anzeigen | Checkbox (Default an) | Pentagon-Diagramm der Fahreigenschaften |
 | Fahreigenschaften | Dimensionen anzeigen | Checkbox (Default an) | Tabelle und maßstäbliche Board-Skizze (Länge, Form/Shape, Waist/Nose/Tail, Inserts) |
 | Fahreigenschaften | Profil-Zonen farbig markieren | Checkbox (Default an, `initialValue="on"`) | Teilt die Seitenansicht farbig in Camber (blau), Rocker (rot), Flat (gelb) und Kick (grün) und zeigt eine Legende; abgewählt wird das Profil einfarbig in der Akzentfarbe gezeichnet |
@@ -98,7 +98,7 @@ Alle Snowboard-Daten kommen aus **Funktionsattributen** des Artikels — in JTL-
 | `flex` | `1`–`10`, Dezimal erlaubt (`7,5` = halbes Segment) | – | Karte „Flex" |
 | `flex_ab`, `flex_bis` | Bereich `1`–`10`, z. B. `5` / `7` | – | wie `flex`, markiert mehrere Segmente/Zonen |
 | `koerpergewicht_ab`, `koerpergewicht_bis` | kg, z. B. `40` / `70` | beide | Gewichtsleiste 35–100 kg |
-| `fahrlevel_ab`, `fahrlevel_bis` | `Beginner`, `Advanced`, `Professional` | eines reicht | Fahrlevel-Leiste |
+| `fahrlevel_ab`, `fahrlevel_bis` | Stufe 1 `Beginner`, Stufe 2 `Intermediate`/`Advanced`, Stufe 3 `Expert`/`Advanced/Expert`/`Professional` | eines reicht | Fahrlevel-Leiste |
 | `laenge` | cm, z. B. `157` (Werte über 400 gelten als mm) | – | Maßstab und Längenmaß der Board-Skizze, Tabellenzeile „Länge" |
 | `shape` | Umriss, siehe Liste unten | – | Tabellenzeile „Shape", steuert Twin/Directional in der Skizze |
 | `form` | Profil, siehe Liste unten | – | Tabellenzeile „Form", steuert die Seitenansicht „Profil" |
@@ -132,7 +132,7 @@ Ein Einzelwert füllt die Segmente bis zum Wert; ein Bereich markiert nur die Se
 ### Körpergewicht und Fahrlevel
 
 - `koerpergewicht_ab`/`_bis`: beide nötig, `bis` ≥ `ab`. Die Skala läuft 35–100 kg (auf Mobilgeräten 40–100 in 10er-Schritten); Werte außerhalb landen im „+"-Feld am Rand.
-- `fahrlevel_ab`/`_bis`: exakt `Beginner`, `Advanced` oder `Professional` (Schreibweise egal). Andere Wörter werden ignoriert — steht in beiden Feldern etwas Unbekanntes, verschwindet die Leiste. Ist nur eines gesetzt, gilt es für beide; vertauschte Reihenfolge wird korrigiert.
+- `fahrlevel_ab`/`_bis`: eine der drei Stufen, erkannt an Wörtern (Groß-/Kleinschreibung egal, erstes Muster gewinnt): Stufe 3 `expert`, `professional`, `pro`, `profi`; Stufe 2 `interm…` (auch die Schreibweise „Intermidiate“), `fortgeschritten`, `mittel`; Stufe 1 `beginner`, `anfänger`, `einsteiger`, `entry`; zuletzt `advanced` allein = Stufe 2. Deshalb ist „Advanced/Expert“ Stufe 3, „Advanced“ (alte Pflege) Stufe 2. Die Beschriftung der Stufen kommt aus den Sprachvariablen `artikel_details_plus_level_*`. Andere Wörter werden ignoriert — steht in beiden Feldern etwas Unbekanntes, verschwindet die Leiste. Ist nur eines gesetzt, gilt es für beide; vertauschte Reihenfolge wird korrigiert.
 
 ### Länge (`laenge`)
 
@@ -186,7 +186,7 @@ Werte, die ohnehin als **Merkmal** für die Filter gepflegt sind, müssen nicht 
 | Feld | Ersatz für | Erkennung der Merkmalwerte |
 |---|---|---|
 | Flex | `flex_ab`/`flex_bis` | Zahlen 1–10 (`6`, `5-7`, `6/10`, `7,5`); mehrere Werte → kleinster bis größter. Ohne Zahl Wörter: Soft/weich 1–2, Medium Soft/mittelweich 3–4, Medium/mittel 5–6, Medium Stiff/mittelhart 7–8, Stiff/hart/steif 9–10 |
-| Fahrlevel | `fahrlevel_ab`/`fahrlevel_bis` | Beginner/Anfänger/Einsteiger, Advanced/Fortgeschritten/Intermediate, Professional/Pro/Profi/Experte; mehrere Werte oder „Anfänger bis Profi“ → Bereich |
+| Fahrlevel | `fahrlevel_ab`/`fahrlevel_bis` | jeder Wert ist eine Stufe, Erkennung wie beim Attribut (z. B. die Shop-Werte `Beginner`, `Intermidiate`, `Advanced/Expert`); mehrere Werte oder „Anfänger bis Profi“ → Bereich |
 | Körpergewicht | `koerpergewicht_ab`/`_bis` | alle Zahlen 20–200 aller Werte, kleinste bis größte (`50 - 70 kg`; „ab 80 kg“ ergibt 80–80) |
 | Brettlänge | `laenge` | Zahlen 80–200 cm (über 400 als mm); nur wenn **genau eine** Länge vorkommt – ein Vater mit `154`, `156`, `158` liefert nichts, dann greift wie bisher die gewählte Variation |
 | Form (Profil) | `form` | Text wie beim Attribut, mehrere Werte mit Komma verbunden |
@@ -207,6 +207,7 @@ Alle frontend-relevanten Texte sind als Sprachvariablen hinterlegt und können u
 |---|---|---|
 | `artikel_details_plus_weight_title` | Empfohlenes Körpergewicht: | Suggested Weight: |
 | `artikel_details_plus_level_title` | Fahrlevel: | Rider Skills: |
+| `artikel_details_plus_level_beginner` / `_intermediate` / `_expert` | Beginner / Intermediate / Advanced/Expert | (gleich) |
 | `artikel_details_plus_flex_title` | Flex | Flex |
 | `artikel_details_plus_flex_zone_soft` … `_stiff` | Soft, Medium-Soft, Medium, Medium-Stiff, Stiff | (gleich) |
 | `artikel_details_plus_stock_text` | Nur noch %s Stück verfügbar! | Only %s pieces available! |
@@ -321,6 +322,13 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.10.1 (2026-09-28)
+- Fix Fahrlevel aus Merkmal: „Advanced/Expert“ markierte Stufe 2 und 3 statt nur Stufe 3, „Intermidiate“ (Schreibweise im Shop) wurde nicht erkannt. Je Wert gewinnt jetzt das spezifischste Wort; `levelIndex()` nutzt dieselbe Erkennung auch für die Funktionsattribute
+- Beschriftung der Leiste wie im Shop-Filter: Beginner / Intermediate / Advanced/Expert, neue Sprachvariablen `artikel_details_plus_level_beginner/_intermediate/_expert`
+
+### 0.10.0 (2026-09-28)
+- Neu: Tab „Merkmal-Zuordnung“ — Flex, Fahrlevel, Körpergewicht, Brettlänge, Form, Shape und Inserts können aus Merkmalen kommen, wenn das Funktionsattribut fehlt (Standardsprache, Artikel vor Vaterartikel)
 
 ### 0.9.0 (2026-09-21)
 - Neu: Schalter „Profil-Zonen farbig markieren" (Default an) — die Seitenansicht wird in Camber (blau), Rocker (rot), Flat (gelb) und Kick (grün) unterteilt, mit Legende; abgewählt bleibt sie einfarbig
