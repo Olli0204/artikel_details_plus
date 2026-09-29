@@ -270,6 +270,10 @@ class Bootstrap extends Bootstrapper
         'setback' => 'Setback',
     ];
 
+    /** Maßstab der Skizze ohne gepflegte Länge (cm) und Taille ohne gepflegte Breiten (mm) */
+    private const GENERIC_LENGTH_CM = 156.0;
+    private const GENERIC_WAIST_MM  = 250.0;
+
     /** Einheiten der Dimensionen-Tabelle */
     private const DIMENSION_UNITS = [
         'laenge'  => 'cm',
@@ -398,24 +402,39 @@ class Bootstrap extends Bootstrapper
             }
             $smarty->assign('adpSpecsDimensions', $dimensions);
 
-            $nose  = $this->numericAttribute($artikel, 'nose');
-            $waist = $this->numericAttribute($artikel, 'waist');
-            $tail  = $this->numericAttribute($artikel, 'tail');
-            if ($nose !== null && $waist !== null && $tail !== null && $nose > 0 && $waist > 0 && $tail > 0) {
+            // Breiten nur, wenn numerisch und positiv; fehlende zeichnet die Skizze generisch ohne Bemaßung
+            $widths = [];
+            foreach (['nose', 'waist', 'tail'] as $part) {
+                $value          = $this->numericAttribute($artikel, $part);
+                $widths[$part] = $value !== null && $value > 0 ? $value : null;
+            }
+            // Skizze, sobald ein Umriss (shape/outline) gepflegt ist oder alle drei Breiten vorliegen
+            $hasShape = ($this->attribute($artikel, 'shape') ?? '') !== ''
+                || ($this->attribute($artikel, 'outline') ?? '') !== '';
+            if ($hasShape || !\in_array(null, $widths, true)) {
                 $board = $this->buildBoardSketch(
-                    $nose,
-                    $waist,
-                    $tail,
+                    $widths['nose'],
+                    $widths['waist'],
+                    $widths['tail'],
                     $lengthCm,
                     $outline,
                     $inserts,
                     $stanceCm,
                     $setbackCm
                 );
-                // Beschriftung wie im Shop gepflegt (z. B. "298,5"), nicht als Float
+                $aria = [];
                 foreach (['nose', 'waist', 'tail'] as $part) {
-                    $board[$part]['value'] = $dimensions[$part]['value'];
+                    if ($board[$part] !== null) {
+                        // Beschriftung wie im Shop gepflegt (z. B. "298,5"), nicht als Float
+                        $board[$part]['value'] = $dimensions[$part]['value'];
+                        $board[$part]['label'] = $dimensions[$part]['label'];
+                        $aria[] = $dimensions[$part]['label'] . ' ' . $dimensions[$part]['value'] . ' mm';
+                    }
                 }
+                if ($board['length'] !== null) {
+                    $aria[] = self::DIMENSIONS['laenge'] . ' ' . $board['length']['label'];
+                }
+                $board['aria'] = \implode(', ', [\ucfirst($outline), ...$aria]);
                 $smarty->assign('adpSpecsBoard', $board);
             }
         }
@@ -668,10 +687,14 @@ class Bootstrap extends Bootstrapper
      *     tail: array{x: float, y1: float, y2: float, value: float}
      * }
      */
+    /**
+     * Draufsicht des Boards. Fehlende Breiten (null) werden aus den vorhandenen bzw. typischen Proportionen
+     * ergänzt und nicht bemaßt; ohne Länge gilt 156 cm als Maßstab ohne Längenmaß.
+     */
     private function buildBoardSketch(
-        float $nose,
-        float $waist,
-        float $tail,
+        ?float $nose,
+        ?float $waist,
+        ?float $tail,
         ?float $lengthCm,
         string $outline,
         ?string $inserts,
@@ -679,20 +702,23 @@ class Bootstrap extends Bootstrapper
         ?float $setbackCm
     ): array {
         $prop     = self::OUTLINES[$outline] ?? self::OUTLINES['twin'];
-        $lengthMm = $lengthCm !== null ? $lengthCm * 10 : \max($nose, $waist, $tail) * 5.2;
+        $lengthMm = ($lengthCm ?? self::GENERIC_LENGTH_CM) * 10;
         $scale    = 560.0 / $lengthMm;
         $x0       = 20.0;
         $x1       = 580.0;
 
-        $nh = $nose * $scale / 2;
-        $wh = $waist * $scale / 2;
-        $th = $tail * $scale / 2;
+        [$noseW, $waistW, $tailW] = $this->completeWidths($nose, $waist, $tail, $outline);
+        $hasWidthLabel = $nose !== null || $waist !== null || $tail !== null;
+
+        $nh = $noseW * $scale / 2;
+        $wh = $waistW * $scale / 2;
+        $th = $tailW * $scale / 2;
         $maxHalf = \max($nh, $wh, $th);
 
         $yTop = $lengthCm !== null ? 40.0 : 16.0;
         $cy   = $yTop + $maxHalf;
         $labelY = $cy + $maxHalf + 30;
-        $height = $labelY + 12;
+        $height = $hasWidthLabel ? $labelY + 12 : $cy + $maxHalf + 16;
 
         // breiteste Stellen und Taille entlang der Länge
         $xN = $x0 + 560 * $prop['nose'];
@@ -781,10 +807,31 @@ class Bootstrap extends Bootstrapper
                 ? ['x1' => $x0, 'x2' => $x1, 'y' => 18.0, 'label' => $this->formatNumber($lengthCm) . ' cm']
                 : null,
             'inserts' => $insertData,
-            'nose'    => ['x' => $r($xN), 'y1' => $r($cy - $nh), 'y2' => $r($cy + $nh), 'value' => $nose],
-            'waist'   => ['x' => $r($xW), 'y1' => $r($cy - $wh), 'y2' => $r($cy + $wh), 'value' => $waist],
-            'tail'    => ['x' => $r($xT), 'y1' => $r($cy - $th), 'y2' => $r($cy + $th), 'value' => $tail],
+            // Bemaßung nur für gepflegte Breiten
+            'nose'    => $nose !== null ? ['x' => $r($xN), 'y1' => $r($cy - $nh), 'y2' => $r($cy + $nh), 'value' => $nose] : null,
+            'waist'   => $waist !== null ? ['x' => $r($xW), 'y1' => $r($cy - $wh), 'y2' => $r($cy + $wh), 'value' => $waist] : null,
+            'tail'    => $tail !== null ? ['x' => $r($xT), 'y1' => $r($cy - $th), 'y2' => $r($cy + $th), 'value' => $tail] : null,
         ];
+    }
+
+    /**
+     * Ergänzt fehlende Breiten (mm): Nose und Tail liegen typisch 45 mm über der Taille, beim
+     * Directional-Umriss die Nose etwas breiter als das Tail. Ohne jede Breite gilt eine Taille von 250 mm.
+     *
+     * @return array{0: float, 1: float, 2: float} Nose, Waist, Tail
+     */
+    private function completeWidths(?float $nose, ?float $waist, ?float $tail, string $outline): array
+    {
+        $offset = $outline === 'directional' ? [50.0, 40.0] : [45.0, 45.0];
+        $waist ??= match (true) {
+            $nose !== null && $tail !== null => \min($nose, $tail) - 45,
+            $nose !== null                   => $nose - $offset[0],
+            $tail !== null                   => $tail - $offset[1],
+            default                          => self::GENERIC_WAIST_MM,
+        };
+        $waist = \max(150.0, $waist);
+
+        return [$nose ?? $waist + $offset[0], $waist, $tail ?? $waist + $offset[1]];
     }
 
     /**
