@@ -1,4 +1,5 @@
-{* Dimensionen: Werte kommen aus Bootstrap::assignSnowboardSpecs() (Funktionsattribute mit Vater-Fallback) *}
+{* Dimensionen: Werte kommen aus Bootstrap::assignSnowboardSpecs() (Funktionsattribute mit Vater-Fallback);
+   die Skizze erscheint ab gepflegtem Umriss, Breiten ohne Wert werden generisch gezeichnet und nicht bemaßt *}
 {if !empty($adpSpecsDimensions)}
 <section class="adp-panel adp-dims{if $adpSpecsBoard !== null} adp-dims--sketch{/if}">
     <h3 class="adp-panel__title">{$oPlugin_artikel_details_plus->getLocalization()->getTranslation('artikel_details_plus_specs_heading_dimensions')|escape:'html'}</h3>
@@ -8,7 +9,7 @@
     {assign var=b value=$adpSpecsBoard}
     <div class="adp-dims__board">
         <svg class="adp-board__svg" viewBox="{$b.viewBox}" xmlns="http://www.w3.org/2000/svg" role="img"
-             aria-label="Nose {$b.nose.value|escape:'html'} mm, Waist {$b.waist.value|escape:'html'} mm, Tail {$b.tail.value|escape:'html'} mm{if $b.length && isset($adpSpecsDimensions.laenge)}, {$adpSpecsDimensions.laenge.label|escape:'html'} {$b.length.label|escape:'html'}{/if}">
+             aria-label="{$b.aria|escape:'html'}">
             <path class="adp-board__outline" d="{$b.path}"/>
 
             {if $b.inserts}
@@ -31,10 +32,12 @@
 
             {foreach ['nose', 'waist', 'tail'] as $part}
                 {assign var=m value=$b.$part}
+                {if $m}
                 <line class="adp-board__measure" x1="{$m.x}" y1="{$m.y1}" x2="{$m.x}" y2="{$m.y2}"/>
                 <line class="adp-board__tick" x1="{$m.x - 8}" y1="{$m.y1}" x2="{$m.x + 8}" y2="{$m.y1}"/>
                 <line class="adp-board__tick" x1="{$m.x - 8}" y1="{$m.y2}" x2="{$m.x + 8}" y2="{$m.y2}"/>
-                <text class="adp-board__label" x="{$m.x}" y="{$b.labelY}" text-anchor="middle">{$adpSpecsDimensions.$part.label|escape:'html'} {$m.value|escape:'html'} mm</text>
+                <text class="adp-board__label" x="{$m.x}" y="{$b.labelY}" text-anchor="middle">{$m.label|escape:'html'} {$m.value|escape:'html'} mm</text>
+                {/if}
             {/foreach}
         </svg>
     </div>

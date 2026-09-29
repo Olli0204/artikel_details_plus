@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.10.1
+**Version:** 0.11.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -21,7 +21,7 @@ Auf der Artikeldetailseite werden im Beschreibungs-Tab die Snowboard-Eigenschaft
 | Fahrlevel | Leiste Beginner / Intermediate / Advanced/Expert (Beschriftung per Sprachvariable) | `fahrlevel_ab`, `fahrlevel_bis` |
 | Profil | **Seitenansicht** (Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker, Flat Rocker) als vollbreite Karte unter den Spalten, vertikal übertrieben, mit Bodenlinie | `profil` (Vorrang), sonst erkannt aus `form`, ersatzweise `shape` |
 | Flex | **Skala 1–10** aus zehn Segmenten mit fünf Zonen (Soft, Medium-Soft, Medium, Medium-Stiff, Stiff) in eigener Karte; Einzelwert oder Bereich, halbe Werte als halbes Segment | `flex` oder `flex_ab`, `flex_bis` (1–10, Dezimal erlaubt) |
-| Dimensionen | Tabelle Länge / Form / Shape / Waist / Nose / Tail / Inserts plus **maßstäbliche SVG-Board-Skizze** (Draufsicht, Nose links, Tail rechts) mit Längen- und Breitenbemaßung, Twin- oder Directional-Umriss und Inserts (Lochmuster oder Channel); die Skizze erscheint, wenn `nose`, `waist` und `tail` numerisch sind | `form`, `shape`, `waist`, `nose`, `tail` (mm), `laenge` (cm), `inserts`, optional `outline`, `stance`, `setback` |
+| Dimensionen | Tabelle Länge / Form / Shape / Waist / Nose / Tail / Inserts plus **maßstäbliche SVG-Board-Skizze** (Draufsicht, Nose links, Tail rechts) mit Längen- und Breitenbemaßung, Twin- oder Directional-Umriss und Inserts (Lochmuster oder Channel); die Skizze erscheint, sobald `shape` (oder `outline`) gepflegt ist oder `nose`, `waist` und `tail` numerisch sind; fehlende Breiten werden generisch gezeichnet, bemaßt wird nur Gepflegtes | `form`, `shape`, `waist`, `nose`, `tail` (mm), `laenge` (cm), `inserts`, optional `outline`, `stance`, `setback` |
 
 Seit 0.10.0 können Flex, Fahrlevel, Körpergewicht, Länge, Form, Shape und Inserts ersatzweise aus **Merkmalen** kommen (Tab „Merkmal-Zuordnung“, siehe [Merkmale statt Funktionsattribute](#merkmale-statt-funktionsattribute)).
 
@@ -102,7 +102,7 @@ Alle Snowboard-Daten kommen aus **Funktionsattributen** des Artikels — in JTL-
 | `laenge` | cm, z. B. `157` (Werte über 400 gelten als mm) | – | Maßstab und Längenmaß der Board-Skizze, Tabellenzeile „Länge" |
 | `shape` | Umriss, siehe Liste unten | – | Tabellenzeile „Shape", steuert Twin/Directional in der Skizze |
 | `form` | Profil, siehe Liste unten | – | Tabellenzeile „Form", steuert die Seitenansicht „Profil" |
-| `nose`, `waist`, `tail` | mm, reine Zahl, Komma erlaubt (`298,5`) | alle drei für die Skizze | Board-Skizze + Tabellenzeilen |
+| `nose`, `waist`, `tail` | mm, reine Zahl, Komma erlaubt (`298,5`) | – (alle drei ersetzen `shape` als Auslöser der Skizze) | Breitenmaß in der Skizze + Tabellenzeilen |
 | `inserts` | `channel`, `2x4`, `4x4` (Text darf mehr enthalten) | – | Inserts in der Skizze, Tabellenzeile „Inserts" |
 | `stance` | cm, z. B. `56` | – | Referenzstance der Inserts (sonst 36 % der Länge, 40–60 cm) |
 | `setback` | cm Richtung Tail, z. B. `2` | – | Versatz der Inserts (sonst 0 / 1 / 2 cm je Umriss) |
@@ -311,7 +311,9 @@ artikel_details_plus/
 ```
 
 ### Board-Skizze
-`Bootstrap::buildBoardSketch()` berechnet die Geometrie in SVG-Einheiten (viewBox 600 × dynamische Höhe): die **Boardlänge** wird auf 560 Einheiten skaliert, alle Breiten im selben Maßstab – ein 157er Board mit 300 mm Nose erscheint also im echten Verhältnis 5,2:1. Ohne bekannte Länge gilt dieses typische Verhältnis zur breitesten Stelle, und die Längenbemaßung entfällt.
+`Bootstrap::buildBoardSketch()` berechnet die Geometrie in SVG-Einheiten (viewBox 600 × dynamische Höhe): die **Boardlänge** wird auf 560 Einheiten skaliert, alle Breiten im selben Maßstab – ein 157er Board mit 300 mm Nose erscheint also im echten Verhältnis 5,2:1. Ohne bekannte Länge gilt 156 cm als Maßstab (`GENERIC_LENGTH_CM`), und die Längenbemaßung entfällt.
+
+**Auslöser und generische Breiten (seit 0.11.0):** Die Skizze erscheint, sobald `shape` oder `outline` gepflegt ist (auch über die Merkmal-Zuordnung), oder – wie bisher – wenn alle drei Breiten vorliegen. Fehlende Breiten ergänzt `completeWidths()`: Nose und Tail liegen 45 mm über der Taille (Directional: Nose +50, Tail +40), eine fehlende Taille wird aus Nose/Tail abgeleitet, ohne jede Breite gilt 250 mm (`GENERIC_WAIST_MM`). Ergänzte Breiten werden nur gezeichnet, nicht bemaßt; Inserts erscheinen nur mit gepflegtem `inserts`, das Längenmaß nur mit bekannter Länge. Ohne Breitenmaß entfällt der Beschriftungsstreifen unter dem Board.
 
 - **Länge:** Funktionsattribut `laenge` in cm (Werte über 400 gelten als mm). Fehlt es, liest `boardLength()` beim Kind-Artikel den gewählten Wert einer Variation, deren Name „Läng“, „Length“, „Size“ oder „Grö“ enthält, und nimmt die führende Zahl (`156 Wide` → 156). Auf der Vaterseite ohne gewählte Variation bleibt die Länge unbekannt.
 - **Umriss:** `outlineType()` nimmt zuerst das Attribut `outline` (`twin`, `directional`, `directional twin`); fehlt es oder enthält es keines der Wörter, wird aus den Texten von `form` und `shape` erkannt (Groß-/Kleinschreibung egal): „directional" → Directional, „directional" + „twin" → Directional Twin, sonst Twin. Die Proportionen stehen in `Bootstrap::OUTLINES`: Anteil der Länge bis zur breitesten Stelle an Nose/Tail (Twin 11,5 % / 11,5 %, Directional 14,5 % / 8,5 %), Rundung der Enden (Directional-Tail stumpfer) und Standard-Setback (0 / 1 / 2 cm). Die Enden sind kubische Bézier-Kurven mit senkrechter Tangente an der Spitze und waagerechter an der breitesten Stelle, die Sidecuts S-Kurven.
@@ -322,6 +324,10 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.11.0 (2026-09-29)
+- Board-Skizze erscheint, sobald `shape` (oder `outline`) gepflegt ist; fehlende Nose/Waist/Tail werden aus typischen Proportionen ergänzt und nicht bemaßt. Inserts und Längenmaß nur, wenn gepflegt bzw. bekannt
+- `aria-label` der Skizze wird in PHP gebaut und nennt nur vorhandene Maße
 
 ### 0.10.1 (2026-09-28)
 - Fix Fahrlevel aus Merkmal: „Advanced/Expert“ markierte Stufe 2 und 3 statt nur Stufe 3, „Intermidiate“ (Schreibweise im Shop) wurde nicht erkannt. Je Wert gewinnt jetzt das spezifischste Wort; `levelIndex()` nutzt dieselbe Erkennung auch für die Funktionsattribute
