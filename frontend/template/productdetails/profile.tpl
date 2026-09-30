@@ -6,5 +6,8 @@
     <p class="adp-profile__caption">
         <b>{$adpProfile.label|escape:'html'}</b>{if $adpProfile.text !== '' && $adpProfile.text|lower !== $adpProfile.label|lower} <span class="adp-profile__raw">· {$adpProfile.text|escape:'html'}</span>{/if}
     </p>
+    {if !empty($adpProfile.guideUrl)}
+        <p class="adp-profile__more"><a href="{$adpProfile.guideUrl|escape:'html'}">{$adpProfile.guideText|escape:'html'}</a></p>
+    {/if}
 </section>
 {/if}

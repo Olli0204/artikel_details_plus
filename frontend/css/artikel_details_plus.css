@@ -509,6 +509,122 @@
     border-bottom: 0;
 }
 
+/* ------------------------------------ Profil-Link auf der Artikelseite */
+.adp-profile__more {
+    margin: .35rem 0 0;
+    text-align: center;
+    font-size: .85rem;
+}
+.adp-profile__more a {
+    color: var(--adp-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+/* ------------------------------------ Erklärseite "Snowboard-Profile" */
+.adp-guide {
+    --adp-accent: var(--primary, #FFA54F);
+    --adp-ink: #1b1b1b;
+    --adp-muted: #6c757d;
+    --adp-border: #e1e5ea;
+    --adp-surface: #f7f8fa;
+    --adp-radius: 6px;
+    max-width: 960px;
+    margin: 0 auto 2rem;
+}
+.adp-guide__intro {
+    max-width: 720px;
+    margin: 0 0 1.5rem;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--adp-ink);
+}
+.adp-guide__legend {
+    margin-bottom: 1rem;
+}
+.adp-guide__zones {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: .6rem 1.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: .9rem;
+    color: var(--adp-ink);
+}
+.adp-guide__zone {
+    display: flex;
+    align-items: baseline;
+    gap: .55rem;
+    margin: 0;
+}
+.adp-guide__zone .adp-profile__dot {
+    flex: 0 0 auto;
+    transform: translateY(.05rem);
+}
+.adp-guide__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+}
+.adp-guide__profile {
+    margin: 0;
+    scroll-margin-top: 6rem;
+}
+.adp-guide__profile:target {
+    border-color: var(--adp-accent);
+    box-shadow: 0 0 0 1px var(--adp-accent);
+}
+.adp-guide__name {
+    margin: 0 0 .75rem;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--adp-ink);
+}
+.adp-guide__text {
+    margin: 1rem 0 .75rem;
+    font-size: .92rem;
+    line-height: 1.55;
+    color: var(--adp-ink);
+}
+.adp-guide__facts {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: .35rem .9rem;
+    margin: 0;
+    font-size: .88rem;
+}
+.adp-guide__facts dt {
+    font-weight: 700;
+    color: var(--adp-ink);
+}
+.adp-guide__facts dd {
+    margin: 0;
+    color: var(--adp-ink);
+}
+.adp-guide__aka {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .35rem;
+    margin: .9rem 0 0;
+    font-size: .8rem;
+    color: var(--adp-muted);
+}
+.adp-guide__chip {
+    padding: .1rem .55rem;
+    border: 1px solid var(--adp-border);
+    border-radius: 999px;
+    background: var(--adp-surface);
+    color: var(--adp-ink);
+}
+@media (min-width: 768px) {
+    .adp-guide__zones,
+    .adp-guide__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 575px) {
     .adp-panel {
         padding: 1rem .9rem .9rem;
