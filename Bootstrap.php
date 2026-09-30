@@ -7,6 +7,7 @@ use JTL\Helpers\Form;
 use JTL\Mail\Mail\Mail;
 use JTL\Plugin\Bootstrapper;
 use JTL\Shop;
+use JTL\Smarty\JTLSmarty;
 
 class Bootstrap extends Bootstrapper
 {
@@ -312,6 +313,27 @@ class Bootstrap extends Bootstrapper
         'kick'   => 'artikel_details_plus_profile_zone_kick',
     ];
 
+    /**
+     * Beispielbegriffe je Profiltyp für den Backend-Tab "Profil-Übersicht" – bei Änderungen an profileType() mitpflegen
+     * (der lokale Test prüft, dass jeder Begriff den angegebenen Typ ergibt).
+     */
+    private const PROFILE_HINTS = [
+        'camber'        => ['Camber', 'Positive Camber', 'Traditional Camber'],
+        'rocker'        => ['Rocker', 'Reverse Camber', 'Banana'],
+        'flat'          => ['Flat', 'Zero Camber', 'Camber/Flat/Camber'],
+        'hybrid camber' => ['Hybrid Camber', 'CamRock', 'Directional Camber', 'Rocker/Camber/Rocker', 'Camber/Rocker'],
+        'hybrid rocker' => ['Hybrid Rocker', 'Flying V', 'Camber/Rocker/Camber', 'Rocker/Camber'],
+        'flat rocker'   => ['Flat Rocker', 'Zero Rocker', 'Rocker/Flat/Rocker'],
+    ];
+
+    /** Quellen der Profilerkennung in der Reihenfolge der Artikelseite: Funktionsattribut => Beschriftung */
+    private const PROFILE_SOURCES = [
+        'profil'  => 'Funktionsattribut profil',
+        'profile' => 'Funktionsattribut profile',
+        'form'    => 'Funktionsattribut form',
+        'shape'   => 'Funktionsattribut shape (Ersatz)',
+    ];
+
     /** Profile der Seitenansicht: Typ => Anzeigename */
     private const PROFILES = [
         'camber'        => 'Camber',
@@ -573,7 +595,8 @@ class Bootstrap extends Bootstrapper
             $zonePoints[] = $point($to);
             $zones[] = ['kind' => $kind, 'path' => 'M ' . \implode(' L ', $zonePoints)];
             if (!isset($legend[$kind])) {
-                $legend[$kind] = ['kind' => $kind, 'label' => $loc->getTranslation(self::PROFILE_ZONE_LABELS[$kind])];
+                $label         = (string)$loc->getTranslation(self::PROFILE_ZONE_LABELS[$kind]);
+                $legend[$kind] = ['kind' => $kind, 'label' => $label !== '' ? $label : \ucfirst($kind)];
             }
         }
 
@@ -1048,6 +1071,139 @@ class Bootstrap extends Bootstrapper
         $value = \str_replace(',', '.', $value);
 
         return \is_numeric($value) ? (float)$value : null;
+    }
+
+    /**
+     * Backend-Tabs aus info.xml (Customlink). Der Core ruft das für jeden Customlink bei jedem Aufruf auf,
+     * deshalb verarbeitet der Tab nur sein eigenes Formularfeld adp_profile_term.
+     */
+    public function renderAdminMenuTab(string $tabName, int $menuID, JTLSmarty $smarty): string
+    {
+        if ($tabName !== 'Profil-Übersicht') {
+            return parent::renderAdminMenuTab($tabName, $menuID, $smarty);
+        }
+        $term = null;
+        if (isset($_POST['adp_profile_term']) && Form::validateToken()) {
+            $term = \trim((string)$_POST['adp_profile_term']);
+        }
+        $colored = $this->isOn($this->getPlugin()->getConfig()->getValue('artikel_details_plus_profile_zones_aktiv'));
+
+        $types = [];
+        foreach (self::PROFILES as $type => $label) {
+            $types[] = $this->profileView($type, $colored) + ['hints' => self::PROFILE_HINTS[$type] ?? []];
+        }
+
+        return $smarty->assign('adpMenuID', $menuID)
+            ->assign('adpTerm', $term)
+            ->assign('adpTermProfile', $term !== null && $term !== '' ? $this->profileView($this->profileType($term), $colored) : null)
+            ->assign('adpProfileTypes', $types)
+            ->assign('adpProfileTerms', $this->profileTerms($colored))
+            ->assign('adpProfileSvgTpl', $this->getPlugin()->getPaths()->getFrontendPath() . 'template/productdetails/profile_svg.tpl')
+            ->assign('adpFrontendCss', $this->getPlugin()->getPaths()->getFrontendURL() . 'css/artikel_details_plus.css?v='
+                . $this->getPlugin()->getMeta()->getVersion())
+            ->fetch($this->getPlugin()->getPaths()->getAdminPath() . 'templates/profiles.tpl');
+    }
+
+    /**
+     * Anzeige-Daten eines Profiltyps wie auf der Artikelseite; null = nicht erkannt (keine Skizze).
+     *
+     * @return array<string, mixed>|null
+     */
+    private function profileView(?string $type, bool $colored): ?array
+    {
+        if ($type === null) {
+            return null;
+        }
+
+        return ['type' => $type, 'label' => self::PROFILES[$type], 'colored' => $colored] + $this->buildProfileSketch($type);
+    }
+
+    /**
+     * Alle Profil-Begriffe, die im Shop an Artikeln hängen: Funktionsattribute profil/profile/form/shape und
+     * die in der Merkmal-Zuordnung gewählten Merkmale für Form und Shape (Standardsprache), gruppiert nach
+     * Quelle und Wert, mit Artikelanzahl, Beispielen und erkanntem Typ.
+     *
+     * @return list<array<string, mixed>>
+     */
+    private function profileTerms(bool $colored): array
+    {
+        $db   = $this->getDB();
+        $rows = [];
+        foreach (
+            $db->getObjects(
+                "SELECT LOWER(aa.cName) AS source, aa.cWert AS term, a.kArtikel, a.cArtNr, a.cName
+                    FROM tartikelattribut aa
+                    JOIN tartikel a
+                        ON a.kArtikel = aa.kArtikel
+                    WHERE LOWER(aa.cName) IN ('profil', 'profile', 'form', 'shape')"
+            ) as $row
+        ) {
+            $row->label = self::PROFILE_SOURCES[$row->source] ?? $row->source;
+            $rows[]     = $row;
+        }
+        $config = $this->getPlugin()->getConfig();
+        foreach (['form' => 'Form', 'shape' => 'Shape (Ersatz)'] as $field => $fieldLabel) {
+            $featureID = (int)$config->getValue(self::FEATURE_FIELDS[$field][0]);
+            if ($featureID <= 0) {
+                continue;
+            }
+            foreach (
+                $db->getObjects(
+                    "SELECT m.cName AS featureName, mws.cWert AS term, a.kArtikel, a.cArtNr, a.cName
+                        FROM tartikelmerkmal am
+                        JOIN tartikel a
+                            ON a.kArtikel = am.kArtikel
+                        JOIN tmerkmal m
+                            ON m.kMerkmal = am.kMerkmal
+                        JOIN tmerkmalwertsprache mws
+                            ON mws.kMerkmalWert = am.kMerkmalWert
+                        JOIN tsprache s
+                            ON s.kSprache = mws.kSprache
+                            AND s.cShopStandard = 'Y'
+                        WHERE am.kMerkmal = " . $featureID
+                ) as $row
+            ) {
+                $row->source = 'merkmal_' . $field;
+                $row->label  = 'Merkmal „' . $row->featureName . '“ → ' . $fieldLabel;
+                $rows[]      = $row;
+            }
+        }
+
+        $order = \array_flip(['profil', 'profile', 'form', 'merkmal_form', 'shape', 'merkmal_shape']);
+        $terms = [];
+        foreach ($rows as $row) {
+            $term = \trim(\html_entity_decode(\strip_tags((string)$row->term), \ENT_QUOTES | \ENT_HTML5, 'UTF-8'));
+            if ($term === '') {
+                continue;
+            }
+            $key = $row->source . "\0" . \mb_strtolower($term);
+            if (!isset($terms[$key])) {
+                $terms[$key] = [
+                    'source'   => $row->source,
+                    'label'    => $row->label,
+                    'fallback' => \str_contains($row->source, 'shape'),
+                    'term'     => $term,
+                    'articles' => [],
+                    'profile'  => $this->profileView($this->profileType($term), $colored),
+                    'sort'     => $order[$row->source] ?? 99,
+                ];
+            }
+            $terms[$key]['articles'][(int)$row->kArtikel] = \trim($row->cArtNr . ' ' . \html_entity_decode((string)$row->cName, \ENT_QUOTES | \ENT_HTML5, 'UTF-8'));
+        }
+        foreach ($terms as &$item) {
+            $item['count']    = \count($item['articles']);
+            $item['examples'] = \array_slice(\array_values($item['articles']), 0, 3);
+            unset($item['articles']);
+        }
+        unset($item);
+        // Nicht erkannte Profil-Begriffe zuerst, dann Quelle, Häufigkeit und Begriff
+        \usort($terms, static fn(array $a, array $b): int => [
+            $a['fallback'] || $a['profile'] !== null, $a['sort'], -$a['count'], \mb_strtolower($a['term'])
+        ] <=> [
+            $b['fallback'] || $b['profile'] !== null, $b['sort'], -$b['count'], \mb_strtolower($b['term'])
+        ]);
+
+        return $terms;
     }
 
     private function handleCheaperForm(): void

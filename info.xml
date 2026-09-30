@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.0</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.11.0</Version>
+    <Version>0.12.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -224,6 +224,9 @@ Link:     {$oPluginMail->cURL}
                     <ValueName>artikel_details_plus_cheaper_aktiv</ValueName>
                 </Setting>
             </Settingslink>
+            <Customlink sort="6">
+                <Name>Profil-Übersicht</Name>
+            </Customlink>
         </Adminmenu>
         <Locales>
             <Variable>
