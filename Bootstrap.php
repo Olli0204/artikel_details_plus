@@ -555,11 +555,14 @@ class Bootstrap extends Bootstrapper
                     if ($d < 0.2) {
                         return $tip($d, 0.2);
                     }
+                    // Rocker zwischen den Füßen: Mitte liegt auf, steigt zu den Füßen hin bis $rise an
+                    $rise = 5.0;
                     if ($d < 0.36) {
-                        return $arch($d, 0.2, 0.36, 3.5); // kleiner Camber-Bogen unter dem Fuß
+                        // kleiner Camber-Bogen unter dem Fuß, vom Kontaktpunkt (0,2) bis auf die Rocker-Höhe
+                        return $arch($d, 0.2, 0.36, 4.5) + $rise * ($d - 0.2) / 0.16;
                     }
 
-                    return 7.0 * (1 - ((($u - 0.5) / 0.14) ** 2)); // Rocker zwischen den Füßen
+                    return $rise * ((($u - 0.5) / 0.14) ** 2);
             }
 
             return 0.0;
