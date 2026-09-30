@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.12.1
+**Version:** 0.12.2
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -338,6 +338,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.12.2 (2026-09-30)
+- Hybrid-Rocker-Skizze nach Hersteller-Vorlage: kurzer, fast flach aufliegender Rocker in der Mitte (Zone 0,42–0,58), lange Camber-Bögen in voller Camber-Höhe unter den Füßen (0,12–0,42), kürzere Kicks (0–0,12)
 
 ### 0.12.1 (2026-09-30)
 - Fix Hybrid-Rocker-Skizze: der Rocker zwischen den Füßen war als Buckel nach oben gezeichnet; jetzt liegt die Mitte auf und steigt zu den Füßen hin an, die Camber-Bögen unter den Füßen führen zu den Kontaktpunkten
