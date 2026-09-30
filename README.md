@@ -3,8 +3,8 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.12.3
-**Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
+**Version:** 0.13.0
+**Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.1
 **Voraussetzung:** PHP 8.1+
 
 ---
@@ -50,6 +50,13 @@ Das Formular nutzt Post-Redirect-Get (PRG): nach dem Submit wird per 303 zurück
 
 Erfolgs- und Fehlermeldungen werden als Alerts oberhalb des Formulars angezeigt; das Modal öffnet sich automatisch erneut, damit der Kunde das Feedback sieht.
 
+### 6. Erklärseite „Snowboard-Profile“ (seit 0.13.0)
+Eigene Shop-Seite (`/snowboard-profile`, englisch `/snowboard-profiles`, Titel „Snowboard-Profile erklärt“) nach dem Muster der Größentabellen: Einleitung, Erklärung der Farbzonen und je Profiltyp eine Karte mit Skizze, Beschreibung, „Fahrgefühl“, „Geeignet für“ und „Auch bekannt als“ (Herstellerbegriffe aus `PROFILE_HINTS`). Jede Karte hat eine Sprungmarke (`#profil-camber`, `#profil-hybrid-rocker` …); die angesprungene Karte wird hervorgehoben.
+
+Alle Texte sind Sprachvariablen (`artikel_details_plus_guide_*`, Deutsch und Englisch) und lassen sich im Plugin unter **Sprachvariablen** anpassen. Unter der Profil-Seitenansicht auf der Artikelseite steht ein Link „Was bedeutet Hybrid Rocker?“ direkt zum passenden Abschnitt (Schalter „Profil-Erklärseite verlinken“, Default an).
+
+Technik: `<FrontendLink>` in `info.xml` (Identifier `adpProfileGuide`), `Bootstrap::prepareFrontend()` stellt `adpGuide` bereit und gibt `false` zurück, damit der Core `frontend/template/snowboard_profile.tpl` rendert. Die URL für den Link auf der Artikelseite kommt aus `getPlugin()->getLinks()` über den Identifier.
+
 ---
 
 ## Installation
@@ -57,7 +64,8 @@ Erfolgs- und Fehlermeldungen werden als Alerts oberhalb des Formulars angezeigt;
 1. Plugin-Ordner in das Verzeichnis `plugins/` des JTL-Shops kopieren (z. B. via Git: `git clone https://github.com/OkampsUni/artikel_details_plus.git`)
 2. Im Backend unter **Plugin-Manager → Verfügbar** das Plugin installieren und aktivieren
 3. Unter **Plugins → Artikeldetails Plus** die einzelnen Funktionsbereiche konfigurieren
-4. Bei Bedarf das E-Mail-Template **„Günstiger gesehen Benachrichtigung"** unter **Inhalte → E-Mail-Vorlagen** anpassen
+4. Die Erklärseite „Snowboard-Profile“ liegt nach der Installation unter **Inhalte → Seiten** in der Linkgruppe „Versteckt“ – von dort in die gewünschte Linkgruppe (z. B. Footer) verschieben. Erreichbar und von der Artikelseite verlinkt ist sie auch ohne Linkgruppe.
+5. Bei Bedarf das E-Mail-Template **„Günstiger gesehen Benachrichtigung"** unter **Inhalte → E-Mail-Vorlagen** anpassen
 
 ---
 
@@ -74,6 +82,7 @@ Die Einstellungen sind in fünf Tabs gegliedert; dazu kommt der Anzeige-Tab **Pr
 | Fahreigenschaften | Profil-Zonen farbig markieren | Checkbox (Default an, `initialValue="on"`) | Teilt die Seitenansicht farbig in Camber (blau), Rocker (rot), Flat (gelb) und Kick (grün) und zeigt eine Legende; abgewählt wird das Profil einfarbig in der Akzentfarbe gezeichnet |
 | Merkmalbilder | Merkmalbilder Anzeige aktiv | Checkbox | Aktiviert Bilder unter den Artikelboxen in der Listenansicht |
 | Merkmalbilder | Merkmalwerte mit Bildern | Mehrfachauswahl | Welche Merkmale (mit hinterlegten Bildern) angezeigt werden — dynamisch aus `tmerkmal` |
+| Fahreigenschaften | Profil-Erklärseite verlinken | Checkbox (Default an) | Link „Was bedeutet …?“ unter der Profil-Seitenansicht zur Erklärseite |
 | Merkmal-Zuordnung | Flex, Fahrlevel, Körpergewicht, Brettlänge, Form (Profil), Shape (Umriss), Inserts | Auswahl je Feld (Default „– kein Merkmal –“) | Merkmal, das einspringt, wenn das Funktionsattribut fehlt — dynamisch aus `tmerkmal` |
 | Lagerbestandsanzeige | Lagerbestandsanzeige aktiv | Checkbox | Zeigt den Fortschrittsbalken bei niedrigem Bestand |
 | Lagerbestandsanzeige | Nur bei Lagerbestand unter | Number (Default 10) | Schwellenwert, ab dem die Anzeige erscheint |
@@ -338,6 +347,11 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.13.0 (2026-09-30)
+- Neu: Erklärseite „Snowboard-Profile“ (`/snowboard-profile`) mit allen sechs Profilen, Zonen-Erklärung, Fahrgefühl, Einsatzbereich und Herstellerbegriffen; Texte als Sprachvariablen (DE/EN)
+- Neu: Link „Was bedeutet …?“ unter der Profil-Seitenansicht auf der Artikelseite, springt zum passenden Abschnitt (abschaltbar)
+- MaxShopVersion 5.8.1 (genutzte Core-Dateien zwischen 5.8.0 und 5.8.1 unverändert)
 
 ### 0.12.3 (2026-09-30)
 - Hybrid Rocker: Rocker-Mitte wieder sichtbar gewölbt (Ränder 5 statt 1,5 Einheiten angehoben, Zone 0,4–0,6), Übergang zum Camber-Bogen ohne Knick

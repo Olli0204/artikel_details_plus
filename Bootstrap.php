@@ -4,6 +4,7 @@ namespace Plugin\artikel_details_plus;
 
 use JTL\Events\Dispatcher;
 use JTL\Helpers\Form;
+use JTL\Link\LinkInterface;
 use JTL\Mail\Mail\Mail;
 use JTL\Plugin\Bootstrapper;
 use JTL\Shop;
@@ -473,11 +474,19 @@ class Bootstrap extends Bootstrapper
             $profileType = $this->profileType($profileText ?? '');
         }
         if ($profileType !== null) {
+            $guideUrl = $this->isOn($config->getValue('artikel_details_plus_profile_guide_link'))
+                ? $this->profileGuideUrl()
+                : null;
             $smarty->assign('adpProfile', [
-                'type'    => $profileType,
-                'label'   => self::PROFILES[$profileType],
-                'text'    => \trim((string)$profileText),
-                'colored' => $this->isOn($config->getValue('artikel_details_plus_profile_zones_aktiv')),
+                'type'      => $profileType,
+                'label'     => self::PROFILES[$profileType],
+                'text'      => \trim((string)$profileText),
+                'colored'   => $this->isOn($config->getValue('artikel_details_plus_profile_zones_aktiv')),
+                'guideUrl'  => $guideUrl !== null ? $guideUrl . '#' . $this->profileAnchor($profileType) : null,
+                'guideText' => \sprintf(
+                    (string)$this->getPlugin()->getLocalization()->getTranslation('artikel_details_plus_guide_more'),
+                    self::PROFILES[$profileType]
+                ),
             ] + $this->buildProfileSketch($profileType));
         }
     }
@@ -1106,6 +1115,73 @@ class Bootstrap extends Bootstrapper
             ->assign('adpFrontendCss', $this->getPlugin()->getPaths()->getFrontendURL() . 'css/artikel_details_plus.css?v='
                 . $this->getPlugin()->getMeta()->getVersion())
             ->fetch($this->getPlugin()->getPaths()->getAdminPath() . 'templates/profiles.tpl');
+    }
+
+    /**
+     * Erklärseite "Snowboard-Profile" (FrontendLink adpProfileGuide): alle Profiltypen mit Skizze, Texten
+     * aus den Sprachvariablen und Herstellerbegriffen. false = der Core rendert das Template aus info.xml.
+     */
+    public function prepareFrontend(LinkInterface $link, JTLSmarty $smarty): bool
+    {
+        $loc     = $this->getPlugin()->getLocalization();
+        $text    = static fn(string $var): string => (string)$loc->getTranslation('artikel_details_plus_' . $var);
+        $colored = $this->isOn($this->getPlugin()->getConfig()->getValue('artikel_details_plus_profile_zones_aktiv'));
+
+        $profiles = [];
+        foreach (\array_keys(self::PROFILES) as $type) {
+            $key        = \str_replace(' ', '_', $type);
+            $profiles[] = $this->profileView($type, $colored) + [
+                'anchor' => $this->profileAnchor($type),
+                'text'   => $text('guide_' . $key . '_text'),
+                'feel'   => $text('guide_' . $key . '_feel'),
+                'suited' => $text('guide_' . $key . '_suited'),
+                'aka'    => \array_values(\array_filter(
+                    self::PROFILE_HINTS[$type] ?? [],
+                    static fn(string $hint): bool => \mb_strtolower($hint) !== $type
+                )),
+            ];
+        }
+        $zones = [];
+        foreach (\array_keys(self::PROFILE_ZONE_LABELS) as $kind) {
+            $zones[] = [
+                'kind'  => $kind,
+                'label' => (string)$loc->getTranslation(self::PROFILE_ZONE_LABELS[$kind]),
+                'text'  => $text('guide_zone_' . $kind),
+            ];
+        }
+
+        $smarty->assign('adpGuide', [
+            'intro'       => $text('guide_intro'),
+            'legendTitle' => $text('guide_legend_title'),
+            'feelLabel'   => $text('guide_feel'),
+            'suitedLabel' => $text('guide_suited'),
+            'akaLabel'    => $text('guide_aka'),
+            'colored'     => $colored,
+            'zones'       => $zones,
+            'profiles'    => $profiles,
+        ])->assign('adpProfileSvgTpl', $this->getPlugin()->getPaths()->getFrontendPath() . 'template/productdetails/profile_svg.tpl')
+            ->assign('adpFrontendCss', $this->getPlugin()->getPaths()->getFrontendURL() . 'css/artikel_details_plus.css?v='
+                . $this->getPlugin()->getMeta()->getVersion());
+
+        return false;
+    }
+
+    /** Sprungmarke eines Profils auf der Erklärseite, z. B. "profil-hybrid-rocker" */
+    private function profileAnchor(string $type): string
+    {
+        return 'profil-' . \str_replace(' ', '-', $type);
+    }
+
+    /** URL der Erklärseite oder null, wenn der Link fehlt (Plugin-Seite nicht installiert) */
+    private function profileGuideUrl(): ?string
+    {
+        foreach ($this->getPlugin()->getLinks()->getLinks() as $link) {
+            if ($link->getIdentifier() === 'adpProfileGuide') {
+                return $link->getURL();
+            }
+        }
+
+        return null;
     }
 
     /**

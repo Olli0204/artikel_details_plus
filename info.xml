@@ -6,9 +6,9 @@
     <URL>https://ollipolli.de</URL>
     <XMLVersion>102</XMLVersion>
     <MinShopVersion>5.5.1</MinShopVersion>
-    <MaxShopVersion>5.8.0</MaxShopVersion>
+    <MaxShopVersion>5.8.1</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.12.3</Version>
+    <Version>0.13.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -72,6 +72,11 @@ Link:     {$oPluginMail->cURL}
                     <Name>Profil-Zonen farbig markieren</Name>
                     <Description>Teilt die Seitenansicht des Profils farbig in ihre Abschnitte (Camber, Rocker, Flat, Kick) und zeigt eine Legende. Abgewählt wird das Profil einfarbig gezeichnet.</Description>
                     <ValueName>artikel_details_plus_profile_zones_aktiv</ValueName>
+                </Setting>
+                <Setting type="checkbox" initialValue="on" sort="6" conf="Y">
+                    <Name>Profil-Erklärseite verlinken</Name>
+                    <Description>Zeigt unter der Profil-Seitenansicht auf der Artikelseite einen Link "Was bedeutet …?" zur Erklärseite "Snowboard-Profile" (direkt zum passenden Abschnitt).</Description>
+                    <ValueName>artikel_details_plus_profile_guide_link</ValueName>
                 </Setting>
                 <Setting type="checkbox" sort="4" conf="Y">
                     <Name>Dimensionen anzeigen</Name>
@@ -228,6 +233,34 @@ Link:     {$oPluginMail->cURL}
                 <Name>Profil-Übersicht</Name>
             </Customlink>
         </Adminmenu>
+        <FrontendLink>
+            <Link>
+                <Filename>snowboard_profile.php</Filename>
+                <Name>Snowboard-Profile</Name>
+                <Template>snowboard_profile.tpl</Template>
+                <VisibleAfterLogin>N</VisibleAfterLogin>
+                <PrintButton>N</PrintButton>
+                <NoFollow>N</NoFollow>
+                <Identifier>adpProfileGuide</Identifier>
+                <SSL>2</SSL>
+                <LinkLanguage iso="GER">
+                    <Seo>snowboard-profile</Seo>
+                    <Name>Snowboard-Profile</Name>
+                    <Title>Snowboard-Profile erklärt</Title>
+                    <MetaTitle>Snowboard-Profile erklärt: Camber, Rocker, Flat und Hybride</MetaTitle>
+                    <MetaKeywords>Snowboard Profil, Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker</MetaKeywords>
+                    <MetaDescription>Camber, Rocker, Flat oder Hybrid? So unterscheiden sich die Snowboard-Profile und welches zu deinem Fahrstil passt.</MetaDescription>
+                </LinkLanguage>
+                <LinkLanguage iso="ENG">
+                    <Seo>snowboard-profiles</Seo>
+                    <Name>Snowboard Profiles</Name>
+                    <Title>Snowboard Profiles Explained</Title>
+                    <MetaTitle>Snowboard Profiles Explained: Camber, Rocker, Flat and Hybrids</MetaTitle>
+                    <MetaKeywords>snowboard profile, camber, rocker, flat, hybrid camber, hybrid rocker</MetaKeywords>
+                    <MetaDescription>Camber, rocker, flat or hybrid? How snowboard profiles differ and which one suits your riding style.</MetaDescription>
+                </LinkLanguage>
+            </Link>
+        </FrontendLink>
         <Locales>
             <Variable>
                 <Name>artikel_details_plus_weight_title</Name>
@@ -402,6 +435,174 @@ Link:     {$oPluginMail->cURL}
                 <Description>Text des Absenden-Buttons im "Günstiger gesehen"-Formular</Description>
                 <VariableLocalized iso="GER">Abschicken</VariableLocalized>
                 <VariableLocalized iso="ENG">Submit</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_intro</Name>
+                <Description>Einleitung der Erklärseite</Description>
+                <VariableLocalized iso="GER">Das Profil beschreibt, wie sich ein Snowboard von der Seite gesehen zwischen Nose und Tail wölbt, wenn es ohne Belastung auf dem Boden liegt. Es bestimmt, wie viel Kantengriff, Pop und Drehfreude ein Board hat – und damit, zu welchem Fahrstil es passt. Die Skizzen sind zur Verdeutlichung stark überhöht.</VariableLocalized>
+                <VariableLocalized iso="ENG">The profile describes how a snowboard bends between nose and tail when it lies unweighted on the ground. It decides how much edge hold, pop and playfulness a board has – and which riding style it suits. The sketches are strongly exaggerated for clarity.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_legend_title</Name>
+                <Description>Überschrift der Zonen-Erklärung</Description>
+                <VariableLocalized iso="GER">So liest du die Skizzen</VariableLocalized>
+                <VariableLocalized iso="ENG">How to read the sketches</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_zone_camber</Name>
+                <Description>Erklärung Zone Camber</Description>
+                <VariableLocalized iso="GER">Bogen nach oben – Vorspannung, Kantengriff und Pop</VariableLocalized>
+                <VariableLocalized iso="ENG">Arched upwards – tension, edge hold and pop</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_zone_rocker</Name>
+                <Description>Erklärung Zone Rocker</Description>
+                <VariableLocalized iso="GER">Bogen nach unten – leichtes Drehen, verkantet kaum, Auftrieb im Powder</VariableLocalized>
+                <VariableLocalized iso="ENG">Arched downwards – easy turning, forgiving, float in powder</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_zone_flat</Name>
+                <Description>Erklärung Zone Flat</Description>
+                <VariableLocalized iso="GER">flach aufliegend – stabil und berechenbar</VariableLocalized>
+                <VariableLocalized iso="ENG">Flat on the ground – stable and predictable</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_zone_kick</Name>
+                <Description>Erklärung Zone Kick</Description>
+                <VariableLocalized iso="GER">aufgebogene Spitzen an Nose und Tail</VariableLocalized>
+                <VariableLocalized iso="ENG">Kicked-up tips at nose and tail</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_feel</Name>
+                <Description>Beschriftung Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Fahrgefühl</VariableLocalized>
+                <VariableLocalized iso="ENG">Ride feel</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_suited</Name>
+                <Description>Beschriftung Geeignet für</Description>
+                <VariableLocalized iso="GER">Geeignet für</VariableLocalized>
+                <VariableLocalized iso="ENG">Best for</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_aka</Name>
+                <Description>Beschriftung Herstellerbegriffe</Description>
+                <VariableLocalized iso="GER">Auch bekannt als</VariableLocalized>
+                <VariableLocalized iso="ENG">Also known as</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_more</Name>
+                <Description>Link auf der Artikelseite (%s = Profilname)</Description>
+                <VariableLocalized iso="GER">Was bedeutet %s?</VariableLocalized>
+                <VariableLocalized iso="ENG">What does %s mean?</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_camber_text</Name>
+                <Description>Profil Camber: Beschreibung</Description>
+                <VariableLocalized iso="GER">Das klassische Profil: Das Board liegt nur kurz vor Nose und Tail auf, dazwischen wölbt es sich nach oben. Beim Draufstellen drückst du diese Vorspannung weg und bringst die ganze Kante auf den Schnee.</VariableLocalized>
+                <VariableLocalized iso="ENG">The classic profile: the board only touches the snow just before nose and tail and arches up in between. Standing on it presses this tension out and puts the whole edge on the snow.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_camber_feel</Name>
+                <Description>Profil Camber: Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Präziser Kantengriff, stabil bei hohem Tempo, kraftvoller Pop.</VariableLocalized>
+                <VariableLocalized iso="ENG">Precise edge hold, stable at speed, powerful pop.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_camber_suited</Name>
+                <Description>Profil Camber: Geeignet für</Description>
+                <VariableLocalized iso="GER">Carving, Piste und Kicker – für Fahrer mit sauberer Technik.</VariableLocalized>
+                <VariableLocalized iso="ENG">Carving, groomers and jumps – for riders with solid technique.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_rocker_text</Name>
+                <Description>Profil Rocker: Beschreibung</Description>
+                <VariableLocalized iso="GER">Die umgekehrte Wölbung: Die Mitte liegt auf, Nose und Tail biegen sich nach oben – wie eine Banane.</VariableLocalized>
+                <VariableLocalized iso="ENG">The reversed bend: the middle touches the snow and nose and tail curve upwards – like a banana.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_rocker_feel</Name>
+                <Description>Profil Rocker: Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Verkantet kaum, dreht sehr leicht, schwimmt im Tiefschnee auf.</VariableLocalized>
+                <VariableLocalized iso="ENG">Hardly catches an edge, turns very easily, floats in deep snow.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_rocker_suited</Name>
+                <Description>Profil Rocker: Geeignet für</Description>
+                <VariableLocalized iso="GER">Einsteiger, Jibbing und Buttern, Powder.</VariableLocalized>
+                <VariableLocalized iso="ENG">Beginners, jibbing and buttering, powder.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_flat_text</Name>
+                <Description>Profil Flat: Beschreibung</Description>
+                <VariableLocalized iso="GER">Zwischen den Kontaktpunkten liegt das Board flach auf, nur Nose und Tail sind aufgebogen.</VariableLocalized>
+                <VariableLocalized iso="ENG">Between the contact points the board lies flat, only nose and tail are kicked up.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_flat_feel</Name>
+                <Description>Profil Flat: Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Stabil und berechenbar, guter Kantenkontakt, verzeihender als Camber.</VariableLocalized>
+                <VariableLocalized iso="ENG">Stable and predictable, good edge contact, more forgiving than camber.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_flat_suited</Name>
+                <Description>Profil Flat: Geeignet für</Description>
+                <VariableLocalized iso="GER">Park, Rails und Boxen, entspanntes Allround-Fahren.</VariableLocalized>
+                <VariableLocalized iso="ENG">Park, rails and boxes, relaxed all-round riding.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_hybrid_camber_text</Name>
+                <Description>Profil Hybrid Camber: Beschreibung</Description>
+                <VariableLocalized iso="GER">Camber zwischen den Füßen, Rocker zu Nose und Tail hin.</VariableLocalized>
+                <VariableLocalized iso="ENG">Camber between the feet, rocker towards nose and tail.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_hybrid_camber_feel</Name>
+                <Description>Profil Hybrid Camber: Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Kantengriff und Pop des Camber, dazu leichteres Andrehen und mehr Auftrieb.</VariableLocalized>
+                <VariableLocalized iso="ENG">The edge hold and pop of camber, plus easier turn initiation and more float.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_hybrid_camber_suited</Name>
+                <Description>Profil Hybrid Camber: Geeignet für</Description>
+                <VariableLocalized iso="GER">All-Mountain und Freeride – für alle, die ein vielseitiges Board suchen.</VariableLocalized>
+                <VariableLocalized iso="ENG">All-mountain and freeride – for anyone looking for a versatile board.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_hybrid_rocker_text</Name>
+                <Description>Profil Hybrid Rocker: Beschreibung</Description>
+                <VariableLocalized iso="GER">Rocker zwischen den Füßen, Camber unter den Bindungen. Die Mitte liegt auf, unter den Füßen wölbt sich das Board nach oben.</VariableLocalized>
+                <VariableLocalized iso="ENG">Rocker between the feet, camber under the bindings. The middle touches the snow, under the feet the board arches upwards.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_hybrid_rocker_feel</Name>
+                <Description>Profil Hybrid Rocker: Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Verspielt und fehlerverzeihend, dank Camber unter den Füßen trotzdem guter Halt auf der Kante.</VariableLocalized>
+                <VariableLocalized iso="ENG">Playful and forgiving, yet good edge hold thanks to the camber under the feet.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_hybrid_rocker_suited</Name>
+                <Description>Profil Hybrid Rocker: Geeignet für</Description>
+                <VariableLocalized iso="GER">Park und Freestyle, Einsteiger mit Ambitionen und Fortgeschrittene.</VariableLocalized>
+                <VariableLocalized iso="ENG">Park and freestyle, ambitious beginners and intermediate riders.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_flat_rocker_text</Name>
+                <Description>Profil Flat Rocker: Beschreibung</Description>
+                <VariableLocalized iso="GER">Flache Mitte zwischen den Füßen, Rocker zu Nose und Tail hin.</VariableLocalized>
+                <VariableLocalized iso="ENG">A flat middle between the feet, rocker towards nose and tail.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_flat_rocker_feel</Name>
+                <Description>Profil Flat Rocker: Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Stabil in der Mitte, dreht leicht, guter Auftrieb im weichen Schnee.</VariableLocalized>
+                <VariableLocalized iso="ENG">Stable in the middle, turns easily, good float in soft snow.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_flat_rocker_suited</Name>
+                <Description>Profil Flat Rocker: Geeignet für</Description>
+                <VariableLocalized iso="GER">Einsteiger, Park und Powder-Tage.</VariableLocalized>
+                <VariableLocalized iso="ENG">Beginners, park and powder days.</VariableLocalized>
             </Variable>
         </Locales>
     </Install>
