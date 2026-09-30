@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.12.0
+**Version:** 0.12.1
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -338,6 +338,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.12.1 (2026-09-30)
+- Fix Hybrid-Rocker-Skizze: der Rocker zwischen den Füßen war als Buckel nach oben gezeichnet; jetzt liegt die Mitte auf und steigt zu den Füßen hin an, die Camber-Bögen unter den Füßen führen zu den Kontaktpunkten
 
 ### 0.12.0 (2026-09-30)
 - Neu: Backend-Tab „Profil-Übersicht“ – Begriff testen, alle Profil-Begriffe im Shop mit erkanntem Typ und Skizze, Übersicht der sechs Profiltypen
