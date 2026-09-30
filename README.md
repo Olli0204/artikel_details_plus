@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.11.0
+**Version:** 0.12.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.0
 **Voraussetzung:** PHP 8.1+
 
@@ -63,7 +63,7 @@ Erfolgs- und Fehlermeldungen werden als Alerts oberhalb des Formulars angezeigt;
 
 ## Konfiguration
 
-Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen sind Checkboxen (seit 0.2.2; gespeichert wird `on` bzw. leer).
+Die Einstellungen sind in fünf Tabs gegliedert; dazu kommt der Anzeige-Tab **Profil-Übersicht** (siehe unten). Alle „Aktiv"-Einstellungen sind Checkboxen (seit 0.2.2; gespeichert wird `on` bzw. leer).
 
 | Tab | Einstellung | Typ | Beschreibung |
 |---|---|---|---|
@@ -81,6 +81,16 @@ Die Einstellungen sind in fünf Tabs gegliedert. Alle „Aktiv"-Einstellungen si
 | Günstiger gesehen | Formular aktiv | Checkbox | Schaltet Button und Modal auf der Artikeldetailseite ein |
 
 ---
+
+### Tab „Profil-Übersicht“ (seit 0.12.0)
+
+Reiner Kontroll-Tab, speichert nichts:
+
+- **Begriff testen:** Freitext eingeben (z. B. „Flying V“) → erkannter Profiltyp und die Skizze, wie sie die Artikelseite zeichnet, oder der Hinweis „nicht erkannt“.
+- **Begriffe im Shop:** alle Werte der Funktionsattribute `profil`, `profile`, `form`, `shape` (`tartikelattribut`) und der in der Merkmal-Zuordnung gewählten Merkmale für Form und Shape (Standardsprache), je Quelle und Wert mit Artikelanzahl, bis zu drei Beispielartikeln, erkanntem Typ und Skizze. Nicht erkannte Profil-Begriffe stehen oben (Badge „nicht erkannt“); Shape-Begriffe ohne Profil gelten als normal („– kein Profil“).
+- **Profiltypen:** die sechs Skizzen mit Beispielbegriffen (`Bootstrap::PROFILE_HINTS`, beim Ändern von `profileType()` mitpflegen).
+
+Die Skizzen nutzen dasselbe Teil-Template wie die Artikelseite (`frontend/template/productdetails/profile_svg.tpl`) und das Frontend-CSS; der Schalter „Profil-Zonen farbig markieren“ gilt auch hier.
 
 ## Datenpflege in der Wawi
 
@@ -246,6 +256,7 @@ Das Plugin hängt sich per `prepend` / `append` in vorhandene NOVA-Blöcke ein, 
 
 ### Dynamische Optionsquelle
 - `adminmenu/merkmalwerte.php`: SQL-Query über `tmerkmal`/`tmerkmalwert`, liefert nur Merkmale mit mindestens einem bebilderten Wert. Versorgt die Mehrfachauswahl „Merkmalwerte mit Bildern".
+- `adminmenu/templates/profiles.tpl`: Backend-Tab „Profil-Übersicht“, gerendert über `Bootstrap::renderAdminMenuTab()` (Customlink in `info.xml`); verarbeitet nur das eigene Formularfeld `adp_profile_term` (mit `Form::validateToken()`), weil der Core `renderAdminMenuTab()` für alle Customlinks aufruft. Styles nutzen JTLs Backend-Variablen (`--primary`, `--body-color`, `--border-color`) für Hell/Dunkel.
 - `adminmenu/merkmale.php`: alle Merkmale aus `tmerkmal` plus „– kein Merkmal –“ (Wert `0`); versorgt die Auswahlfelder im Tab „Merkmal-Zuordnung“.
 
 ### Assets
@@ -290,7 +301,9 @@ artikel_details_plus/
 ├── Migrations/                            # DB-Migrationen
 │   └── Migration20260504120100.php
 ├── adminmenu/
-│   └── merkmalwerte.php                   # Dynamische Optionsquelle (Selectbox)
+│   ├── merkmalwerte.php                   # Optionsquelle Merkmalbilder (Mehrfachauswahl)
+│   ├── merkmale.php                       # Optionsquelle Merkmal-Zuordnung
+│   └── templates/profiles.tpl             # Backend-Tab „Profil-Übersicht“
 ├── frontend/template/
 │   ├── productdetails/
 │   │   ├── details.tpl                    # Stylesheet, Lagerbestand, Cheaper-Button
@@ -299,6 +312,7 @@ artikel_details_plus/
 │   │   ├── flex.tpl                       # Flex-Skala
 │   │   ├── fit.tpl                        # Körpergewicht und Fahrlevel
 │   │   ├── profile.tpl                    # Seitenansicht Camber/Rocker
+│   │   ├── profile_svg.tpl                # Skizze + Legende (auch im Backend-Tab)
 │   │   ├── snowboard_values.tpl           # Dimensionen: Board-Skizze + Tabelle (Form/Shape/Waist/Nose/Tail)
 │   │   ├── popups.tpl                     # Modal-Wrapper
 │   │   └── cheaper.tpl                    # Formular-Markup
@@ -324,6 +338,11 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.12.0 (2026-09-30)
+- Neu: Backend-Tab „Profil-Übersicht“ – Begriff testen, alle Profil-Begriffe im Shop mit erkanntem Typ und Skizze, Übersicht der sechs Profiltypen
+- Skizze der Seitenansicht als gemeinsames Teil-Template `profile_svg.tpl` (Artikelseite und Backend)
+- Legende fällt auf den Zonennamen zurück, wenn die Sprachvariable fehlt
 
 ### 0.11.0 (2026-09-29)
 - Board-Skizze erscheint, sobald `shape` (oder `outline`) gepflegt ist; fehlende Nose/Waist/Tail werden aus typischen Proportionen ergänzt und nicht bemaßt. Inserts und Längenmaß nur, wenn gepflegt bzw. bekannt
