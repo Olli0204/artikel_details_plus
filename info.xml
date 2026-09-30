@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.1</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.13.0</Version>
+    <Version>0.13.1</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -247,17 +247,17 @@ Link:     {$oPluginMail->cURL}
                     <Seo>snowboard-profile</Seo>
                     <Name>Snowboard-Profile</Name>
                     <Title>Snowboard-Profile erklärt</Title>
-                    <MetaTitle>Snowboard-Profile erklärt: Camber, Rocker, Flat und Hybride</MetaTitle>
+                    <MetaTitle>Snowboard-Profile erklärt - Camber, Rocker, Flat und Hybride</MetaTitle>
                     <MetaKeywords>Snowboard Profil, Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker</MetaKeywords>
-                    <MetaDescription>Camber, Rocker, Flat oder Hybrid? So unterscheiden sich die Snowboard-Profile und welches zu deinem Fahrstil passt.</MetaDescription>
+                    <MetaDescription>Camber, Rocker, Flat oder Hybrid. So unterscheiden sich die Snowboard-Profile und so findest du das passende für deinen Fahrstil.</MetaDescription>
                 </LinkLanguage>
                 <LinkLanguage iso="ENG">
                     <Seo>snowboard-profiles</Seo>
                     <Name>Snowboard Profiles</Name>
                     <Title>Snowboard Profiles Explained</Title>
-                    <MetaTitle>Snowboard Profiles Explained: Camber, Rocker, Flat and Hybrids</MetaTitle>
+                    <MetaTitle>Snowboard Profiles Explained - Camber, Rocker, Flat and Hybrids</MetaTitle>
                     <MetaKeywords>snowboard profile, camber, rocker, flat, hybrid camber, hybrid rocker</MetaKeywords>
-                    <MetaDescription>Camber, rocker, flat or hybrid? How snowboard profiles differ and which one suits your riding style.</MetaDescription>
+                    <MetaDescription>Camber, rocker, flat or hybrid. How snowboard profiles differ and which one suits your riding style.</MetaDescription>
                 </LinkLanguage>
             </Link>
         </FrontendLink>
