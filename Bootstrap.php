@@ -301,7 +301,7 @@ class Bootstrap extends Bootstrapper
         'flat'          => [[0, 0.12, 'kick'], [0.12, 0.88, 'flat'], [0.88, 1, 'kick']],
         'rocker'        => [[0, 1, 'rocker']],
         'hybrid camber' => [[0, 0.25, 'rocker'], [0.25, 0.75, 'camber'], [0.75, 1, 'rocker']],
-        'hybrid rocker' => [[0, 0.2, 'kick'], [0.2, 0.36, 'camber'], [0.36, 0.64, 'rocker'], [0.64, 0.8, 'camber'], [0.8, 1, 'kick']],
+        'hybrid rocker' => [[0, 0.12, 'kick'], [0.12, 0.42, 'camber'], [0.42, 0.58, 'rocker'], [0.58, 0.88, 'camber'], [0.88, 1, 'kick']],
         'flat rocker'   => [[0, 0.25, 'rocker'], [0.25, 0.75, 'flat'], [0.75, 1, 'rocker']],
     ];
 
@@ -552,17 +552,17 @@ class Bootstrap extends Bootstrapper
                 case 'flat rocker':
                     return $d < 0.25 ? $tip($d, 0.25) : 0.0;
                 case 'hybrid rocker':
-                    if ($d < 0.2) {
-                        return $tip($d, 0.2);
+                    if ($d < 0.12) {
+                        return $tip($d, 0.12);
                     }
-                    // Rocker zwischen den Füßen: Mitte liegt auf, steigt zu den Füßen hin bis $rise an
-                    $rise = 5.0;
-                    if ($d < 0.36) {
-                        // kleiner Camber-Bogen unter dem Fuß, vom Kontaktpunkt (0,2) bis auf die Rocker-Höhe
-                        return $arch($d, 0.2, 0.36, 4.5) + $rise * ($d - 0.2) / 0.16;
+                    // Kurzer Rocker zwischen den Füßen: liegt fast flach auf, nur die Ränder heben sich um $rise
+                    $rise = 1.5;
+                    if ($d < 0.42) {
+                        // langer Camber-Bogen unter dem Fuß, vom Kontaktpunkt (0,12) bis auf den Rocker-Rand
+                        return $arch($d, 0.12, 0.42, $camber) + $rise * ($d - 0.12) / 0.3;
                     }
 
-                    return $rise * ((($u - 0.5) / 0.14) ** 2);
+                    return $rise * ((($u - 0.5) / 0.08) ** 2);
             }
 
             return 0.0;
