@@ -900,13 +900,16 @@ class Bootstrap extends Bootstrapper
         'inserts'        => ['artikel_details_plus_merkmal_inserts', ['inserts']],
     ];
 
-    /** Flex-Wörter in Merkmalwerten => Bereich auf der Skala 1-10 (zusammengesetzte zuerst prüfen) */
+    /**
+     * Flex-Wörter in Merkmalwerten => Bereich auf der Skala 1-10 (zusammengesetzte zuerst prüfen).
+     * Sprachen dürfen gemischt sein: "Medium - Hart" ist Medium-Stiff, nicht Medium + Stiff.
+     */
     private const FLEX_WORDS = [
-        '/medium\s*stiff|mittel\s*(?:hart|steif)/u' => [7, 8],
-        '/medium\s*soft|mittel\s*weich/u'           => [3, 4],
-        '/stiff|hart|steif/u'                       => [9, 10],
-        '/soft|weich/u'                             => [1, 2],
-        '/medium|mittel/u'                          => [5, 6],
+        '/(?:medium|mittel)\s*(?:stiff|hart|hard|steif)/u' => [7, 8],
+        '/(?:medium|mittel)\s*(?:soft|weich)/u'           => [3, 4],
+        '/stiff|hart|hard|steif/u'                        => [9, 10],
+        '/soft|weich/u'                                   => [1, 2],
+        '/medium|mittel/u'                                => [5, 6],
     ];
 
     /**

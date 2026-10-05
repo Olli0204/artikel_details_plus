@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.13.1
+**Version:** 0.13.2
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.1
 **Voraussetzung:** PHP 8.1+
 
@@ -347,6 +347,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.13.2 (2026-10-05)
+- Fix Flex-Skala aus Merkmalen: „Medium - Hart“ (Englisch und Deutsch gemischt) wurde als Medium + Stiff gelesen und zeigte 5–10/10 statt Medium-Stiff. Zusammengesetzte Werte erkennen jetzt jede Kombination aus medium/mittel mit stiff/hart/hard/steif bzw. soft/weich; „hard“ zählt zusätzlich als Stiff
 
 ### 0.13.1 (2026-09-30)
 - Fix Update-Fehler 47 („MetaTitle entspricht nicht der Konvention“): Der Core erlaubt in `Title`, `MetaTitle` und `MetaDescription` einer Plugin-Seite nur Buchstaben, Ziffern, Leerzeichen und `, . ; -` (`Validation/Items/FrontendLinks`). Doppelpunkt, Fragezeichen und Gedankenstrich entfernt (die MetaDescription wäre sonst mit Fehler 49 gescheitert)
