@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.1</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.14.1</Version>
+    <Version>0.14.2</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -607,8 +607,8 @@ Link:     {$oPluginMail->cURL}
             <Variable>
                 <Name>artikel_details_plus_guide_triple_camber_text</Name>
                 <Description>Profil Triple Camber: Beschreibung</Description>
-                <VariableLocalized iso="GER">Drei Camber-Bögen hintereinander: ein großer in der Mitte und je ein kleinerer unter den Bindungen.</VariableLocalized>
-                <VariableLocalized iso="ENG">Three camber arches in a row: a large one in the middle and a smaller one under each binding.</VariableLocalized>
+                <VariableLocalized iso="GER">Drei Camber-Bögen: ein großer zwischen den Füßen und je ein kleinerer Richtung Nose und Tail. Unter den Bindungen liegen kurze Rocker-Zonen.</VariableLocalized>
+                <VariableLocalized iso="ENG">Three camber arches: a large one between the feet and a smaller one towards nose and tail. Short rocker zones sit under the bindings.</VariableLocalized>
             </Variable>
             <Variable>
                 <Name>artikel_details_plus_guide_triple_camber_feel</Name>

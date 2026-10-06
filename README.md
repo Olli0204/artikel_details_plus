@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.14.1
+**Version:** 0.14.2
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.1
 **Voraussetzung:** PHP 8.1+
 
@@ -181,14 +181,14 @@ Freitext, erscheint 1:1 in der Tabelle; die Seitenansicht erkennt daraus einen v
 | Hybrid Camber | Camber zwischen den Füßen, Rocker zu den Spitzen | `Hybrid Camber`, `CamRock`, `Directional Camber` |
 | Hybrid Rocker | Rocker zwischen den Füßen, kleine Camber-Bögen unter den Füßen | `Hybrid Rocker`, `Flying V` |
 | Flat Rocker | flach unter den Füßen, Rocker zu den Spitzen | `Flat Rocker` |
-| Triple Camber | drei Camber-Bögen, der mittlere am höchsten | `Triple Camber`, `Triple-Camber`, `Triple Camber Recurve` (aber `Triple Camber Hybrid` → Hybrid Rocker) |
+| Triple Camber | drei Camber-Bögen, der mittlere am höchsten, dazwischen unter den Bindungen kurze Rocker-Zonen | `Triple Camber`, `Triple-Camber`, `Triple Camber Recurve` (aber `Triple Camber Hybrid` → Hybrid Rocker) |
 | S-Rocker | richtungsgebunden: lange, hohe Rocker-Nose, Camber unter den Füßen, kurzer Kick am Tail | `S-Rocker`, `S Rocker`, `SRocker`, `Directional Rocker`, `Surf Rocker` |
 
 **Dreiteilige Schreibweise `X/Y/X`** (auch `X-Y-X`): das *mittlere* Wort beschreibt den Bereich zwischen den Füßen — `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Diese Notation ist in der Branche nicht einheitlich; zeigt ein Board das falsche Bild, `profil` auf einen der acht Typen setzen (`camber`, `rocker`, `flat`, `hybrid camber`, `hybrid rocker`, `flat rocker`, `triple camber`, `s rocker`). Unbekannte Texte wie `3BT` zeichnen nichts — die Tabellenzeile bleibt, nur die Karte „Profil" fehlt.
 
 Vorschlag für die Auswahlliste: `Camber`, `Rocker`, `Flat`, `Hybrid Camber`, `Hybrid Rocker`, `Camber/Rocker/Camber`, `Flying V`, `3BT`, `Directional Camber`.
 
-Mit dem Schalter „Profil-Zonen farbig markieren" wird die Seitenansicht in ihre Abschnitte unterteilt — Camber blau, Rocker (Reverse Camber) rot, Flat (Zero Camber) gelb, Kick (Aufbiegung der Spitzen) grün — mit Legende unter der Skizze. Welche Zonen ein Profiltyp hat, ist fest hinterlegt (`Bootstrap::PROFILE_ZONES`): Camber und Flat = Kick / Mitte / Kick, Rocker = durchgehend, Hybrid Camber und Flat Rocker = Rocker / Mitte / Rocker, Hybrid Rocker = Kick / Camber / Rocker / Camber / Kick, Triple Camber = Kick / Camber / Kick, S-Rocker = Rocker / Camber / Kick.
+Mit dem Schalter „Profil-Zonen farbig markieren" wird die Seitenansicht in ihre Abschnitte unterteilt — Camber blau, Rocker (Reverse Camber) rot, Flat (Zero Camber) gelb, Kick (Aufbiegung der Spitzen) grün — mit Legende unter der Skizze. Welche Zonen ein Profiltyp hat, ist fest hinterlegt (`Bootstrap::PROFILE_ZONES`): Camber und Flat = Kick / Mitte / Kick, Rocker = durchgehend, Hybrid Camber und Flat Rocker = Rocker / Mitte / Rocker, Hybrid Rocker = Kick / Camber / Rocker / Camber / Kick, Triple Camber = Kick / Camber / Rocker / Camber / Rocker / Camber / Kick (kurze Rocker-Zonen unter den Bindungen), S-Rocker = Rocker / Camber / Kick.
 
 ### Breiten und Inserts (`nose`, `waist`, `tail`, `inserts`, `stance`, `setback`)
 
@@ -349,6 +349,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.14.2 (2026-10-06)
+- Triple Camber: kurze Rocker-Zonen in den Tälern unter den Bindungen (je 8 % der Länge) wie in der Never-Summer-Grafik; Erklärtext DE/EN angepasst
 
 ### 0.14.1 (2026-10-06)
 - Triple Camber: Täler zwischen den drei Camber-Bögen laufen rund aus (sin² statt Knick), Camber als eine durchgehende Zone – die farbige Darstellung hatte an den Übergängen Lücken im Strich

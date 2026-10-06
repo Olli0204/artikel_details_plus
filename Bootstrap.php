@@ -304,7 +304,7 @@ class Bootstrap extends Bootstrapper
         'hybrid camber' => [[0, 0.25, 'rocker'], [0.25, 0.75, 'camber'], [0.75, 1, 'rocker']],
         'hybrid rocker' => [[0, 0.12, 'kick'], [0.12, 0.4, 'camber'], [0.4, 0.6, 'rocker'], [0.6, 0.88, 'camber'], [0.88, 1, 'kick']],
         'flat rocker'   => [[0, 0.25, 'rocker'], [0.25, 0.75, 'flat'], [0.75, 1, 'rocker']],
-        'triple camber' => [[0, 0.12, 'kick'], [0.12, 0.88, 'camber'], [0.88, 1, 'kick']],
+        'triple camber' => [[0, 0.12, 'kick'], [0.12, 0.32, 'camber'], [0.32, 0.4, 'rocker'], [0.4, 0.6, 'camber'], [0.6, 0.68, 'rocker'], [0.68, 0.88, 'camber'], [0.88, 1, 'kick']],
         's rocker'      => [[0, 0.35, 'rocker'], [0.35, 0.9, 'camber'], [0.9, 1, 'kick']],
     ];
 
@@ -574,8 +574,8 @@ class Bootstrap extends Bootstrapper
                 case 'flat rocker':
                     return $d < 0.25 ? $tip($d, 0.25) : 0.0;
                 case 'triple camber':
-                    // drei Camber-Bögen: großer in der Mitte, kleinere unter den Füßen. sin² statt sin, damit die
-                    // Täler zwischen den Bögen rund auslaufen (kein Knick, an dem der Strich aufreißt)
+                    // drei Camber-Bögen: großer zwischen den Füßen, kleinere Richtung Nose/Tail. sin² statt sin, damit
+                    // die Täler unter den Bindungen rund auslaufen – sie sind die kurzen Rocker-Zonen (0,32–0,4 / 0,6–0,68)
                     if ($d < 0.12) {
                         return $tip($d, 0.12);
                     }
