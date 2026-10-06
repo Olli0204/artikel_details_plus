@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.1</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.14.0</Version>
+    <Version>0.14.1</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
