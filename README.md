@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.13.2
+**Version:** 0.14.0
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.1
 **Voraussetzung:** PHP 8.1+
 
@@ -19,7 +19,7 @@ Auf der Artikeldetailseite werden im Beschreibungs-Tab die Snowboard-Eigenschaft
 | Fahreigenschaften | interaktives **Pentagon-SVG-Diagramm** (`ecm_polygon_svg.js`), Werte 0–10; erscheint ab drei vorhandenen Werten | `carving`, `jib`, `powder`, `all_mountain`, `jump` |
 | Körpergewicht | Skalenleiste in kg | `koerpergewicht_ab`, `koerpergewicht_bis` |
 | Fahrlevel | Leiste Beginner / Intermediate / Advanced/Expert (Beschriftung per Sprachvariable) | `fahrlevel_ab`, `fahrlevel_bis` |
-| Profil | **Seitenansicht** (Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker, Flat Rocker) als vollbreite Karte unter den Spalten, vertikal übertrieben, mit Bodenlinie | `profil` (Vorrang), sonst erkannt aus `form`, ersatzweise `shape` |
+| Profil | **Seitenansicht** (Camber, Rocker, Flat, Hybrid Camber, Hybrid Rocker, Flat Rocker, Triple Camber, S-Rocker) als vollbreite Karte unter den Spalten, vertikal übertrieben, mit Bodenlinie | `profil` (Vorrang), sonst erkannt aus `form`, ersatzweise `shape` |
 | Flex | **Skala 1–10** aus zehn Segmenten mit fünf Zonen (Soft, Medium-Soft, Medium, Medium-Stiff, Stiff) in eigener Karte; Einzelwert oder Bereich, halbe Werte als halbes Segment | `flex` oder `flex_ab`, `flex_bis` (1–10, Dezimal erlaubt) |
 | Dimensionen | Tabelle Länge / Form / Shape / Waist / Nose / Tail / Inserts plus **maßstäbliche SVG-Board-Skizze** (Draufsicht, Nose links, Tail rechts) mit Längen- und Breitenbemaßung, Twin- oder Directional-Umriss und Inserts (Lochmuster oder Channel); die Skizze erscheint, sobald `shape` (oder `outline`) gepflegt ist oder `nose`, `waist` und `tail` numerisch sind; fehlende Breiten werden generisch gezeichnet, bemaßt wird nur Gepflegtes | `form`, `shape`, `waist`, `nose`, `tail` (mm), `laenge` (cm), `inserts`, optional `outline`, `stance`, `setback` |
 
@@ -97,7 +97,7 @@ Reiner Kontroll-Tab, speichert nichts:
 
 - **Begriff testen:** Freitext eingeben (z. B. „Flying V“) → erkannter Profiltyp und die Skizze, wie sie die Artikelseite zeichnet, oder der Hinweis „nicht erkannt“.
 - **Begriffe im Shop:** alle Werte der Funktionsattribute `profil`, `profile`, `form`, `shape` (`tartikelattribut`) und der in der Merkmal-Zuordnung gewählten Merkmale für Form und Shape (Standardsprache), je Quelle und Wert mit Artikelanzahl, bis zu drei Beispielartikeln, erkanntem Typ und Skizze. Nicht erkannte Profil-Begriffe stehen oben (Badge „nicht erkannt“); Shape-Begriffe ohne Profil gelten als normal („– kein Profil“).
-- **Profiltypen:** die sechs Skizzen mit Beispielbegriffen (`Bootstrap::PROFILE_HINTS`, beim Ändern von `profileType()` mitpflegen).
+- **Profiltypen:** die acht Skizzen mit Beispielbegriffen (`Bootstrap::PROFILE_HINTS`, beim Ändern von `profileType()` mitpflegen).
 
 Die Skizzen nutzen dasselbe Teil-Template wie die Artikelseite (`frontend/template/productdetails/profile_svg.tpl`) und das Frontend-CSS; der Schalter „Profil-Zonen farbig markieren“ gilt auch hier.
 
@@ -126,7 +126,7 @@ Alle Snowboard-Daten kommen aus **Funktionsattributen** des Artikels — in JTL-
 | `stance` | cm, z. B. `56` | – | Referenzstance der Inserts (sonst 36 % der Länge, 40–60 cm) |
 | `setback` | cm Richtung Tail, z. B. `2` | – | Versatz der Inserts (sonst 0 / 1 / 2 cm je Umriss) |
 | `outline` | `twin`, `directional`, `directional twin` | – | überstimmt die Umriss-Erkennung aus `shape`/`form` |
-| `profil` | einer der sechs Profiltypen, siehe unten | – | überstimmt die Profil-Erkennung aus `form`/`shape` |
+| `profil` | einer der acht Profiltypen, siehe unten | – | überstimmt die Profil-Erkennung aus `form`/`shape` |
 
 Alle Karten hängen am Hauptschalter „Merkmalwert-Anzeige aktiv"; Diagramm, Dimensionen und Fahrlevel haben zusätzlich eigene Schalter. Karten ohne Daten werden nicht ausgegeben.
 
@@ -171,7 +171,7 @@ Regel: enthält der Text „directional" → Directional; zusätzlich „twin" �
 
 ### Form — Profil (`form`, Fallback `shape`, Override `profil`)
 
-Freitext, erscheint 1:1 in der Tabelle; die Seitenansicht erkennt daraus einen von sechs Typen:
+Freitext, erscheint 1:1 in der Tabelle; die Seitenansicht erkennt daraus einen von acht Typen:
 
 | Typ | Seitenansicht | erkannte Schreibweisen |
 |---|---|---|
@@ -181,12 +181,14 @@ Freitext, erscheint 1:1 in der Tabelle; die Seitenansicht erkennt daraus einen v
 | Hybrid Camber | Camber zwischen den Füßen, Rocker zu den Spitzen | `Hybrid Camber`, `CamRock`, `Directional Camber` |
 | Hybrid Rocker | Rocker zwischen den Füßen, kleine Camber-Bögen unter den Füßen | `Hybrid Rocker`, `Flying V` |
 | Flat Rocker | flach unter den Füßen, Rocker zu den Spitzen | `Flat Rocker` |
+| Triple Camber | drei Camber-Bögen, der mittlere am höchsten | `Triple Camber`, `Triple-Camber`, `Triple Camber Recurve` (aber `Triple Camber Hybrid` → Hybrid Rocker) |
+| S-Rocker | richtungsgebunden: lange, hohe Rocker-Nose, Camber unter den Füßen, kurzer Kick am Tail | `S-Rocker`, `S Rocker`, `SRocker`, `Directional Rocker`, `Surf Rocker` |
 
-**Dreiteilige Schreibweise `X/Y/X`** (auch `X-Y-X`): das *mittlere* Wort beschreibt den Bereich zwischen den Füßen — `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Diese Notation ist in der Branche nicht einheitlich; zeigt ein Board das falsche Bild, `profil` auf einen der sechs Typen setzen (`camber`, `rocker`, `flat`, `hybrid camber`, `hybrid rocker`, `flat rocker`). Unbekannte Texte wie `3BT` zeichnen nichts — die Tabellenzeile bleibt, nur die Karte „Profil" fehlt.
+**Dreiteilige Schreibweise `X/Y/X`** (auch `X-Y-X`): das *mittlere* Wort beschreibt den Bereich zwischen den Füßen — `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Diese Notation ist in der Branche nicht einheitlich; zeigt ein Board das falsche Bild, `profil` auf einen der acht Typen setzen (`camber`, `rocker`, `flat`, `hybrid camber`, `hybrid rocker`, `flat rocker`, `triple camber`, `s rocker`). Unbekannte Texte wie `3BT` zeichnen nichts — die Tabellenzeile bleibt, nur die Karte „Profil" fehlt.
 
 Vorschlag für die Auswahlliste: `Camber`, `Rocker`, `Flat`, `Hybrid Camber`, `Hybrid Rocker`, `Camber/Rocker/Camber`, `Flying V`, `3BT`, `Directional Camber`.
 
-Mit dem Schalter „Profil-Zonen farbig markieren" wird die Seitenansicht in ihre Abschnitte unterteilt — Camber blau, Rocker (Reverse Camber) rot, Flat (Zero Camber) gelb, Kick (Aufbiegung der Spitzen) grün — mit Legende unter der Skizze. Welche Zonen ein Profiltyp hat, ist fest hinterlegt (`Bootstrap::PROFILE_ZONES`): Camber und Flat = Kick / Mitte / Kick, Rocker = durchgehend, Hybrid Camber und Flat Rocker = Rocker / Mitte / Rocker, Hybrid Rocker = Kick / Camber / Rocker / Camber / Kick.
+Mit dem Schalter „Profil-Zonen farbig markieren" wird die Seitenansicht in ihre Abschnitte unterteilt — Camber blau, Rocker (Reverse Camber) rot, Flat (Zero Camber) gelb, Kick (Aufbiegung der Spitzen) grün — mit Legende unter der Skizze. Welche Zonen ein Profiltyp hat, ist fest hinterlegt (`Bootstrap::PROFILE_ZONES`): Camber und Flat = Kick / Mitte / Kick, Rocker = durchgehend, Hybrid Camber und Flat Rocker = Rocker / Mitte / Rocker, Hybrid Rocker = Kick / Camber / Rocker / Camber / Kick, Triple Camber = Kick / Camber / Camber / Camber / Kick, S-Rocker = Rocker / Camber / Kick.
 
 ### Breiten und Inserts (`nose`, `waist`, `tail`, `inserts`, `stance`, `setback`)
 
@@ -278,7 +280,7 @@ Alle Bauteile teilen sich ein Design-System im Stylesheet — keine Inline-`<sty
 - **Panels:** Jeder Specs-Bereich sitzt in einer eigenen Karte (`.adp-panel`, 1px Rahmen, 6px Radius) mit kleiner Versal-Überschrift und Akzentstrich.
 - **Raster:** `.adp-specs__grid` enthält zwei echte Spalten (`.adp-specs__col`, Flex-Column): links Fahreigenschaften + Flex, rechts Gewicht/Fahrlevel + Dimensionen; ab 768px nebeneinander, darunter gestapelt. Die Spalten sind als Grid-Zellen gleich hoch, die Fahreigenschaften-Karte wächst (`flex: 1 0 auto`) und verteilt die Resthöhe über und unter dem Diagramm — so enden beide Spalten bündig, egal wie lang die Dimensionen-Tabelle ist. Eine leere Spalte wird in `tabs.tpl` gar nicht ausgegeben, die verbleibende spannt dann über die volle Breite (`:only-child`).
 - **Radar-Diagramm:** Gitter und Fläche werden über die Klassen `.adp-radar__grid`, `.adp-radar__area`, `.adp-radar__hit` und `.adp-radar__label` gestylt (Akzentfarbe statt Rot). Unter dem Diagramm steht eine Chip-Liste mit allen Werten, damit die Zahlen auch ohne Hover (Touch) sichtbar sind; beim Überfahren eines Sektors wird der passende Chip hervorgehoben.
-- **Profil:** `profileType()` erkennt den Typ aus Freitext. Dreiteilige Notation `X/Y/X` (auch mit `-`) wird nach dem *mittleren* Element gelesen — es beschreibt den Bereich zwischen den Füßen: `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Sonst Schlüsselwörter: „Flying V", „Hybrid Rocker" → Hybrid Rocker; „Hybrid Camber", „CamRock", „Directional Camber" → Hybrid Camber; „Flat"/„Zero" (+ „Rocker") → Flat (Rocker); „Rocker", „Reverse", „Banana" → Rocker; „Camber" → Camber. Unbekannte Texte (z. B. „3BT") zeichnen nichts. `buildProfileSketch()` erzeugt eine Polylinie aus 113 Stützpunkten über eine Höhenfunktion je Typ (Spitzen 26, Camber 12 Einheiten) — die Werte sind bewusst übertrieben, damit die Unterschiede auf den ersten Blick sichtbar sind. Für die farbige Darstellung liefert sie zusätzlich je Zone (`PROFILE_ZONES`) einen Teilpfad mit gemeinsamen Randpunkten (nahtlose Farbwechsel, `stroke-linecap: butt`) und die Legende; die Zonenfarben sind CSS-Variablen `--adp-zone-*` auf `.adp-profile`.
+- **Profil:** `profileType()` erkennt den Typ aus Freitext. Dreiteilige Notation `X/Y/X` (auch mit `-`) wird nach dem *mittleren* Element gelesen — es beschreibt den Bereich zwischen den Füßen: `Camber/Rocker/Camber` → Hybrid Rocker (Lib Tech C2, Nitro Gullwing), `Rocker/Camber/Rocker` → Hybrid Camber (Rome CamRock), `Rocker/Flat/Rocker` → Flat Rocker. Vorher: „Triple Camber" (auch mit Bindestrich) → Triple Camber, mit „Hybrid" → Hybrid Rocker; „S-Rocker"/„S Rocker", „Directional Rocker", „Surf Rocker" → S-Rocker. Sonst Schlüsselwörter: „Flying V", „Hybrid Rocker" → Hybrid Rocker; „Hybrid Camber", „CamRock", „Directional Camber" → Hybrid Camber; „Flat"/„Zero" (+ „Rocker") → Flat (Rocker); „Rocker", „Reverse", „Banana" → Rocker; „Camber" → Camber. Unbekannte Texte (z. B. „3BT") zeichnen nichts. `buildProfileSketch()` erzeugt eine Polylinie aus 113 Stützpunkten über eine Höhenfunktion je Typ (Spitzen 26, Camber 12 Einheiten) — die Werte sind bewusst übertrieben, damit die Unterschiede auf den ersten Blick sichtbar sind. Für die farbige Darstellung liefert sie zusätzlich je Zone (`PROFILE_ZONES`) einen Teilpfad mit gemeinsamen Randpunkten (nahtlose Farbwechsel, `stroke-linecap: butt`) und die Legende; die Zonenfarben sind CSS-Variablen `--adp-zone-*` auf `.adp-profile`.
 - **Flex:** Eigene Karte unter den Fahreigenschaften: Titel, Kopfzeile mit Zone (fett) und Wert, zehn Segmente, fünf Zonenbeschriftungen. Zonennamen sind Sprachvariablen (`artikel_details_plus_flex_zone_*`).
 - **Gewicht und Fahrlevel:** Pill-Leisten (`.adp-meter`) mit hellem Track, akzentfarbenem Bereich und der Spanne im Klartext neben der Überschrift statt im Tooltip.
 - **Dimensionen:** Board-Skizze und Tabelle stehen per Container-Query nebeneinander, sobald das Panel breit genug ist.
@@ -347,6 +349,10 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.14.0 (2026-10-06)
+- Neu: Profile „Triple Camber“ (drei Camber-Bögen, Never Summer Triple Camber / Triple Camber Recurve) und „S-Rocker“ (richtungsgebunden: lange Rocker-Nose, Camber unter den Füßen, kurzer Kick am Tail; auch „Directional Rocker“, „Surf Rocker“) mit eigener Seitenansicht, Zonen und Abschnitt auf der Erklärseite (Texte DE/EN als Sprachvariablen)
+- „Triple Camber Hybrid“ bleibt Hybrid Rocker; „S-Rocker“ wurde bisher als Rocker, „Triple Camber“ als Camber gezeichnet
 
 ### 0.13.2 (2026-10-05)
 - Fix Flex-Skala aus Merkmalen: „Medium - Hart“ (Englisch und Deutsch gemischt) wurde als Medium + Stiff gelesen und zeigte 5–10/10 statt Medium-Stiff. Zusammengesetzte Werte erkennen jetzt jede Kombination aus medium/mittel mit stiff/hart/hard/steif bzw. soft/weich; „hard“ zählt zusätzlich als Stiff
