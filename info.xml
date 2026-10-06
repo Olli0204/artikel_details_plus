@@ -8,7 +8,7 @@
     <MinShopVersion>5.5.1</MinShopVersion>
     <MaxShopVersion>5.8.1</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.13.2</Version>
+    <Version>0.14.0</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>
@@ -603,6 +603,42 @@ Link:     {$oPluginMail->cURL}
                 <Description>Profil Flat Rocker: Geeignet für</Description>
                 <VariableLocalized iso="GER">Einsteiger, Park und Powder-Tage.</VariableLocalized>
                 <VariableLocalized iso="ENG">Beginners, park and powder days.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_triple_camber_text</Name>
+                <Description>Profil Triple Camber: Beschreibung</Description>
+                <VariableLocalized iso="GER">Drei Camber-Bögen hintereinander: ein großer in der Mitte und je ein kleinerer unter den Bindungen.</VariableLocalized>
+                <VariableLocalized iso="ENG">Three camber arches in a row: a large one in the middle and a smaller one under each binding.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_triple_camber_feel</Name>
+                <Description>Profil Triple Camber: Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Viel Kantengriff und Pop wie beim Camber, durch die Unterteilung aber etwas leichter zu drehen und weniger hakelig.</VariableLocalized>
+                <VariableLocalized iso="ENG">Lots of edge hold and pop like camber, but easier to turn and less catchy thanks to the split arches.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_triple_camber_suited</Name>
+                <Description>Profil Triple Camber: Geeignet für</Description>
+                <VariableLocalized iso="GER">Fortgeschrittene, All Mountain und Carven.</VariableLocalized>
+                <VariableLocalized iso="ENG">Intermediate and advanced riders, all mountain and carving.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_s_rocker_text</Name>
+                <Description>Profil S-Rocker: Beschreibung</Description>
+                <VariableLocalized iso="GER">Richtungsgebundenes Profil: lange, hohe Rocker-Zone an der Nose, unter den Füßen und zum Tail hin Camber mit kurzem Kick.</VariableLocalized>
+                <VariableLocalized iso="ENG">Directional profile: a long, high rocker zone at the nose, camber under the feet towards the tail with a short kick.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_s_rocker_feel</Name>
+                <Description>Profil S-Rocker: Fahrgefühl</Description>
+                <VariableLocalized iso="GER">Die Nose schwimmt im Tiefschnee auf, das Tail bleibt stabil und gibt Halt auf der Kante. Fährt sich wie ein Surfbrett.</VariableLocalized>
+                <VariableLocalized iso="ENG">The nose floats in deep snow while the tail stays stable and holds the edge. Rides like a surfboard.</VariableLocalized>
+            </Variable>
+            <Variable>
+                <Name>artikel_details_plus_guide_s_rocker_suited</Name>
+                <Description>Profil S-Rocker: Geeignet für</Description>
+                <VariableLocalized iso="GER">Freeride, Powder und Surf-Feeling auf der Piste.</VariableLocalized>
+                <VariableLocalized iso="ENG">Freeride, powder and a surfy feel on the piste.</VariableLocalized>
             </Variable>
         </Locales>
     </Install>

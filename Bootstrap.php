@@ -304,6 +304,8 @@ class Bootstrap extends Bootstrapper
         'hybrid camber' => [[0, 0.25, 'rocker'], [0.25, 0.75, 'camber'], [0.75, 1, 'rocker']],
         'hybrid rocker' => [[0, 0.12, 'kick'], [0.12, 0.4, 'camber'], [0.4, 0.6, 'rocker'], [0.6, 0.88, 'camber'], [0.88, 1, 'kick']],
         'flat rocker'   => [[0, 0.25, 'rocker'], [0.25, 0.75, 'flat'], [0.75, 1, 'rocker']],
+        'triple camber' => [[0, 0.12, 'kick'], [0.12, 0.36, 'camber'], [0.36, 0.64, 'camber'], [0.64, 0.88, 'camber'], [0.88, 1, 'kick']],
+        's rocker'      => [[0, 0.35, 'rocker'], [0.35, 0.9, 'camber'], [0.9, 1, 'kick']],
     ];
 
     /** Zonenarten => Sprachvariable der Legende */
@@ -325,6 +327,8 @@ class Bootstrap extends Bootstrapper
         'hybrid camber' => ['Hybrid Camber', 'CamRock', 'Directional Camber', 'Rocker/Camber/Rocker', 'Camber/Rocker'],
         'hybrid rocker' => ['Hybrid Rocker', 'Flying V', 'Camber/Rocker/Camber', 'Rocker/Camber'],
         'flat rocker'   => ['Flat Rocker', 'Zero Rocker', 'Rocker/Flat/Rocker'],
+        'triple camber' => ['Triple Camber', 'Triple Camber Recurve'],
+        's rocker'      => ['S-Rocker', 'Directional Rocker', 'Surf Rocker'],
     ];
 
     /** Quellen der Profilerkennung in der Reihenfolge der Artikelseite: Funktionsattribut => Beschriftung */
@@ -343,6 +347,8 @@ class Bootstrap extends Bootstrapper
         'hybrid camber' => 'Hybrid Camber',
         'hybrid rocker' => 'Hybrid Rocker',
         'flat rocker'   => 'Flat Rocker',
+        'triple camber' => 'Triple Camber',
+        's rocker'      => 'S-Rocker',
     ];
 
     /**
@@ -509,6 +515,13 @@ class Bootstrap extends Bootstrapper
             };
         }
         $has = static fn(string $needle): bool => \str_contains($t, $needle);
+        // "Triple Camber Hybrid" ist ein Hybrid Rocker, "Triple Camber (Recurve)" ein eigenes Profil
+        if (\preg_match('/triple[\s\-]*camber/u', $t)) {
+            return $has('hybrid') ? 'hybrid rocker' : 'triple camber';
+        }
+        if (\preg_match('/(?<![\p{L}\d])s[\s\-]*rocker|directional[\s\-]*rocker|surf[\s\-]*rocker/u', $t)) {
+            return 's rocker';
+        }
         if ($has('flying v') || $has('hybrid rocker') || $has('rocker/camber') || $has('rocker-camber') || $has('rocker camber')) {
             return 'hybrid rocker';
         }
@@ -560,6 +573,23 @@ class Bootstrap extends Bootstrapper
                     return $d < 0.25 ? $tip($d, 0.25) : $arch($u, 0.25, 0.75, $camber * 0.8);
                 case 'flat rocker':
                     return $d < 0.25 ? $tip($d, 0.25) : 0.0;
+                case 'triple camber':
+                    // drei Camber-Bögen: großer in der Mitte, kleinere unter den Füßen
+                    if ($d < 0.12) {
+                        return $tip($d, 0.12);
+                    }
+                    if ($u < 0.36) {
+                        return $arch($u, 0.12, 0.36, $camber * 0.6);
+                    }
+
+                    return $u <= 0.64 ? $arch($u, 0.36, 0.64, $camber) : $arch($u, 0.64, 0.88, $camber * 0.6);
+                case 's rocker':
+                    // richtungsgebunden: lange, hohe Rocker-Nose, Camber unter den Füßen, kurzer Kick am Tail
+                    if ($u < 0.35) {
+                        return $tipKick * 1.2 * ((0.35 - $u) / 0.35) ** 2;
+                    }
+
+                    return $u < 0.9 ? $arch($u, 0.35, 0.9, $camber * 0.7) : $tip(1 - $u, 0.1) * 0.6;
                 case 'hybrid rocker':
                     if ($d < 0.12) {
                         return $tip($d, 0.12);
