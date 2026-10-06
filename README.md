@@ -3,7 +3,7 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.14.0
+**Version:** 0.14.1
 **Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.1
 **Voraussetzung:** PHP 8.1+
 
@@ -188,7 +188,7 @@ Freitext, erscheint 1:1 in der Tabelle; die Seitenansicht erkennt daraus einen v
 
 Vorschlag für die Auswahlliste: `Camber`, `Rocker`, `Flat`, `Hybrid Camber`, `Hybrid Rocker`, `Camber/Rocker/Camber`, `Flying V`, `3BT`, `Directional Camber`.
 
-Mit dem Schalter „Profil-Zonen farbig markieren" wird die Seitenansicht in ihre Abschnitte unterteilt — Camber blau, Rocker (Reverse Camber) rot, Flat (Zero Camber) gelb, Kick (Aufbiegung der Spitzen) grün — mit Legende unter der Skizze. Welche Zonen ein Profiltyp hat, ist fest hinterlegt (`Bootstrap::PROFILE_ZONES`): Camber und Flat = Kick / Mitte / Kick, Rocker = durchgehend, Hybrid Camber und Flat Rocker = Rocker / Mitte / Rocker, Hybrid Rocker = Kick / Camber / Rocker / Camber / Kick, Triple Camber = Kick / Camber / Camber / Camber / Kick, S-Rocker = Rocker / Camber / Kick.
+Mit dem Schalter „Profil-Zonen farbig markieren" wird die Seitenansicht in ihre Abschnitte unterteilt — Camber blau, Rocker (Reverse Camber) rot, Flat (Zero Camber) gelb, Kick (Aufbiegung der Spitzen) grün — mit Legende unter der Skizze. Welche Zonen ein Profiltyp hat, ist fest hinterlegt (`Bootstrap::PROFILE_ZONES`): Camber und Flat = Kick / Mitte / Kick, Rocker = durchgehend, Hybrid Camber und Flat Rocker = Rocker / Mitte / Rocker, Hybrid Rocker = Kick / Camber / Rocker / Camber / Kick, Triple Camber = Kick / Camber / Kick, S-Rocker = Rocker / Camber / Kick.
 
 ### Breiten und Inserts (`nose`, `waist`, `tail`, `inserts`, `stance`, `setback`)
 
@@ -349,6 +349,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.14.1 (2026-10-06)
+- Triple Camber: Täler zwischen den drei Camber-Bögen laufen rund aus (sin² statt Knick), Camber als eine durchgehende Zone – die farbige Darstellung hatte an den Übergängen Lücken im Strich
 
 ### 0.14.0 (2026-10-06)
 - Neu: Profile „Triple Camber“ (drei Camber-Bögen, Never Summer Triple Camber / Triple Camber Recurve) und „S-Rocker“ (richtungsgebunden: lange Rocker-Nose, Camber unter den Füßen, kurzer Kick am Tail; auch „Directional Rocker“, „Surf Rocker“) mit eigener Seitenansicht, Zonen und Abschnitt auf der Erklärseite (Texte DE/EN als Sprachvariablen)
