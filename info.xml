@@ -6,9 +6,9 @@
     <URL>https://ollipolli.de</URL>
     <XMLVersion>102</XMLVersion>
     <MinShopVersion>5.5.1</MinShopVersion>
-    <MaxShopVersion>5.8.1</MaxShopVersion>
+    <MaxShopVersion>5.8.2</MaxShopVersion>
     <PluginID>artikel_details_plus</PluginID>
-    <Version>0.14.2</Version>
+    <Version>0.14.3</Version>
     <CreateDate>2025-06-12</CreateDate>
     <Install>
         <Emailtemplate>

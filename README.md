@@ -3,8 +3,8 @@
 JTL-Shop 5 Plugin, das die Artikeldetailseite und die Artikellistenansicht um visuelle Bauteile und ein Kunden-Feedback-Formular erweitert — ohne dass das Shop-Template angefasst werden muss.
 
 **Autor:** Oliver Kamps
-**Version:** 0.14.2
-**Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.1
+**Version:** 0.14.3
+**Kompatibel mit:** JTL-Shop 5.5.1 – 5.8.2
 **Voraussetzung:** PHP 8.1+
 
 ---
@@ -300,7 +300,7 @@ Ab **0.2.2** sind die Schalter wieder Checkboxen; `Migrations/Migration202609181
 ## Entwicklung
 
 ### Voraussetzungen
-- JTL-Shop 5.5.1 – 5.8.0
+- JTL-Shop 5.5.1 – 5.8.2
 - PHP 8.1+ (`str_contains()`, `declare(strict_types=1)`)
 - jQuery (Standard im JTL-Template enthalten)
 
@@ -349,6 +349,9 @@ artikel_details_plus/
 ---
 
 ## Versionsverlauf
+
+### 0.14.3 (2026-10-17)
+- Kompatibilität mit JTL-Shop 5.8.2 geprüft: die Core-Änderungen 5.8.0 → 5.8.2 (Sicherheitsupdate) betreffen nur Consent-Manager, RMA, Sonderpreis-Berechnung, Banner/ImageMap, PLZ-Autovervollständigung und Backend-Login; NOVA-Templates und Plugin-API sind unverändert. MaxShopVersion auf 5.8.2 angehoben
 
 ### 0.14.2 (2026-10-06)
 - Triple Camber: kurze Rocker-Zonen in den Tälern unter den Bindungen (je 8 % der Länge) wie in der Never-Summer-Grafik; Erklärtext DE/EN angepasst
